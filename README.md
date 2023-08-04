@@ -1,6 +1,10 @@
 A plugin loader example program in kotlin.
 
-This exists because its a fairly standalone example created while making another program. The following is the link to the actual loader class.
+This exists because its a fairly standalone example created while making another program. 
+
+I then built a quick mockup test for it to upload it, in case someone finds it useful
+
+The following is the link to the actual loader class:
 
 [examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
 
