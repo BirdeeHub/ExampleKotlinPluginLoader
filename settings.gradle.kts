@@ -14,3 +14,4 @@ plugins {
 
 rootProject.name = "examplepluginloader"
 include("examplepluginloader")
+include("exampleplugin")
