@@ -26,6 +26,6 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
 
 it will still work after the error, it prints test output from the plugin after the error as expected.
 
-I was just too lazy to import the jar needed to make it be quiet because it doesnt give me an error in the application this is part of
+I was just too lazy to import the jar needed to make it be quiet because it doesnt give me an error in the application this was part of
 
 the most interesting file is [examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
