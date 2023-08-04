@@ -19,20 +19,21 @@ class PluginLoader {
         fun getPlugin(plugID: UUID): MyPlugin? { return pluginObjectMap[plugID] }
         fun unloadPlugin(plugID: UUID){
             cLoaderMap[plugID]?.close()
+            cLoaderMap.remove(plugID)
             pluginClassMap.remove(plugID)
             pluginObjectMap.remove(plugID)
             plugIDList.remove(plugID)
         }
         fun unloadAllPlugins() {
-            for(entry in cLoaderMap){
-                entry.value.close()
-            }
+            for(entry in cLoaderMap)entry.value.close()
+            cLoaderMap.clear()
             pluginClassMap.clear()
             pluginObjectMap.clear()
             plugIDList.clear()
         }
         fun callPlugLoader(api: MyAPI, pluginPath: String): List<UUID> {
-            var pluginUUIDs = loadPlugins(File(pluginPath))
+            val pluginUUIDs = loadPlugins(File(pluginPath))
+            val pluginsToRemove = mutableListOf<UUID>()
             for (plugID in pluginUUIDs) {
                 try {
                     val constructor = pluginClassMap[plugID]?.constructors?.first()
@@ -40,9 +41,12 @@ class PluginLoader {
                     pluginInstance?.launchPlugin(api)//<-- launchplugin(api) must be defined when you implement MyPlugin
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    pluginUUIDs.remove(plugID) //<-- remember:
-                    unloadPlugin(plugID) //<-- remove the ones that dont load to give accurate info
+                    pluginsToRemove.add(plugID) //<-- add to separate list so that we arent modifying our collection while iterating over it
                 }
+            }
+            pluginsToRemove.forEach { plugID ->
+                pluginUUIDs.remove(plugID) //<-- remember:
+                unloadPlugin(plugID) //<-- remove the ones that dont load to give accurate info
             }
             return pluginUUIDs //<-- returns the uuids of the new plugins ACTUALLY loaded
         }
