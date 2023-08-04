@@ -20,7 +20,7 @@ into the same directory as one another, then run:
 
 ```java -jar ./examplepluginloader-all.jar```
 
-it will give an error because I didn't want to spend 3 years on a gradle config for an example code snippet, 
+it will give an error but still work because I didn't want to spend 3 years on a gradle config for an example code snippet, 
 
 and it doesnt give me an error in the application this was originally part of: 
 
