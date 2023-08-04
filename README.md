@@ -1,6 +1,6 @@
 A plugin loader example program in kotlin.
 
-This exists because its a fairly standalone example created while making another program. 
+This exists because its a fairly standalone example created while making part of another program. 
 
 I then built a quick mockup test for it to upload it, in case someone finds it useful
 
