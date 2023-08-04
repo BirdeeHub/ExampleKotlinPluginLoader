@@ -24,9 +24,9 @@ into the same directory as one another, then run:
 
 ```java -jar ./examplepluginloader-all.jar```
 
-it will give an error but still work because I didn't want to spend 3 years on a gradle config for an example code snippet, 
+it will give awarning message but will still work because I didn't want to spend 3 years on a gradle config for an example code snippet, and it doesnt happen in the application this was originally part of: 
 
-and it doesnt give me an error in the application this was originally part of: 
+this is the expected warning that will print before the output:
 
 ```
 SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
@@ -40,9 +40,7 @@ I was just too lazy to import the jar needed to make it not freak out about not 
 
 the original is a plugin system for a plugin for an original program that already had logging anyway
 
-the expected output is the following, where the 4th line is a randomly generated UUID.
-
-It will be output after the error that is above
+the expected output is the following, where the 4th line is a randomly generated UUID. It will be output after the error that is above
 
 ```
 456
