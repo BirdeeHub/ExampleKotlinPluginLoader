@@ -6,7 +6,7 @@ This exists because its a fairly standalone example created while making another
 
 build with 
 
-gradle build shadowJar
+```gradle build shadowJar```
 
 copy:
 
