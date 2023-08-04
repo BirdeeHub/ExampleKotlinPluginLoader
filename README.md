@@ -28,4 +28,4 @@ it will still work after the error, it prints test output from the plugin after 
 
 I was just too lazy to import the jar needed to make it be quiet because it doesnt give me an error in the application this is part of
 
-the most interesting file is [examplepluginloader.PluggerXP.PluginLoader](./examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
+the most interesting file is [examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
