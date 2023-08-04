@@ -4,19 +4,21 @@ This exists because its a fairly standalone example created while making another
 
 [examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
 
-build with gradle build shadowJar
+build with 
 
-copy 
+gradle build shadowJar
 
-examplepluginloader/build/libs/examplepluginloader-all.jar
+copy:
+
+```examplepluginloader/build/libs/examplepluginloader-all.jar```
 
 and
 
-exampleplugin/build/libs/exampleplugin.jar
+```exampleplugin/build/libs/exampleplugin.jar```
 
 into the same directory as one another, then run: 
 
-java -jar ./examplepluginloader-all.jar
+```java -jar ./examplepluginloader-all.jar```
 
 it will give an error because I didn't want to spend 3 years on a gradle config for an example code snippet, 
 
