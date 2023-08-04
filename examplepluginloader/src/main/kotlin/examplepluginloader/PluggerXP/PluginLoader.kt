@@ -80,7 +80,8 @@ class PluginLoader {
         }
         private fun getJarURLs(pluginPath: File): List<URL> {
             if(pluginPath.isDirectory()){// get all jar and class files in the directory
-                val bytecodefiles = (pluginPath.listFiles { file -> file.name.endsWith(".jar") }.map { it.toURI().toURL() }).toMutableList()
+                val bytecodefiles = (pluginPath.listFiles { file -> file.name.endsWith(".jar") }
+                    .map { it.toURI().toURL() }).toMutableList()
                 bytecodefiles.addAll(pluginPath.listFiles { file -> file.name.endsWith(".class") }.map { it.toURI().toURL() })
                 return bytecodefiles
             } else {//<-- specific file was specified
@@ -89,8 +90,7 @@ class PluginLoader {
         }
         private fun loadPluginClass(classLoader: ClassLoader, pluginClass: KClass<out MyPlugin>): MyPlugin? {
             try {
-                return classLoader.loadClass(pluginClass.qualifiedName)
-                    .getConstructor().newInstance() as? MyPlugin 
+                return classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as? MyPlugin 
             } catch (e: Exception) {
                 e.printStackTrace()
                 return null
