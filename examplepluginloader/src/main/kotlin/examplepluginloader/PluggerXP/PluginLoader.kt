@@ -89,9 +89,8 @@ class PluginLoader {
         }
         private fun loadPluginClass(classLoader: ClassLoader, pluginClass: KClass<out MyPlugin>): MyPlugin? {
             try {
-                val pluginInstance = classLoader.loadClass(pluginClass.qualifiedName)
-                    .getConstructor().newInstance() as? MyPlugin
-                return pluginInstance 
+                return classLoader.loadClass(pluginClass.qualifiedName)
+                    .getConstructor().newInstance() as? MyPlugin 
             } catch (e: Exception) {
                 e.printStackTrace()
                 return null
