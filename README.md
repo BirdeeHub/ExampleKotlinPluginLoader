@@ -2,6 +2,8 @@ A plugin loader example program in kotlin.
 
 This exists because its a fairly standalone example created while making another program
 
+[examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
+
 build with gradle build shadowJar
 
 copy 
@@ -16,7 +18,9 @@ into the same directory as one another, then run:
 
 java -jar ./examplepluginloader-all.jar
 
-it will give an error because i got lazy: 
+it will give an error because I didn't want to spend 3 years on a gradle config for an example code snippet, 
+
+and it doesnt give me an error in the application this was originally part of: 
 
 ```
 SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
@@ -26,6 +30,4 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
 
 it will still work after the error, it prints test output from the plugin after the error as expected.
 
-I was just too lazy to import the jar needed to make it be quiet because it doesnt give me an error in the application this was part of
-
-the most interesting file is [examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
+I was just too lazy to import the jar needed to make it not freak out about not being able to log without the proper dependencies
