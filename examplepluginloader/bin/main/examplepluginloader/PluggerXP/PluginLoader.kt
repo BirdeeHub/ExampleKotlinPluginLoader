@@ -22,15 +22,16 @@ object PluginLoader {
         cLoaderMap.remove(plugID)
         pluginClassMap.remove(plugID)
         pluginObjectMap.remove(plugID)
-        plugIDList.remove(plugID) // then remove uuid from list
+        plugIDList.remove(plugID)
     }
     fun unloadAllPlugins() {
         for(entry in cLoaderMap)entry.value.close() //close and clear ALL everywhere
         cLoaderMap.clear()
         pluginClassMap.clear()
         pluginObjectMap.clear()
-        plugIDList.clear() //then clear uuids
+        plugIDList.clear()
     }
+    //public load class function
     fun callPlugLoader(api: MyAPI, pluginPath: String): List<UUID> {
         val pluginUUIDs = loadPlugins(File(pluginPath)) //<-- loads plugins and returns list of UUIDs of loaded plugins
         val pluginsToRemove = mutableListOf<UUID>()
@@ -46,7 +47,7 @@ object PluginLoader {
         }
         pluginsToRemove.forEach { plugID ->
             pluginUUIDs.remove(plugID) //<-- remember:
-            unloadPlugin(plugID) //<-- remove the ones that dont load to give accurate info
+            unloadPlugin(plugID) //<-- remove the ones that dont load/crash on start to give accurate info
         }
         return pluginUUIDs //<-- returns the uuids of the new plugins ACTUALLY loaded
     }
