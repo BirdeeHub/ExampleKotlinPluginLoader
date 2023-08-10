@@ -24,7 +24,7 @@ java {
     }
 }
 
-tasks { 
+tasks {
     jar {
         manifest { attributes( "Main-Class" to "examplepluginloader.MainKt" ) }
     }

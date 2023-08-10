@@ -4,3 +4,10 @@ plugins {
 repositories {
     mavenCentral()
 }
+tasks {
+    clean {
+        doLast {
+            delete("outputDir/")
+        }
+    }
+}
