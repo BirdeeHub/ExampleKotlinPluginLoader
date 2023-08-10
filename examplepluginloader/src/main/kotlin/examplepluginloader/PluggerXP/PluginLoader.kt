@@ -9,8 +9,8 @@ import java.net.URL
 import java.net.URLClassLoader
 import java.util.UUID
 object PluginLoader {
-    private val pluginClassMap: MutableMap<UUID,KClass<out MyPlugin>> = mutableMapOf()
-    private val pluginObjectMap: MutableMap<UUID,MyPlugin> = mutableMapOf()
+    private val pluginClassMap: MutableMap<UUID,KClass<out MyPlugin>> = mutableMapOf() //<-- initialize our lists of stuff for loading and closing
+    private val pluginObjectMap: MutableMap<UUID,MyPlugin> = mutableMapOf() //<-- this one has the loaded instances
     private val cLoaderMap: MutableMap<UUID,URLClassLoader> = mutableMapOf()
     private val plugIDList: MutableList<UUID> = mutableListOf()
     //public functions
