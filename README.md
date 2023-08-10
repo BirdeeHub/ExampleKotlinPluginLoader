@@ -24,7 +24,7 @@ default runs plugins from ./outputDir, so if you go to outputDir on the command 
 
 ```java -jar ./outputDir/examplepluginloader-all.jar ./```
 
-the expected output is the following, where 
+the expected output is the following:
 
 ```
 Testing...
