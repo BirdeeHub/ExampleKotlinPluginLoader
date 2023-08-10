@@ -12,21 +12,19 @@ Instructions:
 
 1st: go to root directory of the git repo.
 
-then, build with:
+Build first with: ```gradle clean build shadowJar``` (if desired)
 
-```gradle build shadowJar```
+to run:
 
-Building first is optional because the jar files are already in outputDir on the repo
-
-to run, stay in the same project root directory and run the following command:
+stay in the same project root directory and run the following command:
 
 ```java -jar ./outputDir/examplepluginloader-all.jar```
 
-default runs plugins from outputDir, so if you go to outputDir on the command line you will need to run the following
+default runs plugins from ./outputDir, so if you go to outputDir on the command line you will need to run the following
 
 ```java -jar ./outputDir/examplepluginloader-all.jar ./```
 
-the expected output is the following, where the 4th line is a randomly generated UUID.
+the expected output is the following, where 
 
 ```
 Testing...
@@ -35,3 +33,5 @@ Testing...
 3ca92eb9-2db6-4631-85ba-8bacff3f0899
 Goodbye!
 ```
+
+The 4th line is a randomly generated UUID for referencing the test plugin.
