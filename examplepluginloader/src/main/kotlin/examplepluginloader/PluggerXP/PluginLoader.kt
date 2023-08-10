@@ -14,9 +14,9 @@ object PluginLoader {
     private val cLoaderMap: MutableMap<UUID,URLClassLoader> = mutableMapOf()
     private val plugIDList: MutableList<UUID> = mutableListOf()
     //public functions
-    fun getPlugIDList(): List<UUID> { return plugIDList }
-    fun getPluginMap(): Map<UUID, MyPlugin> { return pluginObjectMap }
-    fun getPlugin(plugID: UUID): MyPlugin? { return pluginObjectMap[plugID] }
+    fun getPlugIDList(): List<UUID> = plugIDList
+    fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap
+    fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun unloadPlugin(plugID: UUID){
         cLoaderMap[plugID]?.close() //close and remove EVERYWHERE
         cLoaderMap.remove(plugID)
