@@ -16,7 +16,7 @@ go to outputDir on command line and run:
 
 ```java -jar ./examplepluginloader-all.jar```
 
-it will give awarning message but will still work because I didn't want to spend 3 years on a gradle config for an example code snippet, and it doesnt happen in the application this was originally part of: 
+it will give a warning message but will still work because I didn't want to spend 3 years on a gradle config for an example code snippet, and it doesnt happen in the application this was originally part of: 
 
 this is the expected warning that will print before the output:
 
@@ -26,7 +26,7 @@ SLF4J: Defaulting to no-operation (NOP) logger implementation
 SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
 ```
 
-it will still work after the error, it prints test output from the plugin after the error as expected.
+it will still work after the warning, it prints test output from the plugin after the error as expected.
 
 I was just too lazy to import the jar needed to make it not freak out about not being able to log without the proper dependencies
 
@@ -35,8 +35,8 @@ the original is a plugin system for a plugin for an original program that alread
 the expected output is the following, where the 4th line is a randomly generated UUID. It will be output after the error that is above
 
 ```
-456
-test
 123
+test
+456
 8cf4ce1f-6c47-4386-bacb-95a79813fae6
 ```
