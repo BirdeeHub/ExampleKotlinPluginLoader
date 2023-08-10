@@ -32,7 +32,7 @@ object PluginLoader {
         plugIDList.clear() //then clear uuids
     }
     fun callPlugLoader(api: MyAPI, pluginPath: String): List<UUID> {
-        val pluginUUIDs = loadPlugins(File(pluginPath))
+        val pluginUUIDs = loadPlugins(File(pluginPath)) //<-- loads plugins and returns list of UUIDs of loaded plugins
         val pluginsToRemove = mutableListOf<UUID>()
         for (plugID in pluginUUIDs) {
             try {
