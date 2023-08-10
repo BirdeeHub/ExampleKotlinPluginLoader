@@ -12,7 +12,7 @@ class MyProgram(api: MyAPI, pluginPaths: Array<String>){
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
             println(plugin?.test())
             println(plugID)
-            println("Goodbye!")
         }
+        println("Goodbye!")
     }
 }
