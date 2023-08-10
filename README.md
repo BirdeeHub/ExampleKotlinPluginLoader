@@ -8,35 +8,30 @@ The following is the link to the actual loader class:
 
 [examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
 
-build with 
+Instructions:
+
+1st: go to root directory of the git repo.
+
+then, build with:
 
 ```gradle build shadowJar```
 
-go to outputDir on command line and run:
+Building first is optional because the jar files are already in outputDir on the repo
 
-```java -jar ./examplepluginloader-all.jar```
+to run, stay in the same project root directory and run the following command:
 
-it will give a warning message but will still work because I didn't want to spend 3 years on a gradle config for an example code snippet, and it doesnt happen in the application this was originally part of: 
+```java -jar ./outputDir/examplepluginloader-all.jar```
 
-this is the expected warning that will print before the output:
+default runs plugins from outputDir, so if you go to outputDir on the command line you will need to run the following
 
-```
-SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-SLF4J: Defaulting to no-operation (NOP) logger implementation
-SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
-```
+```java -jar ./outputDir/examplepluginloader-all.jar ./```
 
-it will still work after the warning, it prints test output from the plugin after the error as expected.
-
-I was just too lazy to import the jar needed to make it not freak out about not being able to log without the proper dependencies
-
-the original is a plugin system for a plugin for an original program that already had logging anyway
-
-the expected output is the following, where the 4th line is a randomly generated UUID. It will be output after the error that is above
+the expected output is the following, where the 4th line is a randomly generated UUID.
 
 ```
-123
-test
-456
-8cf4ce1f-6c47-4386-bacb-95a79813fae6
+Testing...
+1...
+2...
+3ca92eb9-2db6-4631-85ba-8bacff3f0899
+Goodbye!
 ```

@@ -15,6 +15,7 @@ dependencies {
     implementation("com.google.guava:guava:31.1-jre")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
     implementation("org.reflections:reflections:0.10.2")
+    runtimeOnly("org.slf4j:slf4j-nop:1.7.32")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

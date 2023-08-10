@@ -4,6 +4,6 @@ import examplepluginloader.api.MyAPI
 import examplepluginloader.api.PluggerXP.MyAPIobj
 import examplepluginloader.program.MyProgram
 fun main(args: Array<String>) {
-    if(args.isEmpty())MyProgram(MyAPIobj(), "./")
-    else MyProgram(MyAPIobj(), args[0])
+    if(args.isEmpty())MyProgram(MyAPIobj(), arrayOf("./outputDir/"))
+    else MyProgram(MyAPIobj(), args)
 }
