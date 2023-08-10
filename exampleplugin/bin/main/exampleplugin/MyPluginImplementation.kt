@@ -7,6 +7,6 @@ class MyPluginImplementation : MyPlugin{
         println(api.test())
     }
     override fun test(): String {
-        return "123"
+        return "456"
     }
 }
