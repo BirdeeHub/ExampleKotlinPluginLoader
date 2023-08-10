@@ -12,15 +12,7 @@ build with
 
 ```gradle build shadowJar```
 
-copy:
-
-```examplepluginloader/build/libs/examplepluginloader-all.jar```
-
-and
-
-```exampleplugin/build/libs/exampleplugin.jar```
-
-into the same directory as one another, then run: 
+go to outputDir on command line and run:
 
 ```java -jar ./examplepluginloader-all.jar```
 
