@@ -24,6 +24,11 @@ java {
     }
 }
 
-tasks.jar {
-    manifest { attributes( "Main-Class" to "examplepluginloader.MainKt" ) }
+tasks { 
+    jar {
+        manifest { attributes( "Main-Class" to "examplepluginloader.MainKt" ) }
+    }
+    shadowJar {
+        destinationDirectory.set(file("../outputDir/"))
+    }
 }

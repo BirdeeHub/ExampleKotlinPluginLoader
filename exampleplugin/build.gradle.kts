@@ -21,3 +21,8 @@ java {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
+tasks {
+    jar {
+        destinationDirectory.set(file("../outputDir/"))
+    }
+}
