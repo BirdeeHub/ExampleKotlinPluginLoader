@@ -25,9 +25,11 @@ java {
 }
 
 tasks {
+    // java-library plugin wont find main class for us but we want to be able to make kotlin runtime available to plugins so we need it
     jar {
         manifest { attributes( "Main-Class" to "examplepluginloader.MainKt" ) }
     }
+    // make it output to the shared output directory to make it easier to run it with the plugin (the example program uses the loader to load from ./ by default unless you specify)
     shadowJar {
         destinationDirectory.set(file("../outputDir/"))
     }

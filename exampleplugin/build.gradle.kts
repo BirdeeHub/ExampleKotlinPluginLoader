@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    // Apply the java-library plugin for API and implementation separation.
+    // Apply the java-library plugin because we dont need a Main-Class (plugin loader loads the correct class.)
     `java-library`
 }
 repositories {
@@ -22,6 +22,7 @@ java {
     }
 }
 tasks {
+    // make it output to the shared output directory to make it easier to run it with the plugin (the example program uses the loader to load from ./ by default unless you specify)
     jar {
         destinationDirectory.set(file("../outputDir/"))
     }
