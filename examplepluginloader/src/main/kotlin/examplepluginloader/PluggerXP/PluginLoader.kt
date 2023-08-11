@@ -40,7 +40,7 @@ object PluginLoader {
             try {
                 val constructor = pluginClassMap[plugID]?.constructors?.first() //<-- get primary constructor
                 val pluginInstance = constructor?.call() //<-- call primary constructor
-                if(pluginInstance!=null)pluginInstance.launchPlugin(api)//<-- launchplugin(api) must be defined when you implement MyPlugin
+                if(pluginInstance!=null)pluginInstance.launchPlugin(api) //<-- launchplugin(api) must be defined when you implement MyPlugin
                 else pluginsToRemove.add(plugID)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -56,10 +56,8 @@ object PluginLoader {
     //helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
     private fun loadPlugins(pluginPath: File): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
-        val jarURLs = getJarURLs(pluginPath)
+        val jarURLs = getJarURLs(pluginPath) //<-- defined below
         for(entry in jarURLs){
-            //create a list for reflections to put what it finds into
-            val plugin = mutableListOf<KClass<out MyPlugin>>()
             //create a classloader for finding and loading classes
             val cLoader: URLClassLoader = URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
             // Create a new Reflections instance without specifying the package name
@@ -67,10 +65,11 @@ object PluginLoader {
             // Get all subtypes of MyPlugin using Reflections
             val pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java)
             // Convert the pluginClasses set to a list of KClass objects
+            val plugin = mutableListOf<KClass<out MyPlugin>>()
             plugin.addAll(pluginClasses.map { it.kotlin })
             for (pluginClass in plugin) {
                 // Load and initialize each plugin class using the custom class loader
-                val pluginInstance = loadPluginClass(cLoader, pluginClass)
+                val pluginInstance = loadPluginClass(cLoader, pluginClass) //<-- defined below
                 if (pluginInstance != null) {
                     val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
                     plugIDs.add(pluginUUID) //<-- add the uuid to the uuid list
