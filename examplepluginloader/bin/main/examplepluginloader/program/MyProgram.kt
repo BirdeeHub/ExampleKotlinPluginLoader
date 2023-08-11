@@ -13,6 +13,7 @@ class MyProgram(api: MyAPI, pluginPaths: Array<String>){
                 println(plugID)
             }
         }
+        PluginLoader.unloadAllPlugins() // in this case, not necessary because the jvm closes when our program closes. but still good practice
         println("Goodbye!")
     }
 }
