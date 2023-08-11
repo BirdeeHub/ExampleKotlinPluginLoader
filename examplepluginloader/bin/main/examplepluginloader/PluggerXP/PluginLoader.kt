@@ -53,7 +53,7 @@ object PluginLoader {
         }
         return pluginUUIDs //<-- returns the uuids of the new plugins ACTUALLY loaded
     }
-    //helper functions for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
+    //helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
     private fun loadPlugins(pluginPath: File): MutableList<UUID> {
         val plugIDs: MutableList<UUID> = mutableListOf()
         val jarURLs = getJarURLs(pluginPath)
