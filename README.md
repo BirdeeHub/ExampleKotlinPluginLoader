@@ -1,4 +1,6 @@
-A plugin loader example program in kotlin. Use it if your program needs to load plugins!
+**A plugin loader example program in kotlin-jvm**
+
+Use it if your program needs to load plugins!
 
 This was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
 
