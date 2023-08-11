@@ -97,7 +97,6 @@ object PluginLoader {
         }
     }
     private fun loadPluginClass(classLoader: ClassLoader, pluginClass: KClass<out MyPlugin>): MyPlugin? = 
-        try { //load the instance and try to cast it as MyPlugin
-            classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as? MyPlugin 
-        } catch (e: Exception) { e.printStackTrace(); null }//<-- if it fails return null
+        try { classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as? MyPlugin
+        } catch (e: Exception) { e.printStackTrace(); null }
 }
