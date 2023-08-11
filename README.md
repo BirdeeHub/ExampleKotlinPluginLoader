@@ -2,6 +2,8 @@
 
 Use it if your program needs to load plugins!
 
+It can load .jar and .class files from file or directory that contain a class that implements MyPlugin
+
 This was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
 
 I then built a quick mockup test for it to upload it, in case someone finds it useful
@@ -38,12 +40,12 @@ b383ebcb-2334-4213-b945-3c34d280483d
 Goodbye!
 ```
 
-The 2nd line is the directory or file it looks for plugins at
+./outputDir/ is where it is currently looking for plugins at.
 
-The 3rd line is printed by the plugin when the plugin's launchPlugin(api: MyAPI) is called. It calls api.test(), which calls test() defined in MyAPIobj, passed as MyAPI
+1... is printed by the plugin when the plugin's launchPlugin(api: MyAPI) is called. It calls api.test(), which calls test() defined in MyAPIobj, passed as MyAPI
 
-The 4th line is printed when we call plugin.test()
+2... is printed when we call plugin.test()
 
-The 5th line is a randomly generated UUID for referencing the test plugin.
+b383ebcb-2334-4213-b945-3c34d280483d is a randomly generated UUID for referencing the test plugin.
 
-The 6th line is the list of all UUIDs for all plugins loaded.
+\[b383ebcb-2334-4213-b945-3c34d280483d\] is the list of all UUIDs for all plugins loaded.
