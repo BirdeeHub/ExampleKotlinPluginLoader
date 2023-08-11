@@ -9,10 +9,10 @@ import java.net.URL
 import java.net.URLClassLoader
 import java.util.UUID
 object PluginLoader {
-    private val pluginClassMap: MutableMap<UUID,KClass<out MyPlugin>> = mutableMapOf() //<-- initialize our lists of stuff for loading and closing
-    private val pluginObjectMap: MutableMap<UUID,MyPlugin> = mutableMapOf() //<-- this one has the loaded instances
-    private val cLoaderMap: MutableMap<UUID,URLClassLoader> = mutableMapOf()
-    private val plugIDList: MutableList<UUID> = mutableListOf()
+    private val pluginClassMap = mutableMapOf<UUID,KClass<out MyPlugin>>() //<-- initialize our lists of stuff for loading and closing
+    private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
+    private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>()
+    private val plugIDList = mutableListOf<UUID>()
     //public functions
     fun getPlugIDList(): List<UUID> = plugIDList
     fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap
@@ -55,11 +55,11 @@ object PluginLoader {
     }
     //helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
     private fun loadPlugins(pluginPath: File): MutableList<UUID> {
-        val plugIDs: MutableList<UUID> = mutableListOf()
+        val plugIDs = mutableListOf<UUID>()
         val jarURLs = getJarURLs(pluginPath)
         for(entry in jarURLs){
             //create a list for reflections to put what it finds into
-            val plugin: MutableList<KClass<out MyPlugin>> = mutableListOf()
+            val plugin = mutableListOf<KClass<out MyPlugin>>()
             //create a classloader for finding and loading classes
             val cLoader: URLClassLoader = URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
             // Create a new Reflections instance without specifying the package name
