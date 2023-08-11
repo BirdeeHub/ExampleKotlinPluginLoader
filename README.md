@@ -29,8 +29,9 @@ the expected output is the following:
 ```
 Testing...
 1...
+./outputDir/
 2...
-3ca92eb9-2db6-4631-85ba-8bacff3f0899
+844e2e9e-383a-42e6-b3b6-43cf0a6f1dcf
 Goodbye!
 ```
 
