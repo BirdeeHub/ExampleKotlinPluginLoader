@@ -17,6 +17,7 @@ object PluginLoader {
     fun getPlugIDList(): List<UUID> = plugIDList
     fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
+    fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     fun unloadPlugin(plugID: UUID){
         cLoaderMap[plugID]?.close() //close and remove EVERYWHERE
         cLoaderMap.remove(plugID)
