@@ -24,7 +24,7 @@ stay in the same project root directory and run the following command:
 
 default runs plugins from ./outputDir, so if you go to outputDir on the command line you will need to run the following
 
-```java -jar ./outputDir/examplepluginloader-all.jar ./```
+```java -jar ./examplepluginloader-all.jar ./```
 
 the expected output is the following:
 
