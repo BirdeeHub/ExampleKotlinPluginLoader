@@ -96,7 +96,7 @@ object PluginLoader {
             return listOf(pluginPath.toURI().toURL()) 
         }
     }
-    private fun loadPluginClass(classLoader: ClassLoader, pluginClass: KClass<out MyPlugin>): MyPlugin? = 
-        try { classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as? MyPlugin
+    private fun loadPluginClass(classLoader: ClassLoader, pluginClass: KClass<out MyPlugin>): MyPlugin? = try {
+        classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as? MyPlugin
         } catch (e: Exception) { e.printStackTrace(); null }
 }
