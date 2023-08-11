@@ -40,7 +40,8 @@ object PluginLoader {
             try {
                 val constructor = pluginClassMap[plugID]?.constructors?.first() //<-- get primary constructor
                 val pluginInstance = constructor?.call() //<-- call primary constructor
-                pluginInstance?.launchPlugin(api)//<-- launchplugin(api) must be defined when you implement MyPlugin
+                if(pluginInstance!=null)pluginInstance.launchPlugin(api)//<-- launchplugin(api) must be defined when you implement MyPlugin
+                else pluginsToRemove.add(plugID)
             } catch (e: Exception) {
                 e.printStackTrace()
                 pluginsToRemove.add(plugID) //<-- add to separate list so that we arent modifying our collection while iterating over it
