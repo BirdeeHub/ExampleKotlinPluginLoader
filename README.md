@@ -2,6 +2,8 @@
 
 Use it if your program needs to load plugins!
 
+You will need a copy of JDK 17. The kotlin runtime is in the jar.
+
 It can load .jar and .class files from file or directory that contain a class that implements MyPlugin
 
 This was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.

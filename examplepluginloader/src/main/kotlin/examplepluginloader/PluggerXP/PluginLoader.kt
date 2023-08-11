@@ -18,15 +18,19 @@ object PluginLoader {
     fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
-    fun unloadPlugin(plugID: UUID){
-        cLoaderMap[plugID]?.close() //close and remove EVERYWHERE
-        cLoaderMap.remove(plugID)
+    fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
+        try{
+            cLoaderMap[plugID]?.close()
+        }catch (e: Exception){}//<-- if multiple MyPlugin per jar, it might already be closed. That's fine. We were trying to close it.
+        cLoaderMap.remove(plugID) //these don't throw.
         pluginClassMap.remove(plugID)
         pluginObjectMap.remove(plugID)
         plugIDList.remove(plugID)
     }
-    fun unloadAllPlugins() {
-        for(entry in cLoaderMap)entry.value.close() //close and clear ALL everywhere
+    fun unloadAllPlugins() { //close and clear ALL everywhere
+        for(entry in cLoaderMap)try{
+                entry.value.close()
+            }catch (e: Exception){}//<-- if multiple MyPlugin per jar, it might already be closed. That's fine. We were trying to close it.
         cLoaderMap.clear()
         pluginClassMap.clear()
         pluginObjectMap.clear()
