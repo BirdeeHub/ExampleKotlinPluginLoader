@@ -113,5 +113,5 @@ object PluginLoader {
         }
     }
     private fun loadPluginClass(classLoader: ClassLoader, pluginClass: KClass<out MyPlugin>): MyPlugin =
-            classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as MyPlugin
+        classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as MyPlugin
 }
