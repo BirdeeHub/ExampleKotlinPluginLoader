@@ -82,7 +82,7 @@ object PluginLoader {
             // Convert the pluginClasses set to a list of KClass objects and loop over it
             for (pluginClass in pluginClasses.map { it.kotlin }) {
                 var launchableName = pluginClass.qualifiedName
-                if(launchableName==null)launchableName=pluginClass.simpleName
+                if(launchableName==null)launchableName=pluginClass.simpleName //<-- if not in package it may only have simpleName
                 if(launchableName!=null){
                     // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
                     if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
