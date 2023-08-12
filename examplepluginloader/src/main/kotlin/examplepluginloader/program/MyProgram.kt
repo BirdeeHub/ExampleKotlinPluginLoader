@@ -6,7 +6,7 @@ class MyProgram(api: MyAPI, pluginPaths: Array<String>){
     init{
         println("Testing...")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
-        for(plugID in PluginLoader.callPlugLoader(api, pluginPaths)){ // Test 1..
+        for(plugID in PluginLoader.callPlugLoader(api, pluginPaths, null)){ // Test 1..
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
             if(plugin!=null){
                 println(plugin.getName()) // MyPluginImplementation loaded
