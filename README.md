@@ -51,7 +51,7 @@ All UUIDs: []
 Goodbye!
 ```
 
-for ```java -jar ./outputDir/examplepluginloader-all.jar ./outputDir/ ./outputDir/exampleplugin.jar```:
+for ```java -jar ./outputDir/examplepluginloader-all.jar ./outputDir/plugins/ ./outputDir/plugins/exampleplugin.jar```:
 ```
 Testing...
 ./outputDir/plugins/
