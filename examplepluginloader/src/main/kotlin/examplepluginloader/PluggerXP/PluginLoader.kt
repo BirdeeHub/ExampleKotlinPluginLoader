@@ -22,7 +22,7 @@ object PluginLoader {
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         try{
             cLoaderMap[plugID]?.close() //<-- if already closed somehow, this can throw
-        }catch (e: Exception){}
+        }catch (e: Exception){e.printStackTrace()}
         cLoaderMap.remove(plugID) //these don't throw.
         pluginClassMap.remove(plugID)
         pluginObjectMap.remove(plugID)
@@ -32,7 +32,7 @@ object PluginLoader {
     fun unloadAllPlugins() { //close and clear ALL everywhere
         for(entry in cLoaderMap)try{
                 entry.value.close() //<-- if already closed somehow, this can throw
-            }catch (e: Exception){}
+            }catch (e: Exception){e.printStackTrace()}
         cLoaderMap.clear() //these don't throw.
         pluginClassMap.clear()
         pluginObjectMap.clear()
@@ -106,6 +106,6 @@ object PluginLoader {
         }
     }
     private fun loadPluginClass(classLoader: ClassLoader, pluginClass: KClass<out MyPlugin>): MyPlugin? = try {
-        classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as? MyPlugin
+            classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as? MyPlugin
         } catch (e: Exception) { e.printStackTrace(); null }
 }
