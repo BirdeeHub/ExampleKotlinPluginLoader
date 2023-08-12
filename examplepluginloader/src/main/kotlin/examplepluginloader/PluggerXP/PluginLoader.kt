@@ -66,8 +66,8 @@ object PluginLoader {
             val reflections = Reflections(ConfigurationBuilder().addUrls(entry).addClassLoaders(cLoader))
             // Get all subtypes of MyPlugin using Reflections
             val pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java)
-            // Convert the pluginClasses set to a list of KClass objects and loop over it
             var i = 0
+            // Convert the pluginClasses set to a list of KClass objects and loop over it
             for (pluginClass in pluginClasses.map { it.kotlin }) {
                 // Create new class loader if multiple plugins were in the jar file, to allow individual closing
                 if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
