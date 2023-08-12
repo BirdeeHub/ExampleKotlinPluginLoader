@@ -18,6 +18,7 @@ object PluginLoader {
     fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
+    @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         try{
             cLoaderMap[plugID]?.close() //<-- if already closed somehow, this can throw
@@ -27,6 +28,7 @@ object PluginLoader {
         pluginObjectMap.remove(plugID)
         plugIDList.remove(plugID)
     }
+    @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
         for(entry in cLoaderMap)try{
                 entry.value.close() //<-- if already closed somehow, this can throw
@@ -37,6 +39,7 @@ object PluginLoader {
         plugIDList.clear()
     }
     //public load class function
+    @Synchronized
     fun callPlugLoader(api: MyAPI, pluginPath: String): List<UUID> {
         val pluginUUIDs = loadPlugins(File(pluginPath)) //<-- loads plugins and returns list of UUIDs of loaded plugins
         val pluginsToRemove = mutableListOf<UUID>()
