@@ -57,7 +57,7 @@ object PluginLoader {
         }
         return pluginUUIDs //<-- returns the uuids of the new plugins ACTUALLY loaded
     }
-    //helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
+    //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
     private fun loadPlugins(pluginPath: File): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
         for(entry in getJarURLs(pluginPath)){
@@ -86,7 +86,7 @@ object PluginLoader {
         plugIDList.addAll(plugIDs) //<-- add new uuids to the actual list
         return plugIDs //<-- returns the uuids of the new plugins loaded
     }
-    //helper functions for loadPlugins(pluginPath: File): MutableList<UUID>
+    //2 private helper functions for loadPlugins(pluginPath: File): MutableList<UUID>
     private fun getJarURLs(pluginPath: File): List<URL> {
         if(pluginPath.isDirectory()){
             // get all jar files in the directory and convert list to a mutable list so we can add any .class files
