@@ -40,7 +40,7 @@ object PluginLoader {
     }
     //public load class function
     @Synchronized
-    fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>, targetPackage: String?): List<UUID> {
+    fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>, targetPackage: String? = null): List<UUID> {
         val pluginUUIDs = mutableListOf<UUID>()
         val pluginsToRemove = mutableListOf<UUID>()
         for(pluginPath in pluginPaths){
