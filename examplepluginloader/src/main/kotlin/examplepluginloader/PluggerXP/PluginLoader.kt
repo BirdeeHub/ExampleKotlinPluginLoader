@@ -1,6 +1,7 @@
 package examplepluginloader.PluggerXP
 import org.reflections.Reflections
 import org.reflections.util.ConfigurationBuilder
+import org.reflections.util.FilterBuilder
 import kotlin.reflect.KClass
 import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
@@ -69,26 +70,18 @@ object PluginLoader {
         for(entry in getJarURLs(pluginPath)){
             //create a classloader for finding and loading classes
             var cLoader: URLClassLoader = URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
-            // Create a new Reflections instance without specifying the package name
             val reflections = Reflections(ConfigurationBuilder().addUrls(entry).addClassLoaders(cLoader))
             // Get all subtypes of MyPlugin using Reflections
-            val pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java)
+            var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()
+            if(!targetPluginClasses.isEmpty())pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).filter { pluginClass ->
+                targetPluginClasses.any { target -> pluginClass.name == target }
+            }
             var i = 0
             // Convert the pluginClasses set to a list of KClass objects and loop over it
             for (pluginClass in pluginClasses.map { it.kotlin }) {
-                var targetMatches = false
                 var launchableName = pluginClass.qualifiedName
+                if(launchableName==null)launchableName=pluginClass.simpleName
                 if(launchableName!=null){
-                    targetPluginClasses.forEach { target -> //check if the package name matches any of the names
-                        if(launchableName.toString().startsWith(target))targetMatches=true
-                    }
-                }else{ 
-                    launchableName = pluginClass.simpleName
-                    targetPluginClasses.forEach { target -> //check if the class name matches any of the names
-                        if(launchableName.toString().startsWith(target))targetMatches=true
-                    }
-                }
-                if( ( targetPluginClasses.isEmpty() || targetMatches ) && launchableName!=null){
                     // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
                     if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
                     // Load and initialize each plugin class using the custom class loader
