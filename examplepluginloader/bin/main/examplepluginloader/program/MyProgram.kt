@@ -1,10 +1,11 @@
 package examplepluginloader.program
 import examplepluginloader.api.MyAPI
 import examplepluginloader.api.MyPlugin
-import examplepluginloader.PluggerXP.PluginLoader 
+import examplepluginloader.PluggerXP.PluginLoader
 class MyProgram(api: MyAPI, pluginPaths: Array<String>){
     init{
         println("Testing...")
+        val startTime = System.currentTimeMillis()
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
         for(plugID in PluginLoader.callPlugLoader(api, pluginPaths)){ // package name optional.
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
@@ -19,6 +20,7 @@ class MyProgram(api: MyAPI, pluginPaths: Array<String>){
             PluginLoader.unloadPlugin(plugID)
             println("All UUIDs: "+PluginLoader.getPlugIDList())
         }
+        println("duration in milliseconds: "+(System.currentTimeMillis() - startTime).toString())
         println("Goodbye!")
     }
 }
