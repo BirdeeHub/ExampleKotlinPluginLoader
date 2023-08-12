@@ -8,7 +8,7 @@ class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
         val startTime = System.currentTimeMillis()
         if(pluginPaths.isEmpty())pluginPaths=arrayOf("./outputDir/plugins/")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
-        for(plugID in PluginLoader.callPlugLoader(api, pluginPaths)){ // package name optional.
+        for(plugID in PluginLoader.callPlugLoader(api, pluginPaths, arrayOf("exampleplugin.MyPluginImplementation1"))){ // package name optional if not in package
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
             if(plugin!=null){
                 println(plugin.getName()) // MyPluginImplementation loaded

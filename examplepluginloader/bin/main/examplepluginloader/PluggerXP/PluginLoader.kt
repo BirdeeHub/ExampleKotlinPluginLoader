@@ -40,11 +40,11 @@ object PluginLoader {
     }
     //public load class function
     @Synchronized
-    fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>, targetPackages: Array<String> = arrayOf()): List<UUID> {
+    fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>, targetPluginClasses: Array<String> = arrayOf()): List<UUID> {
         val pluginUUIDs = mutableListOf<UUID>()
         val pluginsToRemove = mutableListOf<UUID>()
         for(pluginPath in pluginPaths){
-            val plugIDs = loadPlugins(File(pluginPath), targetPackages) //<-- loads plugins and returns list of UUIDs of loaded plugins
+            val plugIDs = loadPlugins(File(pluginPath), targetPluginClasses) //<-- loads plugins and returns list of UUIDs of loaded plugins
             pluginUUIDs.addAll(plugIDs)
             for (plugID in plugIDs) {
                 try {
@@ -64,7 +64,7 @@ object PluginLoader {
         return pluginUUIDs.toList() //<-- returns a copy of the list of uuids of the new plugins ACTUALLY loaded
     }
     //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
-    private fun loadPlugins(pluginPath: File, targetPackages: Array<String>): MutableList<UUID> {
+    private fun loadPlugins(pluginPath: File, targetPluginClasses: Array<String>): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
         for(entry in getJarURLs(pluginPath)){
             //create a classloader for finding and loading classes
@@ -79,11 +79,16 @@ object PluginLoader {
                 var targetMatches = false
                 var launchableName = pluginClass.qualifiedName
                 if(launchableName!=null){
-                    targetPackages.forEach { target -> //check if the package name matches any of the package names
+                    targetPluginClasses.forEach { target -> //check if the package name matches any of the names
                         if(launchableName.toString().startsWith(target))targetMatches=true
                     }
-                }else launchableName = pluginClass.simpleName
-                if( ( targetPackages.isEmpty() || targetMatches ) && launchableName!=null){
+                }else{ 
+                    launchableName = pluginClass.simpleName
+                    targetPluginClasses.forEach { target -> //check if the class name matches any of the names
+                        if(launchableName.toString().startsWith(target))targetMatches=true
+                    }
+                }
+                if( ( targetPluginClasses.isEmpty() || targetMatches ) && launchableName!=null){
                     // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
                     if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
                     // Load and initialize each plugin class using the custom class loader

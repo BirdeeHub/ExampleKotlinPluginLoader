@@ -6,7 +6,7 @@ You will need a copy of JDK 17. The kotlin runtime is in the jar.
 
 It can load any number of classes that implement MyPlugin that are defined inside .jar and .class files.
 
-It can load them from file or directory and they can be in java or kotlin, and you can specify package names if you want.
+It can load them from file or directory and they can be in java or kotlin, and you can specify package.class names if you want.
 
 It can also close them individually or all at once, and contains various useful reference functions
 
