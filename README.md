@@ -10,6 +10,8 @@ It can load them from file or directory and they can be in java or kotlin, and y
 
 It can also close them individually or all at once, and contains various useful reference functions
 
+For optimum performance, do not load too many directories, individual files are MUCH faster in large numbers. All in 1 or 2 directories is fine though.
+
 It was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
 
 I then built a quick mockup test for it to upload it, in case someone finds it useful
