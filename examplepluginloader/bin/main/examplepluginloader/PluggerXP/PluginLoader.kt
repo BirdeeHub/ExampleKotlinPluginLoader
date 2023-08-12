@@ -78,7 +78,6 @@ object PluginLoader {
             for (pluginClass in pluginClasses.map { it.kotlin }) {
                 var targetMatches = false
                 var launchableName = pluginClass.qualifiedName
-                //if it had a name we can launch it with
                 if(launchableName!=null){
                     targetPackages.forEach { target -> //check if the package name matches any of the package names
                         if(launchableName.toString().startsWith(target))targetMatches=true
