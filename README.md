@@ -40,11 +40,11 @@ for ```java -jar ./outputDir/examplepluginloader-all.jar```:
 ```
 Testing...
 ./outputDir/
-Plugin Api Call Test
-MyPluginImplementation Name
-f498dff0-8e8e-49e8-89ad-445a2d02f614
-All UUIDs: [f498dff0-8e8e-49e8-89ad-445a2d02f614]
-unloading: MyPluginImplementation Name : f498dff0-8e8e-49e8-89ad-445a2d02f614
+API call test when launchPlugin(api) is called
+MyPluginImplementation getName() Test
+UUID: c94b0a9b-5a96-4488-98ea-b6fab5bb223f
+All UUIDs: [c94b0a9b-5a96-4488-98ea-b6fab5bb223f]
+unloading: MyPluginImplementation getName() Test : c94b0a9b-5a96-4488-98ea-b6fab5bb223f
 All UUIDs: []
 Goodbye!
 ```
@@ -54,16 +54,16 @@ for ```java -jar ./outputDir/examplepluginloader-all.jar ./outputDir/ ./outputDi
 Testing...
 ./outputDir/
 ./outputDir/exampleplugin.jar
-Plugin Api Call Test
-Plugin Api Call Test
-MyPluginImplementation Name Test
-163dd770-777f-4641-9a07-e97db04083ce
-MyPluginImplementation Name Test
-a464f04c-c5c6-4979-bfa1-63d97dbebfbe
-All UUIDs: [163dd770-777f-4641-9a07-e97db04083ce, a464f04c-c5c6-4979-bfa1-63d97dbebfbe]
-unloading: MyPluginImplementation Name : 163dd770-777f-4641-9a07-e97db04083ce
-All UUIDs: [a464f04c-c5c6-4979-bfa1-63d97dbebfbe]
-unloading: MyPluginImplementation Name : a464f04c-c5c6-4979-bfa1-63d97dbebfbe
+API call test when launchPlugin(api) is called
+API call test when launchPlugin(api) is called
+MyPluginImplementation getName() Test
+UUID: 68bd226d-0e46-46b8-8118-bded14c825e6
+MyPluginImplementation getName() Test
+UUID: 64e49eb9-e6d0-419e-8127-f8c67d812211
+All UUIDs: [68bd226d-0e46-46b8-8118-bded14c825e6, 64e49eb9-e6d0-419e-8127-f8c67d812211]
+unloading: MyPluginImplementation getName() Test : 68bd226d-0e46-46b8-8118-bded14c825e6
+All UUIDs: [64e49eb9-e6d0-419e-8127-f8c67d812211]
+unloading: MyPluginImplementation getName() Test : 64e49eb9-e6d0-419e-8127-f8c67d812211
 All UUIDs: []
 Goodbye!
 ```

@@ -10,7 +10,7 @@ class MyProgram(api: MyAPI, pluginPaths: Array<String>){
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
             if(plugin!=null){
                 println(plugin.getName()) // MyPluginImplementation loaded
-                println(PluginLoader.getPluginUUID(plugin))
+                println("UUID: "+PluginLoader.getPluginUUID(plugin))
             }
         }
         println("All UUIDs: "+PluginLoader.getPlugIDList())
