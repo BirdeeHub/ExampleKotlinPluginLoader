@@ -40,11 +40,11 @@ object PluginLoader {
     }
     //public load class function
     @Synchronized
-    fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>, targetPackage: String? = null): List<UUID> {
+    fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>, targetPackages: Array<String> = arrayOf()): List<UUID> {
         val pluginUUIDs = mutableListOf<UUID>()
         val pluginsToRemove = mutableListOf<UUID>()
         for(pluginPath in pluginPaths){
-            val plugIDs = loadPlugins(File(pluginPath), targetPackage) //<-- loads plugins and returns list of UUIDs of loaded plugins
+            val plugIDs = loadPlugins(File(pluginPath), targetPackages) //<-- loads plugins and returns list of UUIDs of loaded plugins
             pluginUUIDs.addAll(plugIDs)
             for (plugID in plugIDs) {
                 try {
@@ -64,7 +64,7 @@ object PluginLoader {
         return pluginUUIDs.toList() //<-- returns a copy of the list of uuids of the new plugins ACTUALLY loaded
     }
     //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
-    private fun loadPlugins(pluginPath: File, targetPackage: String?): MutableList<UUID> {
+    private fun loadPlugins(pluginPath: File, targetPackages: Array<String>): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
         for(entry in getJarURLs(pluginPath)){
             //create a classloader for finding and loading classes
@@ -77,7 +77,12 @@ object PluginLoader {
             // Convert the pluginClasses set to a list of KClass objects and loop over it
             for (pluginClass in pluginClasses.map { it.kotlin }) {
                 //if target package not specified, or is matching to allow individual starting
-                if( targetPackage==null || pluginClass.qualifiedName!!.startsWith(targetPackage) ){
+                var targetMatches = false
+                if(pluginClass.qualifiedName!=null)
+                    targetPackages.forEach { target -> 
+                        if(pluginClass.qualifiedName.toString().startsWith(target))targetMatches=true
+                    }
+                if( targetPackages.isEmpty() || targetMatches ){
                     // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
                     if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
                     // Load and initialize each plugin class using the custom class loader
