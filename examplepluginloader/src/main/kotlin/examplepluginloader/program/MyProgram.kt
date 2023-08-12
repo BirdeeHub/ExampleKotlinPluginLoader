@@ -2,10 +2,11 @@ package examplepluginloader.program
 import examplepluginloader.api.MyAPI
 import examplepluginloader.api.MyPlugin
 import examplepluginloader.PluggerXP.PluginLoader
-class MyProgram(api: MyAPI, pluginPaths: Array<String>){
+class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
     init{
         println("Testing...")
         val startTime = System.currentTimeMillis()
+        if(pluginPaths.isEmpty())pluginPaths=arrayOf("./outputDir/plugins/")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
         for(plugID in PluginLoader.callPlugLoader(api, pluginPaths)){ // package name optional.
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
