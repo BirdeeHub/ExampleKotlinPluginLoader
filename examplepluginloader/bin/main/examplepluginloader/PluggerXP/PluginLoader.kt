@@ -78,16 +78,15 @@ object PluginLoader {
             for (pluginClass in pluginClasses.map { it.kotlin }) {
                 //if target package not specified, or is matching to allow individual starting
                 var targetMatches = false
-                if(pluginClass.qualifiedName!=null)
+                if(pluginClass.qualifiedName!=null){
                     targetPackages.forEach { target -> 
                         if(pluginClass.qualifiedName.toString().startsWith(target))targetMatches=true
                     }
-                if( targetPackages.isEmpty() || targetMatches ){
-                    // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
-                    if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
-                    // Load and initialize each plugin class using the custom class loader
-                    val pluginInstance = loadPluginClass(cLoader, pluginClass) //<-- defined below
-                    if (pluginInstance != null) {
+                    if( targetPackages.isEmpty() || targetMatches ){
+                        // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
+                        if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
+                        // Load and initialize each plugin class using the custom class loader
+                        val pluginInstance = loadPluginClass(cLoader, pluginClass) //<-- defined below
                         val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
                         plugIDs.add(pluginUUID) //<-- add the uuid to the new uuid list
                         pluginClassMap[pluginUUID] = pluginClass //add class, loaded instance, and class loader, 
@@ -113,7 +112,6 @@ object PluginLoader {
             return listOf(pluginPath.toURI().toURL()) 
         }
     }
-    private fun loadPluginClass(classLoader: ClassLoader, pluginClass: KClass<out MyPlugin>): MyPlugin? = try {
-            classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as? MyPlugin
-        } catch (e: Exception) { e.printStackTrace(); null }
+    private fun loadPluginClass(classLoader: ClassLoader, pluginClass: KClass<out MyPlugin>): MyPlugin =
+            classLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as MyPlugin
 }
