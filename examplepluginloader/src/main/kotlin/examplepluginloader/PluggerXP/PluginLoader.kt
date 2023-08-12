@@ -74,7 +74,7 @@ object PluginLoader {
             // Get all subtypes of MyPlugin using Reflections
             var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()
             if(!targetPluginClasses.isEmpty()){
-                pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).filter { pluginClass ->
+                pluginClasses = pluginClasses.filter { pluginClass ->
                     targetPluginClasses.any { target -> pluginClass.name == target }
                 }
             }
