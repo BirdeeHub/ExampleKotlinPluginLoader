@@ -10,7 +10,7 @@ It can load them from file or directory and they can be in java or kotlin, and y
 
 It can also close them individually or all at once, and contains various useful reference functions
 
-For optimum performance, do not load too many directories, individual files can be much faster in large numbers. All in 1 or 2 directories is fine though.
+For optimum performance, do not load too many directories if they may have unrelated .jar files in them (such as in the outputDir of this repo).
 
 It was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
 
