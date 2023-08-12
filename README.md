@@ -4,7 +4,7 @@ Use it if your program needs to load plugins!
 
 You will need a copy of JDK 17. The kotlin runtime is in the jar.
 
-It can load any number of classes that implement MyPlugin that are defined inside .jar and .class files.
+It can load any number of classes that implement MyPlugin that are defined inside the first package or (no package) of .jar and .class files.
 
 It can load them from file or directory and they can be in java or kotlin, and you can specify package.class names if you want.
 
