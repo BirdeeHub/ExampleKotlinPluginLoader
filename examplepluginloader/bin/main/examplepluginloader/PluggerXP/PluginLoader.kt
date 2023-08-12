@@ -42,8 +42,7 @@ object PluginLoader {
         val pluginsToRemove = mutableListOf<UUID>()
         for (plugID in pluginUUIDs) {
             try {
-                val constructor = pluginClassMap[plugID]?.constructors?.first() //<-- get primary constructor
-                val pluginInstance = constructor?.call() //<-- call primary constructor
+                val pluginInstance = pluginObjectMap[plugID]
                 if(pluginInstance!=null)pluginInstance.launchPlugin(api) //<-- launchplugin(api) must be defined when you implement MyPlugin
                 else pluginsToRemove.add(plugID)
             } catch (e: Exception) {
