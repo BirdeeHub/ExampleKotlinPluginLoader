@@ -20,8 +20,8 @@ object PluginLoader {
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         try{
-            cLoaderMap[plugID]?.close()
-        }catch (e: Exception){}//<-- if multiple MyPlugin per jar, it might already be closed. That's fine. We were trying to close it.
+            cLoaderMap[plugID]?.close() //<-- if already closed somehow, this can throw
+        }catch (e: Exception){}
         cLoaderMap.remove(plugID) //these don't throw.
         pluginClassMap.remove(plugID)
         pluginObjectMap.remove(plugID)
@@ -29,9 +29,9 @@ object PluginLoader {
     }
     fun unloadAllPlugins() { //close and clear ALL everywhere
         for(entry in cLoaderMap)try{
-                entry.value.close()
-            }catch (e: Exception){}//<-- if multiple MyPlugin per jar, it might already be closed. That's fine. We were trying to close it.
-        cLoaderMap.clear()
+                entry.value.close() //<-- if already closed somehow, this can throw
+            }catch (e: Exception){}
+        cLoaderMap.clear() //these don't throw.
         pluginClassMap.clear()
         pluginObjectMap.clear()
         plugIDList.clear()
@@ -62,13 +62,16 @@ object PluginLoader {
         val plugIDs = mutableListOf<UUID>()
         for(entry in getJarURLs(pluginPath)){
             //create a classloader for finding and loading classes
-            val cLoader: URLClassLoader = URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
+            var cLoader: URLClassLoader = URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
             // Create a new Reflections instance without specifying the package name
             val reflections = Reflections(ConfigurationBuilder().addUrls(entry).addClassLoaders(cLoader))
             // Get all subtypes of MyPlugin using Reflections
             val pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java)
             // Convert the pluginClasses set to a list of KClass objects and loop over it
+            var i = 0
             for (pluginClass in pluginClasses.map { it.kotlin }) {
+                // Create new class loader if multiple plugins were in the jar file, to allow individual closing
+                if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
                 // Load and initialize each plugin class using the custom class loader
                 val pluginInstance = loadPluginClass(cLoader, pluginClass) //<-- defined below
                 if (pluginInstance != null) {
