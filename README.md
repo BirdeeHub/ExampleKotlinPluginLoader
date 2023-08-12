@@ -10,17 +10,21 @@ It can load them from file or directory and they can be in java or kotlin, and y
 
 It can also close them individually or all at once, and contains various useful reference functions
 
-For optimum performance, do not load too many directories if they may have unrelated .jar files in them.
+For optimum performance, do not load too many directories if they may have unrelated .jar or .class files in them.
 
 It was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
 
 I then built a quick mockup test for it to upload it, in case someone finds it useful
 
-The following is the link to the actual loader class:
+**The following is the link to the actual loader class:**
 
 [examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
 
-Instructions:
+**Instructions:**
+
+if you wish to use, you probably only need the thing i linked.
+
+**To run the quick mockup:**
 
 1st: go to root directory of the git repo.
 
