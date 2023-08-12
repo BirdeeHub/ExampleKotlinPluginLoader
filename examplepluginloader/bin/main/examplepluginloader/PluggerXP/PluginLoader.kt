@@ -40,17 +40,21 @@ object PluginLoader {
     }
     //public load class function
     @Synchronized
-    fun callPlugLoader(api: MyAPI, pluginPath: String): List<UUID> {
-        val pluginUUIDs = loadPlugins(File(pluginPath)) //<-- loads plugins and returns list of UUIDs of loaded plugins
+    fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>): List<UUID> {
+        val pluginUUIDs = mutableListOf<UUID>()
         val pluginsToRemove = mutableListOf<UUID>()
-        for (plugID in pluginUUIDs) {
-            try {
-                val pluginInstance = pluginObjectMap[plugID]
-                if(pluginInstance!=null)pluginInstance.launchPlugin(api) //<-- launchplugin(api) must be defined when you implement MyPlugin
-                else pluginsToRemove.add(plugID)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                pluginsToRemove.add(plugID) //<-- add to separate list so that we arent modifying our collection while iterating over it
+        for(pluginPath in pluginPaths){
+            val plugIDs = loadPlugins(File(pluginPath)) //<-- loads plugins and returns list of UUIDs of loaded plugins
+            pluginUUIDs.addAll(plugIDs)
+            for (plugID in plugIDs) {
+                try {
+                    val pluginInstance = pluginObjectMap[plugID]
+                    if(pluginInstance!=null)pluginInstance.launchPlugin(api) //<-- launchplugin(api) must be defined when you implement CLioSMapPlugin
+                    else pluginsToRemove.add(plugID)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    pluginsToRemove.add(plugID) //<-- add to separate list so that we arent modifying our collection while iterating over it
+                }
             }
         }
         pluginsToRemove.forEach { plugID ->
