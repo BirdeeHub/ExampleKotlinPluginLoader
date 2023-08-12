@@ -22,7 +22,7 @@ class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
             PluginLoader.unloadPlugin(plugID)
             println("All UUIDs: "+PluginLoader.getPlugIDList())
         }
-        println("loaded and unloaded $totalnumber of plugins")
+        println("loaded and unloaded $totalnumber plugin(s)")
         println("duration in milliseconds: "+(System.currentTimeMillis() - startTime).toString())
         println("Goodbye!")
     }
