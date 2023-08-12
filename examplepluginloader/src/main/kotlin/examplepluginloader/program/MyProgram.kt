@@ -6,13 +6,19 @@ class MyProgram(api: MyAPI, pluginPaths: Array<String>){
     init{
         println("Testing...")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
-        for(plugID in PluginLoader.callPlugLoader(api, pluginPaths)){// Test 1..
+        for(plugID in PluginLoader.callPlugLoader(api, pluginPaths)){ // Test 1..
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
-            println(plugin?.getName())// MyPluginImplementation loaded
-            println(plugID)
+            if(plugin!=null){
+                println(plugin.getName()) // MyPluginImplementation loaded
+                println(PluginLoader.getPluginUUID(plugin))
+            }
         }
-        println(PluginLoader.getPlugIDList())
-        PluginLoader.unloadAllPlugins() // in this case, not necessary because the jvm closes when our program closes. but still good practice
+        println("All UUIDs: "+PluginLoader.getPlugIDList())
+        for(plugID in PluginLoader.getPlugIDList()){
+            println("unloading: "+PluginLoader.getPlugin(plugID)?.getName()+" : "+plugID)
+            PluginLoader.unloadPlugin(plugID)
+            println("All UUIDs: "+PluginLoader.getPlugIDList())
+        }
         println("Goodbye!")
     }
 }

@@ -36,22 +36,40 @@ default runs plugins from ./outputDir, so if you go to outputDir on the command 
 
 the expected output is the following:
 
+for ```java -jar ./outputDir/examplepluginloader-all.jar```:
 ```
 Testing...
 ./outputDir/
-Test 1...
-MyPluginImplementation loaded
-8dac5dc3-f486-4f1d-9263-05581c0104e9
-[8dac5dc3-f486-4f1d-9263-05581c0104e9]
+Plugin Api Call Test
+MyPluginImplementation Name
+f498dff0-8e8e-49e8-89ad-445a2d02f614
+All UUIDs: [f498dff0-8e8e-49e8-89ad-445a2d02f614]
+unloading: MyPluginImplementation Name : f498dff0-8e8e-49e8-89ad-445a2d02f614
+All UUIDs: []
 Goodbye!
 ```
 
-./outputDir/ is where it is currently looking for plugins at.
-
-Test 1... is printed by the plugin when the plugin's launchPlugin(api: MyAPI) is called. It calls api.test(), which calls test() defined in MyAPIobj, passed as MyAPI
-
-MyPluginImplementation loaded is printed when we call plugin.test()
-
-8dac5dc3-f486-4f1d-9263-05581c0104e9 is a randomly generated UUID for referencing the test plugin.
-
-\[8dac5dc3-f486-4f1d-9263-05581c0104e9\] is the list of all UUIDs for all plugins loaded.
+for ```java -jar ./outputDir/examplepluginloader-all.jar ./outputDir/ ./outputDir/exampleplugin.jar C:\Users\robin\Desktop\temp\examplepluginloader\outputDir\exampleplugin.jar```:
+```
+Testing...
+./outputDir/
+./outputDir/exampleplugin.jar
+C:\\Users\\robin\\Desktop\\temp\\examplepluginloader\\outputDir\\exampleplugin.jar
+Plugin Api Call Test
+Plugin Api Call Test
+Plugin Api Call Test
+MyPluginImplementation Name
+844e0d13-1205-4761-90a4-16e1994341dd
+MyPluginImplementation Name
+6ac0fa05-e93d-40d0-8690-f782a1491e1e
+MyPluginImplementation Name
+3d92565d-48bd-4a82-8e1a-2c937ec0bb77
+All UUIDs: [844e0d13-1205-4761-90a4-16e1994341dd, 6ac0fa05-e93d-40d0-8690-f782a1491e1e, 3d92565d-48bd-4a82-8e1a-2c937ec0bb77]
+unloading: MyPluginImplementation Name : 844e0d13-1205-4761-90a4-16e1994341dd
+All UUIDs: [6ac0fa05-e93d-40d0-8690-f782a1491e1e, 3d92565d-48bd-4a82-8e1a-2c937ec0bb77]
+unloading: MyPluginImplementation Name : 6ac0fa05-e93d-40d0-8690-f782a1491e1e
+All UUIDs: [3d92565d-48bd-4a82-8e1a-2c937ec0bb77]
+unloading: MyPluginImplementation Name : 3d92565d-48bd-4a82-8e1a-2c937ec0bb77
+All UUIDs: []
+Goodbye!
+```

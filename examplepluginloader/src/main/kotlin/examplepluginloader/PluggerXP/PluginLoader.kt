@@ -14,8 +14,8 @@ object PluginLoader {
     private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>()
     private val plugIDList = mutableListOf<UUID>()
     //public functions
-    fun getPlugIDList(): List<UUID> = plugIDList
-    fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap
+    fun getPlugIDList(): List<UUID> = plugIDList.toList()
+    fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap.toMap()
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     @Synchronized
@@ -61,7 +61,7 @@ object PluginLoader {
             pluginUUIDs.remove(plugID) //<-- remember:
             unloadPlugin(plugID) //<-- remove the ones that dont load/crash on start to give accurate info
         }
-        return pluginUUIDs //<-- returns the uuids of the new plugins ACTUALLY loaded
+        return pluginUUIDs.toList() //<-- returns the uuids of the new plugins ACTUALLY loaded
     }
     //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
     private fun loadPlugins(pluginPath: File): MutableList<UUID> {
