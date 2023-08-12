@@ -73,17 +73,17 @@ object PluginLoader {
             val reflections = Reflections(ConfigurationBuilder().addUrls(entry).addClassLoaders(cLoader))
             // Get all subtypes of MyPlugin using Reflections
             var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()
-            if(!targetPluginClasses.isEmpty()){
+            if(!targetPluginClasses.isEmpty()){// filter for target classes if any
                 pluginClasses = pluginClasses.filter { pluginClass ->
                     targetPluginClasses.any { target -> pluginClass.name == target }
                 }
             }
             var i = 0
-            // Convert the pluginClasses set to a list of KClass objects and loop over it
-            for (pluginClass in pluginClasses.map { it.kotlin }) {
-                var launchableName = pluginClass.qualifiedName
+            // Convert the pluginClasses to a list of KClass objects and loop over it
+            pluginClasses.map { it.kotlin }.forEach { pluginClass ->
+                var launchableName = pluginClass.qualifiedName //<-- get class name
                 if(launchableName==null)launchableName=pluginClass.simpleName //<-- if not in package it may only have simpleName
-                if(launchableName!=null){
+                if(launchableName!=null){ //<-- make it non-nullable if not null
                     // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
                     if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
                     // Load and initialize each plugin class using the custom class loader
@@ -92,7 +92,7 @@ object PluginLoader {
                     plugIDs.add(pluginUUID) //<-- add the uuid to the new uuid list
                     pluginClassMap[pluginUUID] = pluginClass //add class, loaded instance, and class loader, 
                     pluginObjectMap[pluginUUID] = pluginInstance //into respective maps using UUID as the key
-                    cLoaderMap[pluginUUID] = cLoader
+                    cLoaderMap[pluginUUID] = cLoader //<-- we keep track of cLoaders so we can close them later
                 }
             }
         }
@@ -102,14 +102,11 @@ object PluginLoader {
     //private helper function for loadPlugins(pluginPath: File): MutableList<UUID>
     private fun getJarURLs(pluginPath: File): List<URL> {
         if(pluginPath.isDirectory()){
-            // get all jar files in the directory and convert list to a mutable list so we can add any .class files
+            // get all jar files in the directory and convert list to a mutable list so we can add any .class files, then add those too
             val bytecodefiles = (pluginPath.listFiles { file -> file.name.endsWith(".jar") }
                 .map { it.toURI().toURL() }).toMutableList()
-            //add any .class files in the directory
             bytecodefiles.addAll(pluginPath.listFiles { file -> file.name.endsWith(".class") }.map { it.toURI().toURL() })
             return bytecodefiles
-        } else {//<-- else if specific file was specified, return the url as a 1 element list
-            return listOf(pluginPath.toURI().toURL()) 
-        }
+        } else return listOf(pluginPath.toURI().toURL()) //<-- else if specific file was specified, return the url as a 1 element list
     }
 }
