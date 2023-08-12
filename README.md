@@ -10,7 +10,7 @@ It can load them from file or directory and they can be in java or kotlin, and y
 
 It can also close them individually or all at once, and contains various useful reference functions
 
-For optimum performance, do not load too many directories if they may have unrelated .jar files in them (such as in the outputDir of this repo).
+For optimum performance, do not load too many directories if they may have unrelated .jar files in them.
 
 It was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
 
@@ -34,14 +34,14 @@ stay in the same project root directory and run the following command:
 
 default runs plugins from ./outputDir, so if you go to outputDir on the command line you will need to run the following
 
-```java -jar ./examplepluginloader-all.jar ./```
+```java -jar ./examplepluginloader-all.jar ./plugins/```
 
 the expected output is the following:
 
 for ```java -jar ./outputDir/examplepluginloader-all.jar```:
 ```
 Testing...
-./outputDir/
+./outputDir/plugins/
 API call test when launchPlugin(api) is called
 MyPluginImplementation getName() Test
 UUID: c94b0a9b-5a96-4488-98ea-b6fab5bb223f
@@ -54,8 +54,8 @@ Goodbye!
 for ```java -jar ./outputDir/examplepluginloader-all.jar ./outputDir/ ./outputDir/exampleplugin.jar```:
 ```
 Testing...
-./outputDir/
-./outputDir/exampleplugin.jar
+./outputDir/plugins/
+./outputDir/plugins/exampleplugin.jar
 API call test when launchPlugin(api) is called
 API call test when launchPlugin(api) is called
 MyPluginImplementation getName() Test

@@ -6,8 +6,7 @@ repositories {
 }
 tasks {
     clean {
-        doLast {
-            delete("outputDir/")
-        }
+        delete("outputDir/plugins/")
+        delete("outputDir/")
     }
 }
