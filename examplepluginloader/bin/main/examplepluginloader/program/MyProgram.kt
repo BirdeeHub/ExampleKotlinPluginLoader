@@ -15,12 +15,14 @@ class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
                 println("UUID: "+PluginLoader.getPluginUUID(plugin))
             }
         }
+        val totalnumber: Int = PluginLoader.getPlugIDList().size
         println("All UUIDs: "+PluginLoader.getPlugIDList())
         for(plugID in PluginLoader.getPlugIDList()){
             println("unloading: "+PluginLoader.getPlugin(plugID)?.getName()+" : "+plugID)
             PluginLoader.unloadPlugin(plugID)
             println("All UUIDs: "+PluginLoader.getPlugIDList())
         }
+        println("loaded and unloaded $totalnumber of plugins")
         println("duration in milliseconds: "+(System.currentTimeMillis() - startTime).toString())
         println("Goodbye!")
     }
