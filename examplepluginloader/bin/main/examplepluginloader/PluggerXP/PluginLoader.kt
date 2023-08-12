@@ -76,23 +76,24 @@ object PluginLoader {
             var i = 0
             // Convert the pluginClasses set to a list of KClass objects and loop over it
             for (pluginClass in pluginClasses.map { it.kotlin }) {
-                //if target package not specified, or is matching to allow individual starting
                 var targetMatches = false
-                if(pluginClass.qualifiedName!=null){
-                    targetPackages.forEach { target -> 
-                        if(pluginClass.qualifiedName.toString().startsWith(target))targetMatches=true
+                var launchableName = pluginClass.qualifiedName
+                //if it had a name we can launch it with
+                if(launchableName!=null){
+                    targetPackages.forEach { target -> //check if the package name matches any of the package names
+                        if(launchableName.toString().startsWith(target))targetMatches=true
                     }
-                    if( targetPackages.isEmpty() || targetMatches ){
-                        // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
-                        if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
-                        // Load and initialize each plugin class using the custom class loader
-                        val pluginInstance = cLoader.loadClass(pluginClass.qualifiedName).getConstructor().newInstance() as MyPlugin
-                        val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
-                        plugIDs.add(pluginUUID) //<-- add the uuid to the new uuid list
-                        pluginClassMap[pluginUUID] = pluginClass //add class, loaded instance, and class loader, 
-                        pluginObjectMap[pluginUUID] = pluginInstance //into respective maps using UUID as the key
-                        cLoaderMap[pluginUUID] = cLoader
-                    }
+                }else launchableName = pluginClass.simpleName
+                if( ( targetPackages.isEmpty() || targetMatches ) && launchableName!=null){
+                    // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
+                    if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
+                    // Load and initialize each plugin class using the custom class loader
+                    val pluginInstance = cLoader.loadClass(launchableName).getConstructor().newInstance() as MyPlugin
+                    val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
+                    plugIDs.add(pluginUUID) //<-- add the uuid to the new uuid list
+                    pluginClassMap[pluginUUID] = pluginClass //add class, loaded instance, and class loader, 
+                    pluginObjectMap[pluginUUID] = pluginInstance //into respective maps using UUID as the key
+                    cLoaderMap[pluginUUID] = cLoader
                 }
             }
         }
