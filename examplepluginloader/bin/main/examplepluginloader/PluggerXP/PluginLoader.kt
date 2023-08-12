@@ -73,8 +73,10 @@ object PluginLoader {
             val reflections = Reflections(ConfigurationBuilder().addUrls(entry).addClassLoaders(cLoader))
             // Get all subtypes of MyPlugin using Reflections
             var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()
-            if(!targetPluginClasses.isEmpty())pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).filter { pluginClass ->
-                targetPluginClasses.any { target -> pluginClass.name == target }
+            if(!targetPluginClasses.isEmpty()){
+                pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).filter { pluginClass ->
+                    targetPluginClasses.any { target -> pluginClass.name == target }
+                }
             }
             var i = 0
             // Convert the pluginClasses set to a list of KClass objects and loop over it
