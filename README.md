@@ -49,27 +49,21 @@ All UUIDs: []
 Goodbye!
 ```
 
-for ```java -jar ./outputDir/examplepluginloader-all.jar ./outputDir/ ./outputDir/exampleplugin.jar C:\Users\robin\Desktop\temp\examplepluginloader\outputDir\exampleplugin.jar```:
+for ```java -jar ./outputDir/examplepluginloader-all.jar ./outputDir/ ./outputDir/exampleplugin.jar```:
 ```
 Testing...
 ./outputDir/
 ./outputDir/exampleplugin.jar
-C:\\Users\\robin\\Desktop\\temp\\examplepluginloader\\outputDir\\exampleplugin.jar
-Plugin Api Call Test
 Plugin Api Call Test
 Plugin Api Call Test
 MyPluginImplementation Name
-844e0d13-1205-4761-90a4-16e1994341dd
+163dd770-777f-4641-9a07-e97db04083ce
 MyPluginImplementation Name
-6ac0fa05-e93d-40d0-8690-f782a1491e1e
-MyPluginImplementation Name
-3d92565d-48bd-4a82-8e1a-2c937ec0bb77
-All UUIDs: [844e0d13-1205-4761-90a4-16e1994341dd, 6ac0fa05-e93d-40d0-8690-f782a1491e1e, 3d92565d-48bd-4a82-8e1a-2c937ec0bb77]
-unloading: MyPluginImplementation Name : 844e0d13-1205-4761-90a4-16e1994341dd
-All UUIDs: [6ac0fa05-e93d-40d0-8690-f782a1491e1e, 3d92565d-48bd-4a82-8e1a-2c937ec0bb77]
-unloading: MyPluginImplementation Name : 6ac0fa05-e93d-40d0-8690-f782a1491e1e
-All UUIDs: [3d92565d-48bd-4a82-8e1a-2c937ec0bb77]
-unloading: MyPluginImplementation Name : 3d92565d-48bd-4a82-8e1a-2c937ec0bb77
+a464f04c-c5c6-4979-bfa1-63d97dbebfbe
+All UUIDs: [163dd770-777f-4641-9a07-e97db04083ce, a464f04c-c5c6-4979-bfa1-63d97dbebfbe]
+unloading: MyPluginImplementation Name : 163dd770-777f-4641-9a07-e97db04083ce
+All UUIDs: [a464f04c-c5c6-4979-bfa1-63d97dbebfbe]
+unloading: MyPluginImplementation Name : a464f04c-c5c6-4979-bfa1-63d97dbebfbe
 All UUIDs: []
 Goodbye!
 ```
