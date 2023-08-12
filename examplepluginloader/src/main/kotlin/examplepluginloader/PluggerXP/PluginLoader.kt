@@ -14,8 +14,8 @@ object PluginLoader {
     private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>()
     private val plugIDList = mutableListOf<UUID>()
     //public functions
-    fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the list rather than the list itself to prevent concurrent modification exception
-    fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap.toMap() //<-- return a copy of the Map rather than the list itself to prevent concurrent modification exception
+    fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
+    fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap.toMap() //<-- return a copy of the Map rather than the Map itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     @Synchronized
