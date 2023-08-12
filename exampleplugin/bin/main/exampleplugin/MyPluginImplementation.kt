@@ -7,7 +7,7 @@ class MyPluginImplementation : MyPlugin{
         //normally you call your plugin's opening class from here and pass it the api instance.
         println(api.test()) //<-- but this is a test so we just show that making calls to api works.
     }
-    override fun test(): String {
-        return "2..."
+    override fun getName(): String {
+        return "MyPluginImplementation loaded"
     }
 }

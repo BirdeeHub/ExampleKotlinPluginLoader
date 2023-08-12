@@ -39,19 +39,19 @@ the expected output is the following:
 ```
 Testing...
 ./outputDir/
-1...
-2...
-b383ebcb-2334-4213-b945-3c34d280483d
-[b383ebcb-2334-4213-b945-3c34d280483d]
+Test 1...
+MyPluginImplementation loaded
+8dac5dc3-f486-4f1d-9263-05581c0104e9
+[8dac5dc3-f486-4f1d-9263-05581c0104e9]
 Goodbye!
 ```
 
 ./outputDir/ is where it is currently looking for plugins at.
 
-1... is printed by the plugin when the plugin's launchPlugin(api: MyAPI) is called. It calls api.test(), which calls test() defined in MyAPIobj, passed as MyAPI
+Test 1... is printed by the plugin when the plugin's launchPlugin(api: MyAPI) is called. It calls api.test(), which calls test() defined in MyAPIobj, passed as MyAPI
 
-2... is printed when we call plugin.test()
+MyPluginImplementation loaded is printed when we call plugin.test()
 
-b383ebcb-2334-4213-b945-3c34d280483d is a randomly generated UUID for referencing the test plugin.
+8dac5dc3-f486-4f1d-9263-05581c0104e9 is a randomly generated UUID for referencing the test plugin.
 
-\[b383ebcb-2334-4213-b945-3c34d280483d\] is the list of all UUIDs for all plugins loaded.
+\[8dac5dc3-f486-4f1d-9263-05581c0104e9\] is the list of all UUIDs for all plugins loaded.
