@@ -56,9 +56,9 @@ Testing...
 ./outputDir/exampleplugin.jar
 Plugin Api Call Test
 Plugin Api Call Test
-MyPluginImplementation Name
+MyPluginImplementation Name Test
 163dd770-777f-4641-9a07-e97db04083ce
-MyPluginImplementation Name
+MyPluginImplementation Name Test
 a464f04c-c5c6-4979-bfa1-63d97dbebfbe
 All UUIDs: [163dd770-777f-4641-9a07-e97db04083ce, a464f04c-c5c6-4979-bfa1-63d97dbebfbe]
 unloading: MyPluginImplementation Name : 163dd770-777f-4641-9a07-e97db04083ce

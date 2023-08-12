@@ -7,6 +7,6 @@ class MyPluginImplementation : MyPlugin{
         println(api.test()) //<-- but this is a test so we just show that making calls to api works.
     }
     override fun getName(): String {
-        return "MyPluginImplementation Name"
+        return "MyPluginImplementation Name Test"
     }
 }
