@@ -9,9 +9,14 @@ class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
         var targets: Array<String> = arrayOf()
         if(pluginPaths.isEmpty()){
             pluginPaths=arrayOf("./outputDir/plugins/")
-            targets=arrayOf("exampleplugin.MyPluginImplementation1")
+        }else {
+                targets=arrayOf("exampleplugin.MyPluginImplementation1")
+                println("target classes:")
+                targets.forEach { target -> println(target) }
         }
+        println("paths to load from:")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
+        println("tests:")
         for(plugID in PluginLoader.callPlugLoader(api, pluginPaths, targets)){ // targets is optional if you dont want to specify
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
             if(plugin!=null){
