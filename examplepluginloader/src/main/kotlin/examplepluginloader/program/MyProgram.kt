@@ -17,7 +17,8 @@ class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
         println("paths to load from:")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
         println("tests:")
-        for(plugID in PluginLoader.callPlugLoader(api, pluginPaths, targets)){ // targets is optional if you dont want to specify. default value = arrayOf()
+        // targets is optional if you dont want to specify. default value = arrayOf()
+        PluginLoader.callPlugLoader(api, pluginPaths, targets).forEach {plugID ->
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
             if(plugin!=null){
                 println(plugin.getName()) // MyPluginImplementation loaded
