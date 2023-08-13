@@ -76,16 +76,15 @@ object PluginLoader {
             val reflections = Reflections(ConfigurationBuilder().addUrls(plugURL).addClassLoaders(cLoader))
             // Get all subtypes of MyPlugin using Reflections
             var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()
-            if(!targetClassNames.isEmpty()){// filter for target classes if any
-                pluginClasses = pluginClasses.filter { pluginClass ->
-                    targetClassNames.any { target -> pluginClass.name == target }
-                }
+            if(!targetClassNames.isEmpty()) pluginClasses = pluginClasses.filter { pluginClass ->
+                targetClassNames.any { target -> pluginClass.name == target } //<-- If there were targetClassNames, filter for them
             }
-            var i = 0 //<-- we use this to check if we have multiple plugins and need more class loaders
+            var i = false //<-- we use this to check if we have multiple plugins and need more class loaders
             // Convert the pluginClasses to a list of KClass objects and loop over it
             pluginClasses.map { it.kotlin }.forEach { pluginClass ->
                 // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
-                if(i++ != 0)cLoader=URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)
+                if(i == true)cLoader=URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)
+                i = true
                 val plugID = loadPlugin(cLoader, pluginClass, plugURL) //<-- loadPlugin defined below
                 if(plugID!=null)plugIDs.add(plugID)
             }
@@ -104,8 +103,7 @@ object PluginLoader {
             pluginLocation[pluginUUID] = plugURL.toURI().toPath().toString()
             plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
             return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
-        }
-        return null
+        } else return null
     }
     private fun getJarURLs(pluginPath: File): List<URL> {
         if(pluginPath.isDirectory()){
