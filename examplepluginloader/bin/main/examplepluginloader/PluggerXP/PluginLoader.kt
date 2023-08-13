@@ -3,6 +3,7 @@ import org.reflections.Reflections
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
 import kotlin.reflect.KClass
+import kotlin.io.path.toPath
 import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import java.io.File
@@ -13,11 +14,13 @@ object PluginLoader {
     private val pluginClassMap = mutableMapOf<UUID,KClass<out MyPlugin>>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
     private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>()
+    private val pluginLocation = mutableMapOf<UUID,String>() //<-- this one is just for the user to reference. It is the file name
     private val plugIDList = mutableListOf<UUID>()
     //public functions
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap.toMap() //<-- return a copy of the Map rather than the Map itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
+    fun getPluginLocation(plugID: UUID): String? = pluginLocation[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
@@ -41,11 +44,11 @@ object PluginLoader {
     }
     //public load class function
     @Synchronized
-    fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>, targetPluginClasses: Array<String> = arrayOf()): List<UUID> {
+    fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>, targetPluginFullClassNames: Array<String> = arrayOf()): List<UUID> {
         val pluginUUIDs = mutableListOf<UUID>()
         val pluginsToRemove = mutableListOf<UUID>()
         for(pluginPath in pluginPaths){
-            val plugIDs = loadPlugins(File(pluginPath), targetPluginClasses) //<-- loads plugins and returns list of UUIDs of loaded plugins
+            val plugIDs = loadPlugins(File(pluginPath), targetPluginFullClassNames) //<-- loads plugins and returns list of UUIDs of loaded plugins
             pluginUUIDs.addAll(plugIDs)
             for (plugID in plugIDs) {
                 try {
@@ -65,17 +68,17 @@ object PluginLoader {
         return pluginUUIDs.toList() //<-- returns a copy of the list of uuids of the new plugins ACTUALLY loaded
     }
     //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
-    private fun loadPlugins(pluginPath: File, targetPluginClasses: Array<String>): MutableList<UUID> {
+    private fun loadPlugins(pluginPath: File, targetClassNames: Array<String>): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
-        for(entry in getJarURLs(pluginPath)){
+        for(entry in getJarURLs(pluginPath)){ //getJarURLs(pluginPath: File): List<URL> defined below
             //create a classloader for finding and loading classes
             var cLoader: URLClassLoader = URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
             val reflections = Reflections(ConfigurationBuilder().addUrls(entry).addClassLoaders(cLoader))
             // Get all subtypes of MyPlugin using Reflections
             var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()
-            if(!targetPluginClasses.isEmpty()){// filter for target classes if any
+            if(!targetClassNames.isEmpty()){// filter for target classes if any
                 pluginClasses = pluginClasses.filter { pluginClass ->
-                    targetPluginClasses.any { target -> pluginClass.name == target }
+                    targetClassNames.any { target -> pluginClass.name == target }
                 }
             }
             var i = 0
@@ -93,13 +96,13 @@ object PluginLoader {
                     pluginClassMap[pluginUUID] = pluginClass //add class, loaded instance, and class loader, 
                     pluginObjectMap[pluginUUID] = pluginInstance //into respective maps using UUID as the key
                     cLoaderMap[pluginUUID] = cLoader //<-- we keep track of cLoaders so we can close them later
+                    pluginLocation[pluginUUID] = entry.toURI().toPath().toString()
                 }
             }
         }
         plugIDList.addAll(plugIDs) //<-- add new uuids to the actual list
         return plugIDs //<-- returns the uuids of the new plugins loaded
     }
-    //private helper function for loadPlugins(pluginPath: File): MutableList<UUID>
     private fun getJarURLs(pluginPath: File): List<URL> {
         if(pluginPath.isDirectory()){
             // get all jar files in the directory and convert list to a mutable list so we can add any .class files, then add those too

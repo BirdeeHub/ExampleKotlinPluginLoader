@@ -21,12 +21,13 @@ class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
             if(plugin!=null){
                 println(plugin.getName()) // MyPluginImplementation loaded
+                println(PluginLoader.getPluginLocation(plugID))
                 println("UUID: "+PluginLoader.getPluginUUID(plugin))
             }
         }
         val totalnumber: Int = PluginLoader.getPlugIDList().size
         println("All UUIDs: "+PluginLoader.getPlugIDList())
-        for(plugID in PluginLoader.getPlugIDList()){
+        PluginLoader.getPlugIDList().forEach { plugID ->
             println("unloading: "+PluginLoader.getPlugin(plugID)?.getName()+" : "+plugID)
             PluginLoader.unloadPlugin(plugID)
             println("All UUIDs: "+PluginLoader.getPlugIDList())

@@ -51,16 +51,18 @@ tests:
 API call test when launchPlugin(api) is called (This gets filtered out if arguments are used for demonstration)
 API call test when launchPlugin(api) is called
 MyPluginImplementation2 getName() Test (This gets filtered out if arguments are used for demonstration)
-UUID: 4ff003ba-2cbe-4cec-85d3-c3100587ebc3
+C:\Users\robin\Desktop\temp\examplepluginloader\.\outputDir\plugins\exampleplugin.jar
+UUID: 58eb00c6-8ca5-4b75-bfe1-31a3b6ee46a2
 MyPluginImplementation1 getName() Test
-UUID: c39cb2ca-f01e-4cac-b91c-35a948199b23
-All UUIDs: [4ff003ba-2cbe-4cec-85d3-c3100587ebc3, c39cb2ca-f01e-4cac-b91c-35a948199b23]
-unloading: MyPluginImplementation2 getName() Test (This gets filtered out if arguments are used for demonstration) : 4ff003ba-2cbe-4cec-85d3-c3100587ebc3
-All UUIDs: [c39cb2ca-f01e-4cac-b91c-35a948199b23]
-unloading: MyPluginImplementation1 getName() Test : c39cb2ca-f01e-4cac-b91c-35a948199b23
+C:\Users\robin\Desktop\temp\examplepluginloader\.\outputDir\plugins\exampleplugin.jar
+UUID: f3d28a7a-b4f8-42e7-ba83-88959b86121c
+All UUIDs: [58eb00c6-8ca5-4b75-bfe1-31a3b6ee46a2, f3d28a7a-b4f8-42e7-ba83-88959b86121c]
+unloading: MyPluginImplementation2 getName() Test (This gets filtered out if arguments are used for demonstration) : 58eb00c6-8ca5-4b75-bfe1-31a3b6ee46a2
+All UUIDs: [f3d28a7a-b4f8-42e7-ba83-88959b86121c]
+unloading: MyPluginImplementation1 getName() Test : f3d28a7a-b4f8-42e7-ba83-88959b86121c
 All UUIDs: []
 loaded and unloaded 2 plugin(s)
-duration in milliseconds: 316
+duration in milliseconds: 313
 Goodbye!
 ```
 
@@ -76,15 +78,17 @@ tests:
 API call test when launchPlugin(api) is called
 API call test when launchPlugin(api) is called
 MyPluginImplementation1 getName() Test
-UUID: 88c8288e-75f2-44c1-85b2-1cc426ef94a8
+C:\Users\robin\Desktop\temp\examplepluginloader\.\outputDir\plugins\exampleplugin.jar
+UUID: 95d6bc35-e65a-49c2-917d-dc88cf45dd4a
 MyPluginImplementation1 getName() Test
-UUID: a8975448-e698-4cc6-ae04-75619e4f52bb
-All UUIDs: [88c8288e-75f2-44c1-85b2-1cc426ef94a8, a8975448-e698-4cc6-ae04-75619e4f52bb]
-unloading: MyPluginImplementation1 getName() Test : 88c8288e-75f2-44c1-85b2-1cc426ef94a8
-All UUIDs: [a8975448-e698-4cc6-ae04-75619e4f52bb]
-unloading: MyPluginImplementation1 getName() Test : a8975448-e698-4cc6-ae04-75619e4f52bb
+C:\Users\robin\Desktop\temp\examplepluginloader\.\outputDir\plugins\exampleplugin.jar
+UUID: 271e0928-8690-41c1-8b3f-583445dc2d3f
+All UUIDs: [95d6bc35-e65a-49c2-917d-dc88cf45dd4a, 271e0928-8690-41c1-8b3f-583445dc2d3f]
+unloading: MyPluginImplementation1 getName() Test : 95d6bc35-e65a-49c2-917d-dc88cf45dd4a
+All UUIDs: [271e0928-8690-41c1-8b3f-583445dc2d3f]
+unloading: MyPluginImplementation1 getName() Test : 271e0928-8690-41c1-8b3f-583445dc2d3f
 All UUIDs: []
 loaded and unloaded 2 plugin(s)
-duration in milliseconds: 318
+duration in milliseconds: 314
 Goodbye!
 ```
