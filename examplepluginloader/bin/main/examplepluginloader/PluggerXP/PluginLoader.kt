@@ -24,6 +24,8 @@ object PluginLoader {
     //unload and load functions (Synchronized)
     private val lock = Any() // Shared lock object
     @Synchronized
+    fun unloadPlugins(plugIDs: List<UUID>) = plugIDs.forEach { plugID -> unloadPlugin(plugID) }
+    @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         try{ cLoaderMap[plugID]?.close() //<-- if already closed somehow, this can throw
         }catch (e: Exception){e.printStackTrace()}
