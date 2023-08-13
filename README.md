@@ -92,3 +92,44 @@ loaded and unloaded 2 plugin(s)
 duration in milliseconds: 308
 Goodbye!
 ```
+
+I'm pretty sure that if you want to load from web, you only need to change the following functions,
+
+and then make a loadPluginsFrom_protocol_Location(plugURL: URL, targetClassNames: List<String>): MutableList<UUID> 
+
+which would find the classes at the url and then do:
+
+```kotlin
+    private fun loadPluginsFromGenLocation(pluginURI: URI, targetClassNames: List<String>): MutableList<UUID> {
+        val plugIDs = mutableListOf<UUID>()
+        try{
+            for(plugURL in getJarURLs(pluginURI)){ //<-- getJarURLs(pluginPath: File): List<URL>
+                if(plugURL.protocol == "file")plugIDs.addAll(loadPluginsFromFileLocation(plugURL, targetClassNames))
+            }
+        }catch(e: Exception){e.printStackTrace()}
+        return plugIDs //<-- returns the uuids of the new plugins loaded
+    }
+    private fun getJarURLs(pluginPathURI: URI): List<URL> {
+        val pluginPath: URL
+        pluginPath = pluginPathURI.toURL()
+        if(pluginPath.protocol == "file"){
+            if(File(pluginPathURI).isDirectory()){
+                // get all jar files in the directory and convert list to a mutable list so we can add any .class files, then add those too
+                val bytecodefiles = (File(pluginPathURI).listFiles { file -> file.name.endsWith(".jar") }
+                    .map { it.toURI().toURL() }).toMutableList()
+                bytecodefiles.addAll(File(pluginPathURI).listFiles { file -> file.name.endsWith(".class") }.map { it.toURI().toURL() })
+                return bytecodefiles
+            } else return listOf(pluginPath) //<-- else if specific file was specified, return the url as a 1 element list
+        } else return listOf()
+    }
+    private fun loadPluginsFromFileLocation(plugURL: URL, targetClassNames: List<String>): MutableList<UUID> {
+        val plugIDs = mutableListOf<UUID>()
+        // Get all subtypes of MyPlugin using Reflections (Which I cant get to work over the internet)
+        val reflections = Reflections(ConfigurationBuilder().addUrls(plugURL)
+            .addClassLoaders(URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)))
+        var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()
+        //now that we have the classes, convert them to KClasses, and filter then load them
+        plugIDs.addAll(loadPluginKClassesFromURLFilePath(pluginClasses.map { it.kotlin }, plugURL, targetClassNames))
+        return plugIDs
+    }
+```

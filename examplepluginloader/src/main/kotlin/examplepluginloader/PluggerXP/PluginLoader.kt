@@ -2,13 +2,14 @@ package examplepluginloader.PluggerXP
 import org.reflections.Reflections
 import org.reflections.util.ConfigurationBuilder
 import kotlin.reflect.KClass
-import kotlin.io.path.toPath
 import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
+import java.net.URI
 import java.util.UUID
+import java.nio.file.Path
 object PluginLoader {
     private val pluginClassMap = mutableMapOf<UUID,KClass<out MyPlugin>>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
@@ -45,13 +46,54 @@ object PluginLoader {
         pluginLocation.clear()
         plugIDList.clear()
     }
-    //public load class function (3rd argument optional. Default value is empty array.)
     @Synchronized
-    fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>, targetPluginFullClassNames: Array<String> = arrayOf()): List<UUID> {
+    fun loadPlugins(api: MyAPI, pluginPathStrings: List<String>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+        val pluginLocations = mutableListOf<URI>()
+        pluginPathStrings.forEach { pluginPathString -> 
+            try{ pluginLocations.add(File(pluginPathString).toURI()) 
+            } catch(e: Exception) { e.printStackTrace() }
+        }
+        return callPlugLoader(api, pluginLocations, targetPluginFullClassNames)
+    }
+    @Synchronized
+    fun loadPluginsFromURLs(api: MyAPI, pluginURLs: List<URL>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+        val pluginLocations = mutableListOf<URI>()
+        pluginURLs.forEach { pluginURL -> 
+            try{ pluginLocations.add(pluginURL.toURI())
+            } catch(e: Exception) { e.printStackTrace() }
+        }
+        return callPlugLoader(api, pluginLocations, targetPluginFullClassNames)
+    }
+    @Synchronized
+    fun loadPluginsFromPaths(api: MyAPI, pluginPaths: List<Path>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+        val pluginLocations = mutableListOf<URI>()
+        pluginPaths.forEach { pluginPath -> 
+            try{ pluginLocations.add(pluginPath.toUri())
+            } catch(e: Exception) { e.printStackTrace() }
+        }
+        return callPlugLoader(api, pluginLocations, targetPluginFullClassNames)
+    }
+    @Synchronized
+    fun loadPluginsFromFiles(api: MyAPI, pluginFiles: List<File>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+        val pluginLocations = mutableListOf<URI>()
+        pluginFiles.forEach { pluginFile -> 
+            try{ pluginLocations.add(pluginFile.toURI())
+            } catch(e: Exception) { e.printStackTrace() }
+        }
+        return callPlugLoader(api, pluginLocations, targetPluginFullClassNames)
+    }
+    @Synchronized
+    fun loadPluginsFromURIs(api: MyAPI, pluginURIs: List<URI>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+        return callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
+    }
+
+    //End of public functions
+    //main load class function
+    private fun callPlugLoader(api: MyAPI, pluginURIs: List<URI>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
         val pluginUUIDs = mutableListOf<UUID>()
         val pluginsToRemove = mutableListOf<UUID>()
-        for(pluginPath in pluginPaths){
-            val plugIDs = loadPlugins(File(pluginPath), targetPluginFullClassNames) //<-- loads plugins and returns list of UUIDs of loaded plugins
+        for(pluginURI in pluginURIs){
+            val plugIDs = loadPluginsFromGenLocation(pluginURI, targetPluginFullClassNames) //<-- loadPluginsFromGenLocation(pluginURI: URI, targetClassNames: List<String>): MutableList<UUID>
             pluginUUIDs.addAll(plugIDs)
             for (plugID in plugIDs) {
                 try {
@@ -71,28 +113,50 @@ object PluginLoader {
         return pluginUUIDs.toList() //<-- returns a copy of the list of uuids of the new plugins ACTUALLY loaded
     }
     //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
-    private fun loadPlugins(pluginPath: File, targetClassNames: Array<String>): MutableList<UUID> {
+    private fun loadPluginsFromGenLocation(pluginURI: URI, targetClassNames: List<String>): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
-        for(plugURL in getJarURLs(pluginPath)){ //<-- getJarURLs(pluginPath: File): List<URL> defined at end
-            //create a classloader and reflections for finding and loading classes
-            var cLoader: URLClassLoader = URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)
-            val reflections = Reflections(ConfigurationBuilder().addUrls(plugURL).addClassLoaders(cLoader))
-            // Get all subtypes of MyPlugin using Reflections (then filter if target classes exist)
-            var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()
-            if(!targetClassNames.isEmpty()) pluginClasses = pluginClasses.filter { pluginClass ->
-                targetClassNames.any { target -> pluginClass.name == target } //<-- If there were targetClassNames, filter for them
+        try{
+            for(plugURL in getJarURLs(pluginURI)){ //<-- getJarURLs(pluginPath: File): List<URL>
+                if(plugURL.protocol == "file")plugIDs.addAll(loadPluginsFromFileLocation(plugURL, targetClassNames))
             }
-            var i = false //<-- we use this to check if we have multiple plugins and need more class loaders
-            // Convert the pluginClasses to a list of KClass objects and loop over it
-            pluginClasses.map { it.kotlin }.forEach { pluginClass ->
-                // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
-                if(i == true)cLoader=URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)
-                i = true
-                val plugID = loadPlugin(cLoader, pluginClass, plugURL) //<-- loadPlugin(cLoader, pluginClass, plugURL): UUID? defined below
-                if(plugID!=null)plugIDs.add(plugID)//<-- add uuid to the newly-loaded uuid list
-            }
-        }
+        }catch(e: Exception){e.printStackTrace()}
         return plugIDs //<-- returns the uuids of the new plugins loaded
+    }
+    private fun getJarURLs(pluginPathURI: URI): List<URL> {
+        val pluginPath: URL
+        pluginPath = pluginPathURI.toURL()
+        if(pluginPath.protocol == "file"){
+            if(File(pluginPathURI).isDirectory()){
+                // get all jar files in the directory and convert list to a mutable list so we can add any .class files, then add those too
+                val bytecodefiles = (File(pluginPathURI).listFiles { file -> file.name.endsWith(".jar") }
+                    .map { it.toURI().toURL() }).toMutableList()
+                bytecodefiles.addAll(File(pluginPathURI).listFiles { file -> file.name.endsWith(".class") }.map { it.toURI().toURL() })
+                return bytecodefiles
+            } else return listOf(pluginPath) //<-- else if specific file was specified, return the url as a 1 element list
+        } else return listOf()
+    }
+    private fun loadPluginsFromFileLocation(plugURL: URL, targetClassNames: List<String>): MutableList<UUID> {
+        val plugIDs = mutableListOf<UUID>()
+        // Get all subtypes of MyPlugin using Reflections
+        val reflections = Reflections(ConfigurationBuilder().addUrls(plugURL)
+            .addClassLoaders(URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)))
+        var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()
+        //now that we have the classes, convert them to KClasses, and filter then load them
+        plugIDs.addAll(loadPluginKClassesFromURLFilePath(pluginClasses.map { it.kotlin }, plugURL, targetClassNames))
+        return plugIDs
+    }
+    //Once you finally have the KClass objects
+    private fun loadPluginKClassesFromURLFilePath(pluginKClasses: List<KClass<out MyPlugin>>, plugURL: URL, targetClassNames: List<String>): MutableList<UUID> {
+        var pluginClasses = pluginKClasses
+        if(!targetClassNames.isEmpty()) pluginClasses = pluginClasses.filter { pluginClass ->
+            targetClassNames.any { target -> ((pluginClass.qualifiedName == target)||(pluginClass.simpleName == target)) } //<-- If there were targetClassNames, filter for them
+        }
+        val plugIDs = mutableListOf<UUID>()
+        pluginClasses.forEach { pluginClass ->
+            val plugID = loadPlugin(URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader), pluginClass, plugURL) //<-- loadPlugin(cLoader, pluginClass, plugURL): UUID? defined below
+            if(plugID!=null)plugIDs.add(plugID)//<-- add uuid to the newly-loaded uuid list
+        }
+        return plugIDs
     }
     private fun loadPlugin(cLoader: URLClassLoader, pluginClass: KClass<out MyPlugin>, plugURL: URL): UUID? {
         var launchableName = pluginClass.qualifiedName //<-- get class name
@@ -107,14 +171,5 @@ object PluginLoader {
             plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
             return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
         } else return null
-    }
-    private fun getJarURLs(pluginPath: File): List<URL> {
-        if(pluginPath.isDirectory()){
-            // get all jar files in the directory and convert list to a mutable list so we can add any .class files, then add those too
-            val bytecodefiles = (pluginPath.listFiles { file -> file.name.endsWith(".jar") }
-                .map { it.toURI().toURL() }).toMutableList()
-            bytecodefiles.addAll(pluginPath.listFiles { file -> file.name.endsWith(".class") }.map { it.toURI().toURL() })
-            return bytecodefiles
-        } else return listOf(pluginPath.toURI().toURL()) //<-- else if specific file was specified, return the url as a 1 element list
     }
 }

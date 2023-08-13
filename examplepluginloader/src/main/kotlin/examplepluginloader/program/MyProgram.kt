@@ -2,21 +2,21 @@ package examplepluginloader.program
 import examplepluginloader.api.MyAPI
 import examplepluginloader.api.MyPlugin
 import examplepluginloader.PluggerXP.PluginLoader
-class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
+class MyProgram(api: MyAPI, var pluginPaths: List<String>){
     init{
         println("Testing...")
         val startTime = System.currentTimeMillis()
-        var optionalTargets: Array<String> = arrayOf()
-        if(pluginPaths.isEmpty())pluginPaths=arrayOf("./outputDir/plugins/")
+        var optionalTargets: List<String> = listOf()
+        if(pluginPaths.isEmpty())pluginPaths=listOf("./outputDir/plugins/")
         else {
-            optionalTargets=arrayOf("exampleplugin.MyPluginImplementation1")
+            optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
             println("Target classes:")
             optionalTargets.forEach { target -> println(target) }
         }
         println("Paths to load from:")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
         println("Tests:")
-        PluginLoader.callPlugLoader(api, pluginPaths, optionalTargets).forEach {plugID ->
+        PluginLoader.loadPlugins(api, pluginPaths, optionalTargets).forEach {plugID ->
             val plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
             if(plugin!=null){
                 println(plugin.getName()) // MyPluginImplementation loaded
