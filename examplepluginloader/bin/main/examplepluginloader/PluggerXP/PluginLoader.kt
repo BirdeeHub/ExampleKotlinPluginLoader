@@ -137,7 +137,7 @@ object PluginLoader {
     }
     private fun loadPluginsFromFileLocation(plugURL: URL, targetClassNames: List<String>): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
-        // Get all subtypes of MyPlugin using Reflections
+        // Get all subtypes of MyPlugin using Reflections (Which I cant get to work over the internet)
         val reflections = Reflections(ConfigurationBuilder().addUrls(plugURL)
             .addClassLoaders(URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)))
         var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()

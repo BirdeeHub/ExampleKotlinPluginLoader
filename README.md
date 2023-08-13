@@ -97,7 +97,7 @@ I'm pretty sure that if you want to load from web, you only need to change the f
 
 and then make a loadPluginsFrom_protocol_Location(plugURL: URL, targetClassNames: List<String>): MutableList<UUID> 
 
-which would find the classes at the url and then do:
+which would find the classes at the url, because reflections doesnt seem to work over http
 
 ```kotlin
     private fun loadPluginsFromGenLocation(pluginURI: URI, targetClassNames: List<String>): MutableList<UUID> {
