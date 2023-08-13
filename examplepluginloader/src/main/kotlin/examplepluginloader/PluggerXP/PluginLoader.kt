@@ -13,13 +13,13 @@ object PluginLoader {
     private val pluginClassMap = mutableMapOf<UUID,KClass<out MyPlugin>>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
     private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>() //<-- we will close these to unload plugins
-    private val pluginLocation = mutableMapOf<UUID,String>() //<-- this one is just for the user to reference. It is the file name
+    private val pluginLocation = mutableMapOf<UUID,URL>() //<-- this one is just for the user to reference. It is the file name
     private val plugIDList = mutableListOf<UUID>()
     //public getter functions
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap.toMap() //<-- return a copy of the Map rather than the Map itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
-    fun getPluginLocation(plugID: UUID): String? = pluginLocation[plugID]
+    fun getPluginLocation(plugID: UUID): URL? = pluginLocation[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     //unload and load functions (Synchronized)
     private val lock = Any() // Shared lock object
@@ -103,7 +103,7 @@ object PluginLoader {
             pluginClassMap[pluginUUID] = pluginClass //add stuff into respective maps using UUID as the key
             pluginObjectMap[pluginUUID] = pluginInstance
             cLoaderMap[pluginUUID] = cLoader //<-- we keep track of cLoaders so we can close them later
-            pluginLocation[pluginUUID] = plugURL.toURI().toPath().toString()
+            pluginLocation[pluginUUID] = plugURL
             plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
             return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
         } else return null
