@@ -86,13 +86,13 @@ object PluginLoader {
                 // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
                 if(i == true)cLoader=URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)
                 i = true
-                val plugID = loadPlugin(cLoader, pluginClass, pluginPath.toString()) //<-- loadPlugin defined below
+                val plugID = loadPlugin(cLoader, pluginClass, plugURL) //<-- loadPlugin defined below
                 if(plugID!=null)plugIDs.add(plugID)//<-- add uuid to the newly-loaded uuid list
             }
         }
         return plugIDs //<-- returns the uuids of the new plugins loaded
     }
-    private fun loadPlugin(cLoader: URLClassLoader, pluginClass: KClass<out MyPlugin>, pluginPath: String): UUID? {
+    private fun loadPlugin(cLoader: URLClassLoader, pluginClass: KClass<out MyPlugin>, plugURL: URL): UUID? {
         var launchableName = pluginClass.qualifiedName //<-- get class name
         if(launchableName==null)launchableName=pluginClass.simpleName //<-- if not in package it may only have simpleName
         if(launchableName!=null){ // if it has a name at all, launch it and update lists
@@ -101,7 +101,7 @@ object PluginLoader {
             pluginClassMap[pluginUUID] = pluginClass //add stuff into respective maps using UUID as the key
             pluginObjectMap[pluginUUID] = pluginInstance
             cLoaderMap[pluginUUID] = cLoader //<-- we keep track of cLoaders so we can close them later
-            pluginLocation[pluginUUID] = pluginPath
+            pluginLocation[pluginUUID] = plugURL.toURI().toPath().toString()
             plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
             return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
         } else return null
