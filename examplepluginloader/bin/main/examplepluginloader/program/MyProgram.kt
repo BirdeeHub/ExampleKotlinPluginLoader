@@ -11,12 +11,12 @@ class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
             pluginPaths=arrayOf("./outputDir/plugins/")
         }else {
                 targets=arrayOf("exampleplugin.MyPluginImplementation1")
-                println("target classes:")
+                println("Target classes:")
                 targets.forEach { target -> println(target) }
         }
-        println("paths to load from:")
+        println("Paths to load from:")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
-        println("tests:")
+        println("Tests:")
         // targets is optional if you dont want to specify. default value = arrayOf()
         PluginLoader.callPlugLoader(api, pluginPaths, targets).forEach {plugID ->
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
@@ -29,7 +29,7 @@ class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
         val totalnumber: Int = PluginLoader.getPlugIDList().size
         println("All UUIDs: "+PluginLoader.getPlugIDList())
         PluginLoader.getPlugIDList().forEach { plugID ->
-            println("unloading: "+PluginLoader.getPlugin(plugID)?.getName()+" : "+plugID)
+            println("Unloading: "+PluginLoader.getPlugin(plugID)?.getName()+" : "+plugID)
             PluginLoader.unloadPlugin(plugID)
             println("All UUIDs: "+PluginLoader.getPlugIDList())
         }
