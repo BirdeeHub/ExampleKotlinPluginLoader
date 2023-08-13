@@ -73,11 +73,11 @@ object PluginLoader {
     //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
     private fun loadPlugins(pluginPath: File, targetClassNames: Array<String>): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
-        for(plugURL in getJarURLs(pluginPath)){ //getJarURLs(pluginPath: File): List<URL> defined at end
-            //create a classloader for finding and loading classes
+        for(plugURL in getJarURLs(pluginPath)){ //<-- getJarURLs(pluginPath: File): List<URL> defined at end
+            //create a classloader and reflections for finding and loading classes
             var cLoader: URLClassLoader = URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)
             val reflections = Reflections(ConfigurationBuilder().addUrls(plugURL).addClassLoaders(cLoader))
-            // Get all subtypes of MyPlugin using Reflections
+            // Get all subtypes of MyPlugin using Reflections (then filter if target classes exist)
             var pluginClasses = reflections.getSubTypesOf(MyPlugin::class.java).toList()
             if(!targetClassNames.isEmpty()) pluginClasses = pluginClasses.filter { pluginClass ->
                 targetClassNames.any { target -> pluginClass.name == target } //<-- If there were targetClassNames, filter for them
