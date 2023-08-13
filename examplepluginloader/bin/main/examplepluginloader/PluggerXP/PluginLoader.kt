@@ -86,7 +86,7 @@ object PluginLoader {
                 // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
                 if(i == true)cLoader=URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)
                 i = true
-                val plugID = loadPlugin(cLoader, pluginClass, plugURL) //<-- loadPlugin defined below
+                val plugID = loadPlugin(cLoader, pluginClass, plugURL) //<-- loadPlugin(cLoader, pluginClass, plugURL): UUID? defined below
                 if(plugID!=null)plugIDs.add(plugID)//<-- add uuid to the newly-loaded uuid list
             }
         }
