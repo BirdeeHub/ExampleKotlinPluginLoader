@@ -16,7 +16,7 @@ object PluginLoader {
     private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>() //<-- we will close these to unload plugins
     private val pluginLocation = mutableMapOf<UUID,URL>() //<-- this one is just for the user to reference.
     private val plugIDList = mutableListOf<UUID>()
-    
+
     //public getter functions
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap.toMap() //<-- return a copy of the Map rather than the Map itself to prevent concurrent modification exception
@@ -50,39 +50,39 @@ object PluginLoader {
     }
     @Synchronized
     fun loadPlugins(api: MyAPI, pluginPathStrings: List<String>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
-        val pluginLocations = mutableListOf<URI>()
+        val pluginURIs = mutableListOf<URI>()
         pluginPathStrings.forEach { pluginPathString -> 
-            try{ pluginLocations.add(File(pluginPathString).toURI()) 
+            try{ pluginURIs.add(File(pluginPathString).toURI()) 
             } catch(e: Exception) { e.printStackTrace() }
         }
-        return callPlugLoader(api, pluginLocations, targetPluginFullClassNames)
+        return callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
     }
     @Synchronized
     fun loadPluginsFromURLs(api: MyAPI, pluginURLs: List<URL>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
-        val pluginLocations = mutableListOf<URI>()
+        val pluginURIs = mutableListOf<URI>()
         pluginURLs.forEach { pluginURL -> 
-            try{ pluginLocations.add(pluginURL.toURI())
+            try{ pluginURIs.add(pluginURL.toURI())
             } catch(e: Exception) { e.printStackTrace() }
         }
-        return callPlugLoader(api, pluginLocations, targetPluginFullClassNames)
+        return callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
     }
     @Synchronized
     fun loadPluginsFromPaths(api: MyAPI, pluginPaths: List<Path>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
-        val pluginLocations = mutableListOf<URI>()
+        val pluginURIs = mutableListOf<URI>()
         pluginPaths.forEach { pluginPath -> 
-            try{ pluginLocations.add(pluginPath.toUri())
+            try{ pluginURIs.add(pluginPath.toUri())
             } catch(e: Exception) { e.printStackTrace() }
         }
-        return callPlugLoader(api, pluginLocations, targetPluginFullClassNames)
+        return callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
     }
     @Synchronized
     fun loadPluginsFromFiles(api: MyAPI, pluginFiles: List<File>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
-        val pluginLocations = mutableListOf<URI>()
+        val pluginURIs = mutableListOf<URI>()
         pluginFiles.forEach { pluginFile -> 
-            try{ pluginLocations.add(pluginFile.toURI())
+            try{ pluginURIs.add(pluginFile.toURI())
             } catch(e: Exception) { e.printStackTrace() }
         }
-        return callPlugLoader(api, pluginLocations, targetPluginFullClassNames)
+        return callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
     }
     @Synchronized
     fun loadPluginsFromURIs(api: MyAPI, pluginURIs: List<URI>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
