@@ -7,9 +7,8 @@ class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
         println("Testing...")
         val startTime = System.currentTimeMillis()
         var optionalTargets: Array<String> = arrayOf()
-        if(pluginPaths.isEmpty()){
-            pluginPaths=arrayOf("./outputDir/plugins/")
-        }else {
+        if(pluginPaths.isEmpty())pluginPaths=arrayOf("./outputDir/plugins/")
+        else {
             optionalTargets=arrayOf("exampleplugin.MyPluginImplementation1")
             println("Target classes:")
             optionalTargets.forEach { target -> println(target) }
