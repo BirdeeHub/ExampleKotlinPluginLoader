@@ -13,7 +13,7 @@ import java.util.UUID
 object PluginLoader {
     private val pluginClassMap = mutableMapOf<UUID,KClass<out MyPlugin>>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
-    private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>()
+    private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>() //<-- we will close these to unload plugins
     private val pluginLocation = mutableMapOf<UUID,String>() //<-- this one is just for the user to reference. It is the file name
     private val plugIDList = mutableListOf<UUID>()
     //public functions
