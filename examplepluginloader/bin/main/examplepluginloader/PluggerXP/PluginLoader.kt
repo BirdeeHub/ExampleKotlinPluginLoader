@@ -62,8 +62,8 @@ object PluginLoader {
             }
         }
         pluginsToRemove.forEach { plugID ->
-            pluginUUIDs.remove(plugID) //<-- remember:
-            unloadPlugin(plugID) //<-- remove the ones that dont load/crash on start to give accurate info
+            pluginUUIDs.remove(plugID) //<-- remember: remove the ones that
+            unloadPlugin(plugID) //<-- dont load/crash on start to give accurate info
         }
         return pluginUUIDs.toList() //<-- returns a copy of the list of uuids of the new plugins ACTUALLY loaded
     }
@@ -86,7 +86,7 @@ object PluginLoader {
                 if(i == true)cLoader=URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)
                 i = true
                 val plugID = loadPlugin(cLoader, pluginClass, plugURL) //<-- loadPlugin defined below
-                if(plugID!=null)plugIDs.add(plugID)
+                if(plugID!=null)plugIDs.add(plugID)//<-- add uuid to the newly-loaded uuid list
             }
         }
         return plugIDs //<-- returns the uuids of the new plugins loaded
@@ -94,7 +94,7 @@ object PluginLoader {
     private fun loadPlugin(cLoader: URLClassLoader, pluginClass: KClass<out MyPlugin>, plugURL: URL): UUID? {
         var launchableName = pluginClass.qualifiedName //<-- get class name
         if(launchableName==null)launchableName=pluginClass.simpleName //<-- if not in package it may only have simpleName
-        if(launchableName!=null){
+        if(launchableName!=null){ // if it has a name at all, launch it and update lists
             val pluginInstance = cLoader.loadClass(launchableName).getConstructor().newInstance() as MyPlugin
             val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
             pluginClassMap[pluginUUID] = pluginClass //add stuff into respective maps using UUID as the key
