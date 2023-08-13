@@ -70,7 +70,7 @@ object PluginLoader {
     //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
     private fun loadPlugins(pluginPath: File, targetClassNames: Array<String>): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
-        for(entry in getJarURLs(pluginPath)){ //getJarURLs(pluginPath: File): List<URL> defined below
+        for(entry in getJarURLs(pluginPath)){ //getJarURLs(pluginPath: File): List<URL> defined at end
             //create a classloader for finding and loading classes
             var cLoader: URLClassLoader = URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
             val reflections = Reflections(ConfigurationBuilder().addUrls(entry).addClassLoaders(cLoader))
@@ -89,19 +89,21 @@ object PluginLoader {
                 if(launchableName!=null){ //<-- make it non-nullable if not null
                     // Create new class loader after 1st iteration if multiple plugins were in the jar file, to allow individual closing
                     if(i++ != 0)cLoader=URLClassLoader(arrayOf(entry), PluginLoader::class.java.classLoader)
-                    // Load and initialize each plugin class using the custom class loader
-                    val pluginInstance = cLoader.loadClass(launchableName).getConstructor().newInstance() as MyPlugin
-                    val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
-                    plugIDs.add(pluginUUID) //<-- add the uuid to the new uuid list
-                    pluginClassMap[pluginUUID] = pluginClass //add class, loaded instance, and class loader, 
-                    pluginObjectMap[pluginUUID] = pluginInstance //into respective maps using UUID as the key
-                    cLoaderMap[pluginUUID] = cLoader //<-- we keep track of cLoaders so we can close them later
-                    pluginLocation[pluginUUID] = entry.toURI().toPath().toString()
+                    plugIDs.add(loadPlugin(cLoader, pluginClass, launchableName, entry)) //<-- loadPlugin defined below
                 }
             }
         }
-        plugIDList.addAll(plugIDs) //<-- add new uuids to the actual list
         return plugIDs //<-- returns the uuids of the new plugins loaded
+    }
+    private fun loadPlugin(cLoader: URLClassLoader, pluginClass: KClass<out MyPlugin>, launchableName: String, entry: URL): UUID{
+        val pluginInstance = cLoader.loadClass(launchableName).getConstructor().newInstance() as MyPlugin
+        val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
+        pluginClassMap[pluginUUID] = pluginClass //add stuff into respective maps using UUID as the key
+        pluginObjectMap[pluginUUID] = pluginInstance
+        cLoaderMap[pluginUUID] = cLoader //<-- we keep track of cLoaders so we can close them later
+        pluginLocation[pluginUUID] = entry.toURI().toPath().toString()
+        plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
+        return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
     }
     private fun getJarURLs(pluginPath: File): List<URL> {
         if(pluginPath.isDirectory()){
