@@ -16,12 +16,14 @@ object PluginLoader {
     private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>() //<-- we will close these to unload plugins
     private val pluginLocation = mutableMapOf<UUID,URL>() //<-- this one is just for the user to reference.
     private val plugIDList = mutableListOf<UUID>()
+    
     //public getter functions
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap.toMap() //<-- return a copy of the Map rather than the Map itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginLocation(plugID: UUID): URL? = pluginLocation[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
+
     //unload and load functions (Synchronized)
     private val lock = Any() // Shared lock object
     @Synchronized
@@ -112,6 +114,7 @@ object PluginLoader {
         }
         return pluginUUIDs.toList() //<-- returns a copy of the list of uuids of the new plugins ACTUALLY loaded
     }
+
     //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
     private fun loadPluginsFromGenLocation(pluginURI: URI, targetClassNames: List<String>): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
@@ -145,7 +148,8 @@ object PluginLoader {
         plugIDs.addAll(loadPluginKClassesFromURLFilePath(pluginClasses.map { it.kotlin }, plugURL, targetClassNames))
         return plugIDs
     }
-    //Once you finally have the KClass objects
+
+    //Once you finally have the list of correct KClass objects at the url
     private fun loadPluginKClassesFromURLFilePath(pluginKClasses: List<KClass<out MyPlugin>>, plugURL: URL, targetClassNames: List<String>): MutableList<UUID> {
         var pluginClasses = pluginKClasses
         if(!targetClassNames.isEmpty()) pluginClasses = pluginClasses.filter { pluginClass ->
