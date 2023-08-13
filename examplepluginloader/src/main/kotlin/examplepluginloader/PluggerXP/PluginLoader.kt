@@ -1,7 +1,6 @@
 package examplepluginloader.PluggerXP
 import org.reflections.Reflections
 import org.reflections.util.ConfigurationBuilder
-import org.reflections.util.FilterBuilder
 import kotlin.reflect.KClass
 import kotlin.io.path.toPath
 import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
@@ -25,8 +24,7 @@ object PluginLoader {
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
-        try{
-            cLoaderMap[plugID]?.close() //<-- if already closed somehow, this can throw
+        try{ cLoaderMap[plugID]?.close() //<-- if already closed somehow, this can throw
         }catch (e: Exception){e.printStackTrace()}
         cLoaderMap.remove(plugID) //these don't throw.
         pluginClassMap.remove(plugID)
@@ -36,8 +34,7 @@ object PluginLoader {
     }
     @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
-        for(entry in cLoaderMap)try{
-                entry.value.close() //<-- if already closed somehow, this can throw
+        for(entry in cLoaderMap)try{ entry.value.close() //<-- if already closed somehow, this can throw
             }catch (e: Exception){e.printStackTrace()}
         cLoaderMap.clear() //these don't throw.
         pluginClassMap.clear()
