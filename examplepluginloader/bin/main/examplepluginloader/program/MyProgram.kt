@@ -6,19 +6,18 @@ class MyProgram(api: MyAPI, var pluginPaths: Array<String>){
     init{
         println("Testing...")
         val startTime = System.currentTimeMillis()
-        var targets: Array<String> = arrayOf()
+        var optionalTargets: Array<String> = arrayOf()
         if(pluginPaths.isEmpty()){
             pluginPaths=arrayOf("./outputDir/plugins/")
         }else {
-                targets=arrayOf("exampleplugin.MyPluginImplementation1")
-                println("Target classes:")
-                targets.forEach { target -> println(target) }
+            optionalTargets=arrayOf("exampleplugin.MyPluginImplementation1")
+            println("Target classes:")
+            optionalTargets.forEach { target -> println(target) }
         }
         println("Paths to load from:")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
         println("Tests:")
-        // targets is optional if you dont want to specify. default value = arrayOf()
-        PluginLoader.callPlugLoader(api, pluginPaths, targets).forEach {plugID ->
+        PluginLoader.callPlugLoader(api, pluginPaths, optionalTargets).forEach {plugID ->
             var plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
             if(plugin!=null){
                 println(plugin.getName()) // MyPluginImplementation loaded
