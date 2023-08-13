@@ -8,13 +8,11 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
     api(kotlin("stdlib"))
     api("org.apache.commons:commons-math3:3.6.1")
     api("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
     api("org.reflections:reflections:0.10.2")
     api("com.google.guava:guava:31.1-jre")
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     runtimeOnly("org.slf4j:slf4j-nop:1.7.32")
 }
 
