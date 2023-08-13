@@ -31,6 +31,7 @@ object PluginLoader {
         cLoaderMap.remove(plugID) //these don't throw.
         pluginClassMap.remove(plugID)
         pluginObjectMap.remove(plugID)
+        pluginLocation.remove(plugID)
         plugIDList.remove(plugID)
     }
     @Synchronized
@@ -41,6 +42,7 @@ object PluginLoader {
         cLoaderMap.clear() //these don't throw.
         pluginClassMap.clear()
         pluginObjectMap.clear()
+        pluginLocation.clear()
         plugIDList.clear()
     }
     //public load class function
