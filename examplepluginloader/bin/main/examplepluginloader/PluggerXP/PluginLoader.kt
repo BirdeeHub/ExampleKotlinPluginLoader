@@ -11,6 +11,7 @@ import java.net.URL
 import java.net.URLClassLoader
 import java.util.UUID
 object PluginLoader {
+    private val lock = Any() // Shared lock object
     private val pluginClassMap = mutableMapOf<UUID,KClass<out MyPlugin>>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
     private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>() //<-- we will close these to unload plugins
