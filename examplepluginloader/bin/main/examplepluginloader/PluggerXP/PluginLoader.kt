@@ -24,8 +24,6 @@ object PluginLoader {
     fun getPluginLocation(plugID: UUID): String? = pluginLocation[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     @Synchronized
-    fun unloadPlugins(plugIDs: List<UUID>) = plugIDs.forEach { plugID -> unloadPlugin(plugID) }
-    @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         try{
             cLoaderMap[plugID]?.close() //<-- if already closed somehow, this can throw
