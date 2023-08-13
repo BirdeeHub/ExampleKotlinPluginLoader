@@ -42,7 +42,7 @@ object PluginLoader {
         pluginLocation.clear()
         plugIDList.clear()
     }
-    //public load class function
+    //public load class function (3rd argument optional. Default value is empty array.)
     @Synchronized
     fun callPlugLoader(api: MyAPI, pluginPaths: Array<String>, targetPluginFullClassNames: Array<String> = arrayOf()): List<UUID> {
         val pluginUUIDs = mutableListOf<UUID>()
