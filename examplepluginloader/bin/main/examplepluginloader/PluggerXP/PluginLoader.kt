@@ -13,14 +13,14 @@ import java.nio.file.Path
 object PluginLoader {
     private val pluginClassMap = mutableMapOf<UUID,KClass<out MyPlugin>>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
-    private val cLoaderMap = mutableMapOf<UUID,URLClassLoader>() //<-- we will close these to unload plugins
+    private val uRLoaderMap = mutableMapOf<UUID,MyURLoader>() //<-- we will close these to unload plugins
     private val plugIDList = mutableListOf<UUID>()
 
     //public getter functions
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPluginMap(): Map<UUID, MyPlugin> = pluginObjectMap.toMap() //<-- return a copy of the Map rather than the Map itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
-    fun getPluginLocation(plugID: UUID): URL? = cLoaderMap[plugID]?.getURLs()?.get(0)//<-- each loader has only 1 class and 1 url anyway
+    fun getPluginLocation(plugID: UUID): URL? = uRLoaderMap[plugID]?.getURL()//<-- each loader has only 1 class and 1 url anyway
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
 
     //unload and load functions (Synchronized)
@@ -29,18 +29,18 @@ object PluginLoader {
     fun unloadPlugins(plugIDs: List<UUID>) = plugIDs.forEach { plugID -> unloadPlugin(plugID) }
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
-        try{ cLoaderMap[plugID]?.close() //<-- if already closed somehow, this can throw
+        try{ uRLoaderMap[plugID]?.close() //<-- if already closed somehow, this can throw
         }catch (e: Exception){e.printStackTrace()}
-        cLoaderMap.remove(plugID) //these don't throw.
+        uRLoaderMap.remove(plugID) //these don't throw.
         pluginClassMap.remove(plugID)
         pluginObjectMap.remove(plugID)
         plugIDList.remove(plugID)
     }
     @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
-        for(entry in cLoaderMap)try{ entry.value.close() //<-- if already closed somehow, this can throw
+        for(entry in uRLoaderMap)try{ entry.value.close() //<-- if already closed somehow, this can throw
             }catch (e: Exception){e.printStackTrace()}
-        cLoaderMap.clear() //these don't throw.
+        uRLoaderMap.clear() //these don't throw.
         pluginClassMap.clear()
         pluginObjectMap.clear()
         plugIDList.clear()
@@ -118,12 +118,12 @@ object PluginLoader {
         try{
             getJarURLs(pluginURI).forEach { plugURL -> //<-- Step 1: getJarURLs(pluginPath: File): List<URL>
                 //Step 2: get ClassLoader for single URL and init list of plugin Class objects
-                val cLoader = URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)
+                val uRLoader = MyURLoader(plugURL, PluginLoader::class.java.classLoader)
                 val pluginClasses = mutableListOf<Class<out MyPlugin>>()
                 try{ //Step 2: get Class objects at each url with ClassLoader
-                    if(plugURL.protocol == "file")pluginClasses.addAll(getPluginsFromFile(plugURL, cLoader))
-                    //Step 3: loadPluginClasses(List<Class<out MyPlugin>>, URLClassLoader, List<String>)
-                    plugIDs.addAll(loadPluginClasses(pluginClasses, cLoader, targetClassNames))
+                    if(plugURL.protocol == "file")pluginClasses.addAll(getPluginsFromFile(plugURL, uRLoader))
+                    //Step 3: loadPluginClasses(List<Class<out MyPlugin>>, MyURLoader, List<String>)
+                    plugIDs.addAll(loadPluginClasses(pluginClasses, uRLoader, targetClassNames))
                 }catch(e: Exception){e.printStackTrace()}
             }
         }catch(e: Exception){e.printStackTrace()}
@@ -151,31 +151,35 @@ object PluginLoader {
     }
 
     // Get all subtypes of MyPlugin using Reflections (Which I cant get to work over the internet)
-    private fun getPluginsFromFile(plugURL: URL, cLoader: URLClassLoader): List<Class<out MyPlugin>> = Reflections(
-        ConfigurationBuilder().addUrls(plugURL).addClassLoaders(cLoader)).getSubTypesOf(MyPlugin::class.java).toList()
+    private fun getPluginsFromFile(plugURL: URL, uRLoader: MyURLoader): List<Class<out MyPlugin>> = Reflections(
+        ConfigurationBuilder().addUrls(plugURL).addClassLoaders(uRLoader)).getSubTypesOf(MyPlugin::class.java).toList()
 
     //Once you finally have the Class objects
-    private fun loadPluginClasses(pluginClasses: List<Class<out MyPlugin>>, URLoader: URLClassLoader, targetClassNames: List<String> = listOf()): MutableList<UUID> {
+    private fun loadPluginClasses(pluginClasses: List<Class<out MyPlugin>>, uRLoader: MyURLoader, targetClassNames: List<String> = listOf()): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
         pluginClasses.forEach { pluginClass -> // use copy of loader to allow individual closing, also map to KClass
-            val plugID = loadPlugin(URLClassLoader(URLoader.getURLs(), URLoader.parent), pluginClass.kotlin, targetClassNames)
+            val plugID = loadPlugin(MyURLoader(uRLoader.getURL(), uRLoader.parent), pluginClass.kotlin, targetClassNames)
             if(plugID!=null)plugIDs.add(plugID)//<-- if it worked, add uuid to the newly-loaded uuid list
         }
         return plugIDs
     }
-    private fun loadPlugin(cLoader: URLClassLoader, pluginClass: KClass<out MyPlugin>, targetClassNames: List<String> = listOf()): UUID? {
+    private fun loadPlugin(uRLoader: MyURLoader, pluginClass: KClass<out MyPlugin>, targetClassNames: List<String> = listOf()): UUID? {
         if(targetClassNames.isEmpty() || (targetClassNames.any { target -> ((pluginClass.qualifiedName == target)||(pluginClass.simpleName == target)) })){
             var launchableName = pluginClass.qualifiedName //<-- get class name
             if(launchableName==null)launchableName=pluginClass.simpleName //<-- if not in package it may only have simpleName
             if(launchableName!=null){ // if it has a name at all, launch it and update lists
-                val pluginInstance = cLoader.loadClass(launchableName).getConstructor().newInstance() as MyPlugin
+                val pluginInstance = uRLoader.loadClass(launchableName).getConstructor().newInstance() as MyPlugin
                 val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
                 pluginClassMap[pluginUUID] = pluginClass //add stuff into respective maps using UUID as the key
                 pluginObjectMap[pluginUUID] = pluginInstance
-                cLoaderMap[pluginUUID] = cLoader //<-- we keep track of cLoaders so we can close them later
+                uRLoaderMap[pluginUUID] = uRLoader //<-- we keep track of uRLoaders so we can close them later
                 plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
                 return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
             } else return null
         } else return null
+    }
+
+    private class MyURLoader(val plugURL: URL, val parentLoader: ClassLoader = PluginLoader::class.java.classLoader): URLClassLoader(arrayOf(plugURL), parentLoader){
+        fun getURL(): URL = getURLs().get(0)
     }
 }
