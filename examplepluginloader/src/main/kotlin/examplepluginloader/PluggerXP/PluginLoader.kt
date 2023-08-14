@@ -215,7 +215,6 @@ object PluginLoader {
             val urlBytes = readBytes(inputStream)
             response.close()
             httpClient.close()
-            // Load JAR bytes as a JarInputStream
             if(plugURL.toString().endsWith(".jar")){
                 JarInputStream(ByteArrayInputStream(urlBytes)).use { jis ->
                     var entry = jis.getNextJarEntry()
