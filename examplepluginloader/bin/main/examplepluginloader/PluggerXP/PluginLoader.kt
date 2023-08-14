@@ -185,11 +185,8 @@ object PluginLoader {
                 val config = ConfigurationBuilder.build(loader.defineClassesFromJarBytes(urlBytes)).addUrls(plugURL).addClassLoaders(loader)
                 pluginClasses.addAll(Reflections(config).getSubTypesOf(MyPlugin::class.java))
             } else if(plugURL.toString().endsWith(".class")){
-                var uRLClassName = plugURL.toURI().path.substringAfterLast('/').removeSuffix(".class")
-                if(uRLClassName.isNotEmpty()){
-                    val config = ConfigurationBuilder.build(loader.defineClassFromClassBytes(urlBytes)).addUrls(plugURL).addClassLoaders(loader)
-                    pluginClasses.addAll(Reflections(config).getSubTypesOf(MyPlugin::class.java))
-                }
+                val config = ConfigurationBuilder.build(loader.defineClassFromClassBytes(urlBytes)).addUrls(plugURL).addClassLoaders(loader)
+                pluginClasses.addAll(Reflections(config).getSubTypesOf(MyPlugin::class.java))
             }
         } catch (e: Exception) { e.printStackTrace() }
         return pluginClasses
