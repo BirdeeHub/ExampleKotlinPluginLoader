@@ -219,6 +219,7 @@ object PluginLoader {
             } else return null
         } else return null
     }
+
 //-------------------------------------END OF MAIN OBJECT--------PRIVATE CUSTOM CLASS LOADER BELOW------------------------------------------------------------------------
     //The custom class loader that allows for loading from bytes with no class names, and also copying itself (and can only load from 1 url)
     private class URLoader(val plugURL: URL): URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader){
