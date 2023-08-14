@@ -16,8 +16,6 @@ It now also can load classes from the internet. Use 1 or 2 to choose file or url
 
 For loading over http/s specify entire url to jar or class file. 
 
-Over http/s it can load any plugins in jar files, or a single standalone class file that does not have a package declaration
-
 It was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
 
 I then built a quick mockup test for it to upload it, in case someone finds it useful
