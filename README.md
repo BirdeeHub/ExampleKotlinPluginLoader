@@ -96,20 +96,20 @@ Testing...
 Paths to load from:
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar
 Tests:
+API call test when launchPlugin(api) is called (entering paths will set target to only plugin 1, removing this)
 API call test when launchPlugin(api) is called
-API call test when launchPlugin(api) is called (This gets filtered out if arguments are used for demonstration)
+MyPluginImplementation2 getName() Test (Filtering Demo)
+https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar
+UUID: 5addfdb6-77a5-474c-8d83-3d9fcd1042a5
 MyPluginImplementation1 getName() Test
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar
-UUID: f2ada57e-003f-4cf8-88e5-15e3a0f26f59
-MyPluginImplementation2 getName() Test (This gets filtered out if arguments are used for demonstration)
-https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar
-UUID: bec4d115-21f0-4bc4-b495-b5752ac5acab
-All UUIDs: [f2ada57e-003f-4cf8-88e5-15e3a0f26f59, bec4d115-21f0-4bc4-b495-b5752ac5acab]
-Unloading: MyPluginImplementation1 getName() Test : f2ada57e-003f-4cf8-88e5-15e3a0f26f59
-All UUIDs: [bec4d115-21f0-4bc4-b495-b5752ac5acab]
-Unloading: MyPluginImplementation2 getName() Test (This gets filtered out if arguments are used for demonstration) : bec4d115-21f0-4bc4-b495-b5752ac5acab
+UUID: a4c01fe9-37b6-43ff-8eff-fee204d68783
+All UUIDs: [5addfdb6-77a5-474c-8d83-3d9fcd1042a5, a4c01fe9-37b6-43ff-8eff-fee204d68783]
+Unloading: MyPluginImplementation2 getName() Test (Filtering Demo) : 5addfdb6-77a5-474c-8d83-3d9fcd1042a5
+All UUIDs: [a4c01fe9-37b6-43ff-8eff-fee204d68783]
+Unloading: MyPluginImplementation1 getName() Test : a4c01fe9-37b6-43ff-8eff-fee204d68783
 All UUIDs: []
 loaded and unloaded 2 plugin(s)
-duration in milliseconds: 924
+duration in milliseconds: 1625
 Goodbye!
 ```
