@@ -157,7 +157,7 @@ object PluginLoader {
     private fun loadPluginClasses(pluginClasses: List<Class<out MyPlugin>>, URLoader: URLClassLoader, targetClassNames: List<String> = listOf()): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
         pluginClasses.forEach { pluginClass -> // use copy of loader to allow individual closing, also map to KClass
-            val plugID = loadPlugin(URLClassLoader(URLoader.getName(), URLoader.getURLs(), URLoader.parent), pluginClass.kotlin, targetClassNames)
+            val plugID = loadPlugin(URLClassLoader(URLoader.getURLs(), URLoader.parent), pluginClass.kotlin, targetClassNames)
             if(plugID!=null)plugIDs.add(plugID)//<-- if it worked, add uuid to the newly-loaded uuid list
         }
         return plugIDs
