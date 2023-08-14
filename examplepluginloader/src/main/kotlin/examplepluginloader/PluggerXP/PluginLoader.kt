@@ -117,11 +117,11 @@ object PluginLoader {
         val plugIDs = mutableListOf<UUID>()
         try{
             getJarURLs(pluginURI).forEach { plugURL -> //<-- Step 1: getJarURLs(pluginPath: File): List<URL>
-                //Step 2: get ClassLoader for single bytecode file and init list of plugin Class objects
+                //Step 2: get ClassLoader for single URL and init list of plugin Class objects
                 val cLoader = URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader)
                 val pluginClasses = mutableListOf<Class<out MyPlugin>>()
                 try{ //Step 2: get Class objects at each url with ClassLoader
-                    if(plugURL.protocol == "file")pluginClasses.addAll(GetPluginsFromFile(plugURL, cLoader))
+                    if(plugURL.protocol == "file")pluginClasses.addAll(getPluginsFromFile(plugURL, cLoader))
                     //Step 3: loadPluginClasses(List<Class<out MyPlugin>>, URLClassLoader, List<String>)
                     plugIDs.addAll(loadPluginClasses(pluginClasses, cLoader, targetClassNames))
                 }catch(e: Exception){e.printStackTrace()}
@@ -150,7 +150,7 @@ object PluginLoader {
     }
 
     // Get all subtypes of MyPlugin using Reflections (Which I cant get to work over the internet)
-    private fun GetPluginsFromFile(plugURL: URL, cLoader: URLClassLoader): List<Class<out MyPlugin>> = Reflections(
+    private fun getPluginsFromFile(plugURL: URL, cLoader: URLClassLoader): List<Class<out MyPlugin>> = Reflections(
         ConfigurationBuilder().addUrls(plugURL).addClassLoaders(cLoader)).getSubTypesOf(MyPlugin::class.java).toList()
 
     //Once you finally have the Class objects
