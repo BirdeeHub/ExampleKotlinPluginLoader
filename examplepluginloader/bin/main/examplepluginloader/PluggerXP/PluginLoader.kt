@@ -91,7 +91,7 @@ object PluginLoader {
     private fun callPlugLoader(api: MyAPI, pluginURIs: List<URI>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
         val pluginUUIDs = mutableListOf<UUID>()
         val pluginsToRemove = mutableListOf<UUID>()
-        for(pluginURI in pluginURIs){ //for each call loadPluginsFromGenLocation(pluginURI: URI, targetClassNames: List<String>): MutableList<UUID>
+        for(pluginURI in pluginURIs){ //for each, call loadPluginsFromOneURI(pluginURI: URI, targetClassNames: List<String>): MutableList<UUID>
             val plugIDs = loadPluginsFromOneURI(pluginURI, targetPluginFullClassNames)
             pluginUUIDs.addAll(plugIDs)
             for (plugID in plugIDs) {
@@ -129,6 +129,7 @@ object PluginLoader {
         }catch(e: Exception){e.printStackTrace()}
         return plugIDs //<-- returns the uuids of the new plugins loaded
     }
+
     //gets URLS of bytecode files in directories, or URI as URL
     private fun getJarURLs(pluginPathURI: URI): List<URL> {
         try{
