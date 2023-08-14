@@ -1,20 +1,35 @@
 package examplepluginloader.PluggerXP
+
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.Opcodes
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.HttpClients
+import java.io.InputStream
+
 import org.reflections.Reflections
 import org.reflections.util.ConfigurationBuilder
 import kotlin.reflect.KClass
 import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import java.io.File
+import java.io.ByteArrayOutputStream
+import java.io.ByteArrayInputStream
 import java.net.URL
 import java.net.URLClassLoader
 import java.net.URI
 import java.util.UUID
+import java.util.jar.JarInputStream
+import java.util.jar.JarEntry
 import java.nio.file.Path
 object PluginLoader {
     private class MyURLoader(val plugURL: URL, val parentLoader: ClassLoader = PluginLoader::class.java.classLoader): URLClassLoader(arrayOf(plugURL), parentLoader){
         fun copy() = this
         fun getURL(): URL = getURLs().get(0)
         override fun addURL(url: URL){}
+        fun defineClassFromClassBytes(name: String, classBytes: ByteArray): Class<*> {
+            return defineClass(name, classBytes, 0, classBytes.size)
+        }
     }
     private val pluginClassMap = mutableMapOf<UUID,KClass<out MyPlugin>>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
@@ -123,10 +138,12 @@ object PluginLoader {
         try{
             getJarURLs(pluginURI).forEach { plugURL -> //<-- Step 1: getJarURLs(pluginPath: File): List<URL>
                 //Step 2: get ClassLoader for single URL and init list of plugin Class objects
-                val uRLoader = MyURLoader(plugURL, PluginLoader::class.java.classLoader)
+                val uRLoader = MyURLoader(plugURL)
                 val pluginClasses = mutableListOf<Class<out MyPlugin>>()
                 try{ //Step 2: get Class objects at each url with ClassLoader
                     if(plugURL.protocol == "file")pluginClasses.addAll(getPluginsFromFile(plugURL, uRLoader))
+                    if(plugURL.protocol == "http" || plugURL.protocol == "https")
+                        pluginClasses.addAll(getPluginsFromHTTP(plugURL, uRLoader))
                     //Step 3: loadPluginClasses(List<Class<out MyPlugin>>, MyURLoader, List<String>)
                     plugIDs.addAll(loadPluginClasses(pluginClasses, uRLoader, targetClassNames))
                 }catch(e: Exception){e.printStackTrace()}
@@ -151,6 +168,9 @@ object PluginLoader {
                         return bytecodefiles
                     } else return listOf(pluginPath) //<-- else if specific file was specified, return the url as a 1 element list
                 } else return listOf()
+            } else if(pluginPath.protocol == "http" || pluginPath.protocol == "https" && 
+                (pluginPath.toString().endsWith(".jar")||pluginPath.toString().endsWith(".class"))) {
+                return listOf(pluginPath)
             } else return listOf()
         }catch(e: Exception){ e.printStackTrace(); return listOf() }
     }
@@ -182,5 +202,61 @@ object PluginLoader {
                 return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
             } else return null
         } else return null
+    }
+
+    //WEB LOADING
+    private fun getPluginsFromHTTP(plugURL: URL, uRLoader: MyURLoader): List<Class<out MyPlugin>> { 
+        val pluginClasses = mutableListOf<Class<out MyPlugin>>()
+        try {
+            val httpClient = HttpClients.createDefault()
+            val httpGet = HttpGet(plugURL.toURI())
+            val response = httpClient.execute(httpGet)
+            val inputStream: InputStream = response.entity.content
+            val urlBytes = readBytes(inputStream)
+            response.close()
+            httpClient.close()
+            // Load JAR bytes as a JarInputStream
+            if(plugURL.toString().endsWith(".jar")){
+                JarInputStream(ByteArrayInputStream(urlBytes)).use { jis ->
+                    var entry = jis.getNextJarEntry()
+                    while (entry!=null) {
+                        if (!entry.isDirectory && entry.name.endsWith(".class")) {
+                            val classBytes = readBytes(jis)
+                            val pluginClass = getPluginInstanceFromBytes(entry.name.replace('/', '.').removeSuffix(".class"), classBytes, uRLoader)
+                            if(pluginClass!=null)pluginClasses.add(pluginClass)
+                        }
+                        jis.closeEntry()
+                        entry = jis.getNextJarEntry()
+                    }
+                }
+            } else if(plugURL.toString().endsWith(".class")){
+                var uRLClassName = plugURL.toURI().path.substringAfterLast('/').removeSuffix(".class")
+                if(uRLClassName.isNotEmpty()){
+                    val pluginClass = getPluginInstanceFromBytes(uRLClassName, urlBytes, uRLoader)
+                    if(pluginClass!=null)pluginClasses.add(pluginClass)
+                }
+            }
+        } catch (e: Exception) { e.printStackTrace() }
+        return pluginClasses
+    }
+    private fun getPluginInstanceFromBytes(name: String, classBytes: ByteArray, uRLoader: MyURLoader): Class<out MyPlugin>? {
+        try {
+            val remClass = uRLoader.defineClassFromClassBytes(name, classBytes)
+            if(remClass.interfaces.any { it == MyPlugin::class.java }){
+                return remClass as? Class<out MyPlugin> //<-- if it does not implement our interface, this will return null
+            }else return null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
+    fun readBytes(inputStream: InputStream): ByteArray {
+        val buffer = ByteArray(1024)
+        val output = ByteArrayOutputStream()
+        var bytesRead: Int
+        while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+            output.write(buffer, 0, bytesRead)
+        }
+        return output.toByteArray()
     }
 }
