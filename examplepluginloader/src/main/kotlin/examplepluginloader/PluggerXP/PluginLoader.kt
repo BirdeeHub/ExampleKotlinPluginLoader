@@ -237,10 +237,9 @@ object PluginLoader {
                     if (!entry.isDirectory && entry.name.endsWith(".class")) {
                         val classBytes = readBytesToArray(jis)
                         try{
-                            val uRLClassName = getClassNameFromBytes(classBytes)
-                            if(uRLClassName!=null){
-                                val uRLClass = defineClass(uRLClassName, classBytes, 0, classBytes.size)
-                                jarClassList.add(uRLClass)
+                            val byteClassName = getClassNameFromBytes(classBytes)
+                            if(byteClassName!=null){
+                                jarClassList.add(defineClass(byteClassName, classBytes, 0, classBytes.size))
                             }
                         } catch (e: Exception){ e.printStackTrace() }
                     }
