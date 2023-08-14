@@ -158,12 +158,12 @@ object PluginLoader {
     private fun loadPluginClasses(pluginClasses: List<Class<out MyPlugin>>, uRLoader: MyURLoader, targetClassNames: List<String> = listOf()): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
         pluginClasses.forEach { pluginClass -> // use copy of loader to allow individual closing, also map to KClass
-            val plugID = loadPlugin(MyURLoader(uRLoader.getURL(), uRLoader.parent), pluginClass.kotlin, targetClassNames)
+            val plugID = loadPluginInstance(uRLoader.copy(), pluginClass.kotlin, targetClassNames)
             if(plugID!=null)plugIDs.add(plugID)//<-- if it worked, add uuid to the newly-loaded uuid list
         }
         return plugIDs
     }
-    private fun loadPlugin(uRLoader: MyURLoader, pluginClass: KClass<out MyPlugin>, targetClassNames: List<String> = listOf()): UUID? {
+    private fun loadPluginInstance(uRLoader: MyURLoader, pluginClass: KClass<out MyPlugin>, targetClassNames: List<String> = listOf()): UUID? {
         if(targetClassNames.isEmpty() || (targetClassNames.any { target -> ((pluginClass.qualifiedName == target)||(pluginClass.simpleName == target)) })){
             var launchableName = pluginClass.qualifiedName //<-- get class name
             if(launchableName==null)launchableName=pluginClass.simpleName //<-- if not in package it may only have simpleName
@@ -180,6 +180,8 @@ object PluginLoader {
     }
 
     private class MyURLoader(val plugURL: URL, val parentLoader: ClassLoader = PluginLoader::class.java.classLoader): URLClassLoader(arrayOf(plugURL), parentLoader){
+        fun copy() = this
         fun getURL(): URL = getURLs().get(0)
+        override fun addURL(url: URL){}
     }
 }
