@@ -222,7 +222,7 @@ object PluginLoader {
                     while (entry!=null) {
                         if (!entry.isDirectory && entry.name.endsWith(".class")) {
                             val classBytes = readBytes(jis)
-                            val pluginClass = getPluginInstanceFromBytes(entry.name.replace('/', '.').removeSuffix(".class"), classBytes, uRLoader)
+                            val pluginClass = getPluginClassFromBytes(entry.name.replace('/', '.').removeSuffix(".class"), classBytes, uRLoader)
                             if(pluginClass!=null)pluginClasses.add(pluginClass)
                         }
                         jis.closeEntry()
@@ -232,14 +232,14 @@ object PluginLoader {
             } else if(plugURL.toString().endsWith(".class")){
                 var uRLClassName = plugURL.toURI().path.substringAfterLast('/').removeSuffix(".class")
                 if(uRLClassName.isNotEmpty()){
-                    val pluginClass = getPluginInstanceFromBytes(uRLClassName, urlBytes, uRLoader)
+                    val pluginClass = getPluginClassFromBytes(uRLClassName, urlBytes, uRLoader)
                     if(pluginClass!=null)pluginClasses.add(pluginClass)
                 }
             }
         } catch (e: Exception) { e.printStackTrace() }
         return pluginClasses
     }
-    private fun getPluginInstanceFromBytes(name: String, classBytes: ByteArray, uRLoader: MyURLoader): Class<out MyPlugin>? {
+    private fun getPluginClassFromBytes(name: String, classBytes: ByteArray, uRLoader: MyURLoader): Class<out MyPlugin>? {
         try {
             val remClass = uRLoader.defineClassFromClassBytes(name, classBytes)
             if(remClass.interfaces.any { it == MyPlugin::class.java }){
