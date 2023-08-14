@@ -27,6 +27,9 @@ object PluginLoader {
         fun copy() = this
         fun getURL(): URL = getURLs().get(0)
         override fun addURL(url: URL){}
+        fun defineClassFromClassBytes(name: String, classBytes: ByteArray): Class<*> {
+            return defineClass(name, classBytes, 0, classBytes.size)
+        }
     }
     private val pluginClassMap = mutableMapOf<UUID,KClass<out MyPlugin>>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
@@ -139,7 +142,8 @@ object PluginLoader {
                 val pluginClasses = mutableListOf<Class<out MyPlugin>>()
                 try{ //Step 2: get Class objects at each url with ClassLoader
                     if(plugURL.protocol == "file")pluginClasses.addAll(getPluginsFromFile(plugURL, uRLoader))
-                    if(plugURL.protocol == "http" || plugURL.protocol == "https")pluginClasses.addAll(getPluginsFromHTTP(plugURL))
+                    if(plugURL.protocol == "http" || plugURL.protocol == "https")
+                        pluginClasses.addAll(getPluginsFromHTTP(plugURL, uRLoader))
                     //Step 3: loadPluginClasses(List<Class<out MyPlugin>>, MyURLoader, List<String>)
                     plugIDs.addAll(loadPluginClasses(pluginClasses, uRLoader, targetClassNames))
                 }catch(e: Exception){e.printStackTrace()}
@@ -164,7 +168,8 @@ object PluginLoader {
                         return bytecodefiles
                     } else return listOf(pluginPath) //<-- else if specific file was specified, return the url as a 1 element list
                 } else return listOf()
-            } else if(pluginPath.protocol == "http" || pluginPath.protocol == "https") {
+            } else if(pluginPath.protocol == "http" || pluginPath.protocol == "https" && 
+                (pluginPath.toString().endsWith(".jar")||pluginPath.toString().endsWith(".class"))) {
                 return listOf(pluginPath)
             } else return listOf()
         }catch(e: Exception){ e.printStackTrace(); return listOf() }
@@ -200,45 +205,49 @@ object PluginLoader {
     }
 
     //WEB LOADING
-    private fun getPluginsFromHTTP(plugURL: URL): List<Class<out MyPlugin>> { 
+    private fun getPluginsFromHTTP(plugURL: URL, uRLoader: MyURLoader): List<Class<out MyPlugin>> { 
         val pluginClasses = mutableListOf<Class<out MyPlugin>>()
         try {
             val httpClient = HttpClients.createDefault()
             val httpGet = HttpGet(plugURL.toURI())
             val response = httpClient.execute(httpGet)
             val inputStream: InputStream = response.entity.content
-            val jarBytes = readBytes(inputStream)
-    
-            // Load JAR bytes as a JarInputStream
-            val jarInputStream = JarInputStream(ByteArrayInputStream(jarBytes))
-            var jarEntry: JarEntry? = jarInputStream.nextJarEntry
-    
-            while (jarEntry != null) {
-                if (!jarEntry.isDirectory && jarEntry.name.endsWith(".class")) {
-                    val classBytes = readBytes(jarInputStream)
-                    val classReader = ClassReader(classBytes)
-                    val classVisitor = PluginClassVisitor(pluginClasses)
-                    classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES)
-                }
-                jarEntry = jarInputStream.nextJarEntry
-            }
-    
+            val urlBytes = readBytes(inputStream)
             response.close()
             httpClient.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+            // Load JAR bytes as a JarInputStream
+            if(plugURL.toString().endsWith(".jar")){
+                JarInputStream(ByteArrayInputStream(urlBytes)).use { jis ->
+                    var entry = jis.getNextJarEntry()
+                    while (entry!=null) {
+                        if (!entry.isDirectory && entry.name.endsWith(".class")) {
+                            val classBytes = readBytes(jis)
+                            val pluginClass = getPluginInstanceFromBytes(entry.name.replace('/', '.').removeSuffix(".class"), classBytes, uRLoader)
+                            if(pluginClass!=null)pluginClasses.add(pluginClass)
+                        }
+                        jis.closeEntry()
+                        entry = jis.getNextJarEntry()
+                    }
+                }
+            } else if(plugURL.toString().endsWith(".class")){
+                var uRLClassName = plugURL.toURI().path.substringAfterLast('/').removeSuffix(".class")
+                if(uRLClassName.isNotEmpty()){
+                    val pluginClass = getPluginInstanceFromBytes(uRLClassName, urlBytes, uRLoader)
+                    if(pluginClass!=null)pluginClasses.add(pluginClass)
+                }
+            }
+        } catch (e: Exception) { e.printStackTrace() }
         return pluginClasses
     }
-    class PluginClassVisitor(private val pluginClasses: MutableList<Class<out MyPlugin>>) : ClassVisitor(Opcodes.ASM7) {
-        override fun visit(version: Int, access: Int, name: String?, signature: String?, superName: String?, interfaces: Array<String>?) {
-            super.visit(version, access, name, signature, superName, interfaces)
-            if (interfaces != null && name!=null && MyPlugin::class.java.name in interfaces) {
-                try {
-                    val loadedClass = Class.forName(name.replace('/', '.')) as Class<out MyPlugin>
-                    pluginClasses.add(loadedClass)
-                } catch (e: ClassNotFoundException) { e.printStackTrace() }
-            }
+    private fun getPluginInstanceFromBytes(name: String, classBytes: ByteArray, uRLoader: MyURLoader): Class<out MyPlugin>? {
+        try {
+            val remClass = uRLoader.defineClassFromClassBytes(name, classBytes)
+            if(remClass.interfaces.any { it == MyPlugin::class.java }){
+                return remClass as? Class<out MyPlugin> //<-- if it does not implement our interface, this will return null
+            }else return null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
         }
     }
     fun readBytes(inputStream: InputStream): ByteArray {
