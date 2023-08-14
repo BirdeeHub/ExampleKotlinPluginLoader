@@ -1,5 +1,7 @@
 package examplepluginloader.PluggerXP
 
+import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
+import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Opcodes
@@ -9,8 +11,6 @@ import java.io.InputStream
 import org.reflections.Reflections
 import org.reflections.util.ConfigurationBuilder
 import kotlin.reflect.KClass
-import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
-import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import java.io.File
 import java.io.ByteArrayOutputStream
 import java.io.ByteArrayInputStream
@@ -109,7 +109,7 @@ object PluginLoader {
             for (plugID in plugIDs) { //<-- our list from loadPluginsFromOneURI
                 try {
                     val pluginInstance = pluginObjectMap[plugID]
-                    if(pluginInstance!=null)pluginInstance.launchPlugin(api) //<-- launchplugin(api) must be defined when you implement CLioSMapPlugin
+                    if(pluginInstance!=null)pluginInstance.launchPlugin(api) //<-- launchplugin(api) must be defined when you implement MyPlugin
                     else pluginsToRemove.add(plugID) // if not launchable, 
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -179,14 +179,8 @@ object PluginLoader {
     // Get all subtypes of MyPlugin using Reflections from Web
     private fun getPluginsFromHTTP(plugURL: URL, uRLoader: MyURLoader): List<Class<out MyPlugin>> { 
         val pluginClasses = mutableListOf<Class<out MyPlugin>>()
-        try {//"org.apache.httpcomponents:httpclient:4.5.9"
-            val httpClient = HttpClients.createDefault()
-            val httpGet = HttpGet(plugURL.toURI())
-            val response = httpClient.execute(httpGet)
-            val inputStream: InputStream = response.entity.content
-            val urlBytes = MyURLoader.readBytesToArray(inputStream)
-            response.close()
-            httpClient.close()
+        try {
+            val urlBytes = MyURLoader.getBytesFromURL(plugURL)
             if(plugURL.toString().endsWith(".jar")){
                 val config = ConfigurationBuilder.build(uRLoader.defineClassesFromJarBytes(urlBytes)).addUrls(plugURL).addClassLoaders(uRLoader)
                 pluginClasses.addAll(Reflections(config).getSubTypesOf(MyPlugin::class.java))
@@ -256,7 +250,17 @@ object PluginLoader {
             return jarClassList
         }
         companion object {
-            fun getClassNameFromBytes(classBytes: ByteArray): String? {//<-- uses "org.ow2.asm:asm:9.5" to get the class name properly
+            fun getBytesFromURL(plugURL: URL): ByteArray { //"org.apache.httpcomponents:httpclient:4.5.9"
+                val httpClient = HttpClients.createDefault()
+                val httpGet = HttpGet(plugURL.toURI())
+                val response = httpClient.execute(httpGet)
+                val inputStream: InputStream = response.entity.content
+                val urlBytes = readBytesToArray(inputStream)
+                response.close()
+                httpClient.close()
+                return urlBytes
+            }
+            private fun getClassNameFromBytes(classBytes: ByteArray): String? {//<-- uses "org.ow2.asm:asm:9.5" to get the class name properly
                 var className: String? = null
                 val classReader = ClassReader(classBytes)
                 classReader.accept(object : ClassVisitor(Opcodes.ASM9) {
@@ -266,7 +270,7 @@ object PluginLoader {
                 }, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
                 return className
             }
-            fun readBytesToArray(inputStream: InputStream): ByteArray {//<-- this is needed in jar class loading and also for getting web data
+            private fun readBytesToArray(inputStream: InputStream): ByteArray {//<-- this is needed in jar class loading and also for getting web data
                 val buffer = ByteArray(1024)
                 val output = ByteArrayOutputStream()
                 var bytesRead: Int
