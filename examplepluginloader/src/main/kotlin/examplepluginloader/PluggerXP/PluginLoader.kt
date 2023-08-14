@@ -125,7 +125,7 @@ object PluginLoader {
     }
 
     //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
-    private fun loadPluginsFromOneURI(pluginURI: URI, targetClassNames: List<String> = listOf()): MutableList<UUID> {
+    private fun loadPluginsFromOneURI(pluginURI: URI, targetCNames: List<String> = listOf()): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
         try{ // Step 1: getJarURLs(pluginPath: File): List<URL>
             getJarURLs(pluginURI).forEach { plugURL ->
@@ -141,7 +141,7 @@ object PluginLoader {
                         pluginClasses.addAll(getPluginsFromHTTP(plugURL, loader))
 
                     // Step 4: loadPluginClasses(List<Class<out MyPlugin>>, URLoader, List<String>)
-                    plugIDs.addAll(loadPluginClasses(pluginClasses, loader, targetClassNames))
+                    plugIDs.addAll(loadPluginClasses(pluginClasses, loader, targetCNames))
                 }catch(e: Exception){e.printStackTrace()}
             }
         }catch(e: Exception){e.printStackTrace()}
@@ -196,27 +196,24 @@ object PluginLoader {
     }
 
     //Once you finally have the Class objects
-    private fun loadPluginClasses(pluginClasses: List<Class<out MyPlugin>>, loader: URLoader, targetClassNames: List<String> = listOf()): MutableList<UUID> {
+    private fun loadPluginClasses(pluginClasses: List<Class<out MyPlugin>>, loader: URLoader, targetCNames: List<String> = listOf()): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
         pluginClasses.forEach { pluginClass -> // use copy of loader to allow individual closing, also map to KClass
-            val plugID = loadPluginClass(loader.copy(), pluginClass.kotlin, targetClassNames)
+            val plugID = loadPluginClass(loader.copy(), pluginClass.kotlin, targetCNames)
             if(plugID!=null)plugIDs.add(plugID)//<-- if it worked, add uuid to the newly-loaded uuid list
         }
         return plugIDs
     }
-    private fun loadPluginClass(loader: URLoader, pluginClass: KClass<out MyPlugin>, targetClassNames: List<String> = listOf()): UUID? {
-        if(targetClassNames.isEmpty() || (targetClassNames.any { target -> ((pluginClass.qualifiedName == target)||(pluginClass.simpleName == target)) })){
-            var launchableName = pluginClass.qualifiedName //<-- get class name
-            if(launchableName==null)launchableName=pluginClass.simpleName //<-- if not in package it may only have simpleName
-            if(launchableName!=null){ // if it has a name at all, launch it and update lists
-                val pluginInstance = loader.loadClass(launchableName).getConstructor().newInstance() as MyPlugin
-                val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
-                pluginClassMap[pluginUUID] = pluginClass //add stuff into respective maps using UUID as the key
-                pluginObjectMap[pluginUUID] = pluginInstance
-                uRLoaderMap[pluginUUID] = loader //<-- we keep track of uRLoaders so we can close them later
-                plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
-                return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
-            } else return null
+    private fun loadPluginClass(loader: URLoader, pluginClass: KClass<out MyPlugin>, targetCNames: List<String> = listOf()): UUID? {
+        val launchableName = pluginClass.qualifiedName ?: pluginClass.simpleName
+        if(launchableName!=null && (targetCNames.isEmpty()||(targetCNames.any { target -> ((launchableName == target)) }))){
+            val pluginInstance = loader.loadClass(launchableName).getConstructor().newInstance() as MyPlugin
+            val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
+            pluginClassMap[pluginUUID] = pluginClass //add stuff into respective maps using UUID as the key
+            pluginObjectMap[pluginUUID] = pluginInstance
+            uRLoaderMap[pluginUUID] = loader //<-- we keep track of uRLoaders so we can close them later
+            plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
+            return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
         } else return null
     }
 

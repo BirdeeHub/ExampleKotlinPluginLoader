@@ -12,7 +12,7 @@ It can also close them individually or all at once, and contains various useful 
 
 For optimum performance, do not load too many directories if they may have unrelated .jar or .class files in them.
 
-It now also can load classes from the internet. Use 1 or 2 to choose file or url. If leading argument is not an integer, it will behave as if in mode 1
+It now also can load Jar files from the internet. Use 1 or 2 to choose file or url. If leading argument is not an integer, it will behave as if in mode 1
 
 For loading over http/s specify entire url to jar or class file. 
 
