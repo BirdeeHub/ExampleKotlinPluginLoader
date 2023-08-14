@@ -110,7 +110,7 @@ object PluginLoader {
                 try {
                     val pluginInstance = pluginObjectMap[plugID]
                     if(pluginInstance!=null)pluginInstance.launchPlugin(api) //<-- launchplugin(api) must be defined when you implement MyPlugin
-                    else pluginsToRemove.add(plugID) // if not launchable, 
+                    else pluginsToRemove.add(plugID) //<-- if not launchable, 
                 } catch (e: Exception) {
                     e.printStackTrace()
                     pluginsToRemove.add(plugID) //<-- add to separate list so that we arent modifying our collection while iterating over it
