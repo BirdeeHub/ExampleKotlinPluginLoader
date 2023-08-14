@@ -259,6 +259,7 @@ object PluginLoader {
                 val urlBytes = readBytesToArray(inputStream)
                 response.close()
                 httpClient.close()
+                inputStream.close()
                 return urlBytes
             }
             private fun getClassNameFromBytes(classBytes: ByteArray): String? {//<-- uses "org.ow2.asm:asm:9.5" to get the class name properly
