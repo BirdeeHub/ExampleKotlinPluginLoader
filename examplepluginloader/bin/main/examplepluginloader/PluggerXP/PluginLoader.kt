@@ -11,6 +11,11 @@ import java.net.URI
 import java.util.UUID
 import java.nio.file.Path
 object PluginLoader {
+    private class MyURLoader(val plugURL: URL, val parentLoader: ClassLoader = PluginLoader::class.java.classLoader): URLClassLoader(arrayOf(plugURL), parentLoader){
+        fun copy() = this
+        fun getURL(): URL = getURLs().get(0)
+        override fun addURL(url: URL){}
+    }
     private val pluginClassMap = mutableMapOf<UUID,KClass<out MyPlugin>>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
     private val uRLoaderMap = mutableMapOf<UUID,MyURLoader>() //<-- we will close these to unload plugins
@@ -177,11 +182,5 @@ object PluginLoader {
                 return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
             } else return null
         } else return null
-    }
-
-    private class MyURLoader(val plugURL: URL, val parentLoader: ClassLoader = PluginLoader::class.java.classLoader): URLClassLoader(arrayOf(plugURL), parentLoader){
-        fun copy() = this
-        fun getURL(): URL = getURLs().get(0)
-        override fun addURL(url: URL){}
     }
 }
