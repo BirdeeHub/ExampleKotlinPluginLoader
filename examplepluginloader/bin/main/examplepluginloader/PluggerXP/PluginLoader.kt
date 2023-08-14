@@ -104,9 +104,9 @@ object PluginLoader {
         val pluginUUIDs = mutableListOf<UUID>()
         val pluginsToRemove = mutableListOf<UUID>()
         for(pluginURI in pluginURIs){ //for each, call loadPluginsFromOneURI(pluginURI: URI, targetClassNames: List<String>): MutableList<UUID>
-            val plugIDs = loadPluginsFromOneURI(pluginURI, targetPluginFullClassNames)
-            pluginUUIDs.addAll(plugIDs)
-            for (plugID in plugIDs) {
+            val plugIDs = loadPluginsFromOneURI(pluginURI, targetPluginFullClassNames)//<-- loads the stuff, then we run launchPlugin(api) here
+            pluginUUIDs.addAll(plugIDs) //<-- add new IDs to list
+            for (plugID in plugIDs) { //<-- our list from loadPluginsFromOneURI
                 try {
                     val pluginInstance = pluginObjectMap[plugID]
                     if(pluginInstance!=null)pluginInstance.launchPlugin(api) //<-- launchplugin(api) must be defined when you implement CLioSMapPlugin
@@ -127,16 +127,20 @@ object PluginLoader {
     //private helper function for callPlugLoader(api: MyAPI, pluginPath: String): List<UUID>
     private fun loadPluginsFromOneURI(pluginURI: URI, targetClassNames: List<String> = listOf()): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
-        try{
-            getJarURLs(pluginURI).forEach { plugURL -> //<-- Step 1: getJarURLs(pluginPath: File): List<URL>
-                //Step 2: get ClassLoader for single URL and init list of plugin Class objects
+        try{ // Step 1: getJarURLs(pluginPath: File): List<URL>
+            getJarURLs(pluginURI).forEach { plugURL ->
+
+                // Step 2: get ClassLoader for single URL and init list of plugin Class objects
                 val uRLoader = MyURLoader(plugURL)
                 val pluginClasses = mutableListOf<Class<out MyPlugin>>()
-                try{ //Step 2: get Class objects at each url with ClassLoader
-                    if(plugURL.protocol == "file")pluginClasses.addAll(getPluginsFromFile(plugURL, uRLoader))
+
+                try{ // Step 3: get Class objects at each url with ClassLoader
+                    if(plugURL.protocol == "file")
+                        pluginClasses.addAll(getPluginsFromFile(plugURL, uRLoader))
                     if(plugURL.protocol == "http" || plugURL.protocol == "https")
                         pluginClasses.addAll(getPluginsFromHTTP(plugURL, uRLoader))
-                    //Step 3: loadPluginClasses(List<Class<out MyPlugin>>, MyURLoader, List<String>)
+
+                    // Step 4: loadPluginClasses(List<Class<out MyPlugin>>, MyURLoader, List<String>)
                     plugIDs.addAll(loadPluginClasses(pluginClasses, uRLoader, targetClassNames))
                 }catch(e: Exception){e.printStackTrace()}
             }
@@ -149,6 +153,7 @@ object PluginLoader {
         try{
             val pluginPath: URL
             pluginPath = pluginPathURI.toURL()
+            // if file:
             if(pluginPath.protocol == "file"){
                 if((File(pluginPathURI)).exists()){
                     val pluginFile = File(pluginPathURI)
@@ -160,6 +165,7 @@ object PluginLoader {
                         return bytecodefiles
                     } else return listOf(pluginPath) //<-- else if specific file was specified, return the url as a 1 element list
                 } else return listOf()
+            // else if web http/s:
             } else if(pluginPath.protocol == "http" || pluginPath.protocol == "https" && 
                 (pluginPath.toString().endsWith(".jar")||pluginPath.toString().endsWith(".class"))) {
                 return listOf(pluginPath)
@@ -173,7 +179,7 @@ object PluginLoader {
     // Get all subtypes of MyPlugin using Reflections from Web
     private fun getPluginsFromHTTP(plugURL: URL, uRLoader: MyURLoader): List<Class<out MyPlugin>> { 
         val pluginClasses = mutableListOf<Class<out MyPlugin>>()
-        try {
+        try {//"org.apache.httpcomponents:httpclient:4.5.9"
             val httpClient = HttpClients.createDefault()
             val httpGet = HttpGet(plugURL.toURI())
             val response = httpClient.execute(httpGet)
@@ -220,7 +226,8 @@ object PluginLoader {
         } else return null
     }
 
-    private class MyURLoader(val plugURL: URL, val parentLoader: ClassLoader = PluginLoader::class.java.classLoader): URLClassLoader(arrayOf(plugURL), parentLoader){
+    //The custom class loader that allows for loading from bytes with no class names, and also copying itself (and can only load from 1 url)
+    private class MyURLoader(val plugURL: URL): URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader){
         fun copy() = this
         fun getURL(): URL = getURLs().get(0)
         override fun addURL(url: URL){}
@@ -249,19 +256,17 @@ object PluginLoader {
             return jarClassList
         }
         companion object {
-            fun getClassNameFromBytes(classBytes: ByteArray): String? {
+            fun getClassNameFromBytes(classBytes: ByteArray): String? {//<-- uses "org.ow2.asm:asm:9.5" to get the class name properly
                 var className: String? = null
-            
                 val classReader = ClassReader(classBytes)
                 classReader.accept(object : ClassVisitor(Opcodes.ASM9) {
                     override fun visit(version: Int, access: Int, name: String?, signature: String?, superName: String?, interfaces: Array<String>?) {
                         className = name?.replace('/', '.')
                     }
                 }, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
-            
                 return className
             }
-            fun readBytesToArray(inputStream: InputStream): ByteArray {
+            fun readBytesToArray(inputStream: InputStream): ByteArray {//<-- this is needed in jar class loading and also for getting web data
                 val buffer = ByteArray(1024)
                 val output = ByteArrayOutputStream()
                 var bytesRead: Int
