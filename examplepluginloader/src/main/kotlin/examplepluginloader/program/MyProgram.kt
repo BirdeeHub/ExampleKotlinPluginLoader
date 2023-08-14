@@ -2,6 +2,7 @@ package examplepluginloader.program
 import examplepluginloader.api.MyAPI
 import examplepluginloader.api.MyPlugin
 import examplepluginloader.PluggerXP.PluginLoader
+import java.net.URL
 class MyProgram(api: MyAPI, var pluginPaths: List<String>){
     init{
         println("Testing...")
@@ -16,7 +17,7 @@ class MyProgram(api: MyAPI, var pluginPaths: List<String>){
         println("Paths to load from:")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
         println("Tests:")
-        PluginLoader.loadPlugins(api, pluginPaths, optionalTargets).forEach {plugID ->
+        PluginLoader.loadPluginsFromURLs(api, listOf(URL("http://127.0.0.1:8555/exampleplugin.jar")), optionalTargets).forEach {plugID ->
             val plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
             if(plugin!=null){
                 println(plugin.getName()) // MyPluginImplementation loaded
