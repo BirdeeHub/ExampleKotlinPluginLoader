@@ -28,7 +28,7 @@ I then kept returning to it when I got stuck on the bigger project and learned a
 
 **Instructions:**
 
-if you wish to use, you probably only need the thing i linked.
+if you wish to use, you probably only need the thing i linked. Replace all on the word My
 
 **To run the quick mockup:**
 
