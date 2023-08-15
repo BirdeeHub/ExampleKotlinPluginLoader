@@ -229,7 +229,8 @@ object PluginLoader {
         //these 2 are utils for defineAndGetClassInfo. 
         //If you can get bytes of it, you can load it.
         //(assuming it has a url ending in .jar or .class, which getJarURLs already took care of)
-        //to add new protocols, add a getBytes here, call in defineAndGetClassInfo,
+        //to add new protocols:
+        //add a getBytes here, call in defineAndGetClassInfo above,
         //and then show getJarURLs how to find the URL for it
         private fun getBytesFromFile(plugURL: URL): ByteArray {
             val fileinputstream = FileInputStream(File(plugURL.toURI()))
