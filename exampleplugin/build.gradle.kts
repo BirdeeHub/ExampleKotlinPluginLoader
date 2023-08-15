@@ -5,16 +5,17 @@ plugins {
 }
 repositories {
     mavenCentral()
+    gradlePluginPortal()
+    flatDir {
+        dirs("../outputDir/")
+    }
 }
 dependencies {
     compileOnly(kotlin("stdlib"))
     compileOnly(project(":examplepluginloader"))
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
     compileOnly("org.apache.commons:commons-math3:3.6.1")
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     compileOnly("com.google.guava:guava:31.1-jre")
 }
-
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
