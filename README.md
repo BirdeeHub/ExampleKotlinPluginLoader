@@ -100,16 +100,16 @@ API call test when launchPlugin(api) is called
 API call test when launchPlugin(api) is called (entering paths will set target to only plugin 1, removing this)
 MyPluginImplementation1 getName() Test
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar
-UUID: c8b91db2-3d8e-4bbc-a788-39495da3ebf3
+UUID: 5cd9a690-cc00-4924-b64c-5e07931baafa
 MyPluginImplementation2 getName() Test (Filtering Demo)
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar
-UUID: cafbcc6f-7e23-46da-9c82-f7ea28000994
-All UUIDs: [c8b91db2-3d8e-4bbc-a788-39495da3ebf3, cafbcc6f-7e23-46da-9c82-f7ea28000994]
-Unloading: MyPluginImplementation1 getName() Test : c8b91db2-3d8e-4bbc-a788-39495da3ebf3
-All UUIDs: [cafbcc6f-7e23-46da-9c82-f7ea28000994]
-Unloading: MyPluginImplementation2 getName() Test (Filtering Demo) : cafbcc6f-7e23-46da-9c82-f7ea28000994
+UUID: b3cb5c9c-5001-4657-9c08-8f6d048552e7
+All UUIDs: [5cd9a690-cc00-4924-b64c-5e07931baafa, b3cb5c9c-5001-4657-9c08-8f6d048552e7]
+Unloading: MyPluginImplementation1 getName() Test : 5cd9a690-cc00-4924-b64c-5e07931baafa
+All UUIDs: [b3cb5c9c-5001-4657-9c08-8f6d048552e7]
+Unloading: MyPluginImplementation2 getName() Test (Filtering Demo) : b3cb5c9c-5001-4657-9c08-8f6d048552e7
 All UUIDs: []
 loaded and unloaded 2 plugin(s)
-duration in milliseconds: 1002
+duration in milliseconds: 779
 Goodbye!
 ```
