@@ -9,11 +9,10 @@ import org.objectweb.asm.Opcodes
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import java.io.InputStream
-import org.reflections.Reflections
-import org.reflections.util.ConfigurationBuilder
 import java.io.File
 import java.io.ByteArrayOutputStream
 import java.io.ByteArrayInputStream
+import java.io.FileInputStream
 import java.net.URL
 import java.net.URLClassLoader
 import java.net.URI
@@ -126,18 +125,16 @@ object PluginLoader {
         try{ // Step 1: getJarURLs(pluginPath: File): List<URL>
             getJarURLs(pluginURI).forEach { plugURL ->
 
-                // Step 2: get ClassLoader for single URL and init list of plugin Class objects
+                // Step 2: get ClassLoader for single URL and init list of plugin names
                 val loader = URLoader(plugURL)
                 val pluginNames = mutableListOf<String>()
 
-                try{ // Step 3: get Class objects at each url with ClassLoader
-                    if(plugURL.protocol == "file")
-                        pluginNames.addAll(getPluginsFromFile(plugURL, loader))
-                    if(plugURL.protocol == "http" || plugURL.protocol == "https")
-                        pluginNames.addAll(getPluginsFromHTTP(plugURL, loader))
+                try{ // Step 3: get Class names and if subtype at each url with ClassLoader
+                    pluginNames.addAll(loader.defineAndGetClassInfo(plugURL, MyPlugin::class.java)
+                        .filter { (_,v) -> if(v==true)true else false }.map { it.first })
 
                     // Step 4: loadPluginClasses(List<Class<out MyPlugin>>, URLoader, List<String>)
-                    plugIDs.addAll(loadPluginClasses(pluginNames, loader, targetCNames))
+                    plugIDs.addAll(loadPluginClasses(loader, pluginNames, targetCNames))
                 }catch(e: Exception){e.printStackTrace()}
             }
         }catch(e: Exception){e.printStackTrace()}
@@ -169,15 +166,8 @@ object PluginLoader {
         }catch(e: Exception){ e.printStackTrace(); return listOf() }
     }
 
-    // Get all subtypes of MyPlugin using Reflections from File
-    private fun getPluginsFromFile(plugURL: URL, loader: URLoader): List<String> = Reflections( // "org.reflections:reflections:0.10.2"
-        ConfigurationBuilder().addUrls(plugURL).addClassLoaders(loader)).getSubTypesOf(MyPlugin::class.java).map { it.name }
-    // Get all subtypes of MyPlugin from Web (using reflections when i was using asm to get name was redundant)
-    private fun getPluginsFromHTTP(plugURL: URL, loader: URLoader): List<String> = 
-        loader.defineClassesFromHTTPurl(plugURL).filter { (_,v) -> if(v==true)true else false }.map { it.first }
-
     //Once you finally have the Class objects
-    private fun loadPluginClasses(pluginNames: List<String>, loader: URLoader, targetCNames: List<String> = listOf()): MutableList<UUID> {
+    private fun loadPluginClasses(loader: URLoader, pluginNames: List<String>, targetCNames: List<String> = listOf()): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
         pluginNames.forEach { pluginName -> // use copy of loader to allow individual closing
             val plugID = loadPluginClass(loader.copy(), pluginName, targetCNames)
@@ -198,23 +188,53 @@ object PluginLoader {
 
 //-------------------------------------END OF MAIN OBJECT--------PRIVATE CUSTOM CLASS LOADER BELOW------------------------------------------------------------------------
     //The custom class loader that allows for loading from bytes with no class names, and also copying itself (and can only load from 1 url)
-    private class URLoader(val plugURL: URL): URLClassLoader(arrayOf(plugURL), PluginLoader::class.java.classLoader){
+    private class URLoader(val plugURL: URL): URLClassLoader(arrayOf(plugURL), this::class.java.classLoader){
         var pluginFace: Class<*> = MyPlugin::class.java
         override fun addURL(url: URL){}
         fun getURL(): URL = getURLs().get(0)
         fun copy() = this
-        fun defineClassesFromHTTPurl(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
+        fun defineAndGetClassInfo(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
+            if(plugURL.protocol == "file")
+                return defineClassesFromFile(plugURL, implements)
+            if(plugURL.protocol == "http" || plugURL.protocol == "https")
+                return defineClassesFromHTTPurl(plugURL, implements)
+            else return mutableListOf<Pair<String,Boolean>>()
+        }
+
+        //Private functions
+        //these next 2 convert to byteArray then call defineClassFromByteCodeFile
+        private fun defineClassesFromFile(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
             val classList= mutableListOf<Pair<String,Boolean>>()
             try{
+                val fileinputstream = FileInputStream(File(plugURL.toURI()))
+                val fileBytes = fileinputstream.readAllBytes()
+                fileinputstream.close()
+                classList.addAll(defineClassFromByteCodeFile(fileBytes, plugURL, implements))
+            }catch(e: Exception){ e.printStackTrace()}
+            return classList
+        }
+        private fun defineClassesFromHTTPurl(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
+            val classList= mutableListOf<Pair<String,Boolean>>()
+            try{ // uses "org.apache.httpcomponents:httpclient:4.5.9"
                 val httpClient = HttpClients.createDefault()
                 val httpGet = HttpGet(plugURL.toURI())
                 val response = httpClient.execute(httpGet)
                 val inputStream = response.entity.content
-                val urlBytes = readBytesToArray(inputStream)
+                val urlBytes = inputStream.readAllBytes()
                 inputStream.close()
                 response.close()
                 httpClient.close()
-                if(plugURL.toString().endsWith(".jar"))classList.addAll(defineClassesFromJarBytes(urlBytes, implements))
+                classList.addAll(defineClassFromByteCodeFile(urlBytes, plugURL, implements))
+            }catch(e: Exception){ e.printStackTrace()}
+            return classList
+        }
+
+        //calls define on jar if jar or class if class
+        private fun defineClassFromByteCodeFile(urlBytes: ByteArray, plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
+            val classList= mutableListOf<Pair<String,Boolean>>()
+            try{
+                if(plugURL.toString().endsWith(".jar"))
+                    classList.addAll(defineClassesFromJarBytes(urlBytes, implements))
                 if(plugURL.toString().endsWith(".class")){
                     val classInfo = defineClassFromBytes(urlBytes, implements)
                     val className = classInfo.first
@@ -223,6 +243,8 @@ object PluginLoader {
             } catch (e: Exception) { e.printStackTrace() }
             return classList
         }
+
+        //calls defineClassFromBytes on jar entries
         private fun defineClassesFromJarBytes(jarBytes: ByteArray, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
             val jarClassList = mutableListOf<Pair<String,Boolean>>()
             JarInputStream(ByteArrayInputStream(jarBytes)).use { jis ->
@@ -230,7 +252,7 @@ object PluginLoader {
                 while (entry!=null) {
                     if (!entry.isDirectory && entry.name.endsWith(".class")) {
                         try{
-                            val classInfo = defineClassFromBytes(readBytesToArray(jis), implements)
+                            val classInfo = defineClassFromBytes(jis.readAllBytes(), implements)
                             val className = classInfo.first
                             if(className!=null)jarClassList.add(Pair(className, classInfo.second))
                         } catch (e: Exception){ e.printStackTrace() }
@@ -241,18 +263,11 @@ object PluginLoader {
             }
             return jarClassList
         }
-        private fun readBytesToArray(inputStream: InputStream): ByteArray {//<-- this is needed in jar class loading and also for getting web data
-            val buffer = ByteArray(1024)
-            val output = ByteArrayOutputStream()
-            var bytesRead: Int
-            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                output.write(buffer, 0, bytesRead)
-            }
-            return output.toByteArray()
-        }
-        private fun defineClassFromBytes(classBytes: ByteArray, implements: Class<*>? = pluginFace): Pair<String?,Boolean> {//<-- uses "org.ow2.asm:asm:9.5"
-            var classInfo: Pair<String?,Boolean> = Pair(null, false) //since i needed this to get name, may as well use to get subtype,
-            val classReader = ClassReader(classBytes)                //otherwise reflections makes a second get request
+
+        //take byte arrays, gets info, adds class to loader to be run with name later. Uses "org.ow2.asm:asm:9.5". Since I needed this to get name,
+        private fun defineClassFromBytes(classBytes: ByteArray, implements: Class<*>? = pluginFace): Pair<String?,Boolean> {// may as well use to get subtype, and not need reflections
+            var classInfo: Pair<String?,Boolean> = Pair(null, false)
+            val classReader = ClassReader(classBytes)
             classReader.accept(object : ClassVisitor(Opcodes.ASM9) {
                 override fun visit(version: Int, access: Int, name: String?, signature: String?, superName: String?, interfaces: Array<String>?) {
                     if(name!=null){
