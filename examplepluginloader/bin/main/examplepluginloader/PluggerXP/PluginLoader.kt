@@ -132,10 +132,12 @@ object PluginLoader {
                 val pluginNames = mutableListOf<String>()
 
                 try{ // Step 3: get Class names and if it implements at each url with ClassLoader
+                    // this is all defined in our custom class loader at end of file, and contains ASM dependency 
                     pluginNames.addAll(loader.defineAndGetClassInfo(plugURL, MyPlugin::class.java)
-                        .filter { (_,v) -> if(v==true)true else false }.map { it.first })
+                        .filter { (_,v) -> if(v==true)true else false }.map { it.first }) //(GOODBYE REFLECTIONS!!!)
 
                     // Step 4: loadPluginClasses(URLoader, List<String>, List<String>)
+                    //creates plugin instances and populates the globals at the top of file
                     plugIDs.addAll(loadPluginClasses(loader, pluginNames, targetCNames))
                 }catch(e: Exception){e.printStackTrace()}
             }
