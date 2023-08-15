@@ -21,6 +21,7 @@ import java.util.jar.JarEntry
 import java.nio.file.Path
 
 object PluginLoader {
+    //PRIVATE GLOBALS
     private val plugIDList = mutableListOf<UUID>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
     private val uRLoaderMap = mutableMapOf<UUID,URLoader>() //<-- we will close these to unload plugins
@@ -32,7 +33,7 @@ object PluginLoader {
     fun getPluginLocation(plugID: UUID): URL? = uRLoaderMap[plugID]?.getURL()//<-- each loader has only 1 class and 1 url anyway
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
 
-    //unload and load functions (Synchronized)
+    //public unload and load functions (Synchronized)
     private val lock = Any() // Shared lock object
     @Synchronized
     fun unloadPlugins(plugIDs: List<UUID>) = plugIDs.forEach { plugID -> unloadPlugin(plugID) }
@@ -91,6 +92,8 @@ object PluginLoader {
     @Synchronized
     fun loadPluginsFromURIs(api: MyAPI, pluginURIs: List<URI>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> = 
         callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
+
+//------------------------------------INTERNAL---------------------------INTERNAL---------------------------INTERNAL--------------------------------------------------
 
     //End of public functions
     //main load class function
@@ -186,6 +189,7 @@ object PluginLoader {
     }
 
 //-------------------------------------END OF MAIN OBJECT--------PRIVATE CUSTOM CLASS LOADER BELOW------------------------------------------------------------------------
+
     //The custom class loader that allows for loading from bytes with no class names, and also copying itself (and can only load from 1 url)
     private class URLoader(val plugURL: URL): URLClassLoader(arrayOf(plugURL), this::class.java.classLoader){
         var pluginFace: Class<*> = MyPlugin::class.java
