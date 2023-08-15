@@ -25,6 +25,7 @@ object PluginLoader {
     private val plugIDList = mutableListOf<UUID>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
     private val uRLoaderMap = mutableMapOf<UUID,URLoader>() //<-- we will close these to unload plugins
+    private val pluginNameMap = mutableMapOf<UUID,String>() //<-- it felt like I should include this
 
     //public getter functions
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
@@ -32,6 +33,7 @@ object PluginLoader {
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginLocation(plugID: UUID): URL? = uRLoaderMap[plugID]?.getURL()//<-- each loader has only 1 loaded plugin class and 1 url anyway
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
+    fun getPluginClassName(plugID: UUID): String? = pluginNameMap[plugID]
 
     //public unload and load functions (Synchronized)
     private val lock = Any() // Shared lock object
@@ -44,6 +46,7 @@ object PluginLoader {
         uRLoaderMap.remove(plugID) //these don't throw.
         pluginObjectMap.remove(plugID)
         plugIDList.remove(plugID)
+        pluginNameMap.remove(plugID)
     }
     @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
@@ -52,6 +55,7 @@ object PluginLoader {
         uRLoaderMap.clear() //these don't throw.
         pluginObjectMap.clear()
         plugIDList.clear()
+        pluginNameMap.clear()
     }
     @Synchronized
     fun loadPlugins(api: MyAPI, pluginPathStrings: List<String>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
@@ -186,7 +190,8 @@ object PluginLoader {
             //then get instance, UUID, then update global list/maps. Return new UUID so user knows which were loaded
             val pluginInstance = loader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin
             val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
-            pluginObjectMap[pluginUUID] = pluginInstance //add stuff into respective maps using UUID as the key
+            pluginNameMap[pluginUUID] = pluginName //<-- I dont need name map but it felt important or useful
+            pluginObjectMap[pluginUUID] = pluginInstance 
             uRLoaderMap[pluginUUID] = loader //<-- we keep track of uRLoaders so we can close them later
             plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
             return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
