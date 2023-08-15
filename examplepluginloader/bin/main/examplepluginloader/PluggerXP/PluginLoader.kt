@@ -6,8 +6,6 @@ import org.objectweb.asm.Type
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Opcodes
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.HttpClients
 import java.io.InputStream
 import java.io.File
 import java.io.ByteArrayOutputStream
@@ -16,6 +14,7 @@ import java.io.FileInputStream
 import java.net.URL
 import java.net.URLClassLoader
 import java.net.URI
+import java.net.HttpURLConnection
 import java.util.UUID
 import java.util.jar.JarInputStream
 import java.util.jar.JarEntry
@@ -213,19 +212,21 @@ object PluginLoader {
             }catch(e: Exception){ e.printStackTrace()}
             return classList
         }
-        private fun defineClassesFromHTTPurl(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
-            val classList= mutableListOf<Pair<String,Boolean>>()
-            try{ // uses "org.apache.httpcomponents:httpclient:4.5.9"
-                val httpClient = HttpClients.createDefault()
-                val httpGet = HttpGet(plugURL.toURI())
-                val response = httpClient.execute(httpGet)
-                val inputStream = response.entity.content
-                val urlBytes = inputStream.readAllBytes()
-                inputStream.close()
-                response.close()
-                httpClient.close()
-                classList.addAll(defineClassFromByteCodeFile(urlBytes, plugURL, implements))
-            }catch(e: Exception){ e.printStackTrace()}
+        private fun defineClassesFromHTTPurl(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String, Boolean>> {
+            val classList = mutableListOf<Pair<String, Boolean>>()
+            try {
+                val urlConnection = plugURL.openConnection() as HttpURLConnection
+                urlConnection.requestMethod = "GET"
+                if (urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
+                    val inputStream = urlConnection.inputStream
+                    val urlBytes = inputStream.readBytes()
+                    inputStream.close()
+                    urlConnection.disconnect()
+                    classList.addAll(defineClassFromByteCodeFile(urlBytes, plugURL, implements))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             return classList
         }
 

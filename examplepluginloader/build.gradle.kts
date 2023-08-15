@@ -13,7 +13,6 @@ dependencies {
     //api("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
     //api("org.reflections:reflections:0.10.2")
     api("com.google.guava:guava:31.1-jre")
-    api("org.apache.httpcomponents:httpclient:4.5.9")
     api("org.ow2.asm:asm:9.5")
     runtimeOnly("org.slf4j:slf4j-nop:1.7.32")
 }
