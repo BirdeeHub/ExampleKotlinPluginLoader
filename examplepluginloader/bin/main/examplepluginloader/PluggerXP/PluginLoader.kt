@@ -166,7 +166,8 @@ object PluginLoader {
             } else if(pluginPath.protocol == "http" || pluginPath.protocol == "https" && 
                 (pluginPath.toString().endsWith(".jar")||pluginPath.toString().endsWith(".class"))) {
                 return listOf(pluginPath) //<-- you have to specify the whole URL
-            } else return listOf() // Otherwise: return empty list
+        // Otherwise: return empty list:
+            } else return listOf()
         }catch(e: Exception){ e.printStackTrace(); return listOf() }
     }
 
@@ -225,6 +226,11 @@ object PluginLoader {
         }
 
         //------------------Private functions-------------------------------
+        //these 2 are utils for defineAndGetClassInfo. 
+        //If you can get bytes of it, you can load it.
+        //(assuming it has a url ending in .jar or .class, which getJarURLs already took care of)
+        //to add new protocols, add a getBytes here, call in defineAndGetClassInfo,
+        //and then show getJarURLs how to find the URL for it
         private fun getBytesFromFile(plugURL: URL): ByteArray {
             val fileinputstream = FileInputStream(File(plugURL.toURI()))
             val fileBytes = fileinputstream.readAllBytes()
@@ -246,7 +252,8 @@ object PluginLoader {
             return urlBytes
         }
 
-        //calls define on jar if jar or class if class
+        //Now actually define the classes and load them.
+        //call function for jar if jar or class if class
         private fun defineClassFromByteCodeFile(urlBytes: ByteArray, plugURL: URL, implements: Class<*>? = plugInFace): List<Pair<String,Boolean>> {
             val classList= mutableListOf<Pair<String,Boolean>>()
             try{
@@ -261,7 +268,7 @@ object PluginLoader {
             return classList
         }
 
-        //calls defineClassFromBytes on jar entries
+        //This just calls defineClassFromBytes on jar entries
         private fun defineClassesFromJarBytes(jarBytes: ByteArray, implements: Class<*>? = plugInFace): List<Pair<String,Boolean>> {
             val jarClassList = mutableListOf<Pair<String,Boolean>>()
             JarInputStream(ByteArrayInputStream(jarBytes)).use { jis ->
