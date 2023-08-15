@@ -14,7 +14,7 @@ For optimum performance, do not load too many directories if they may have unrel
 
 It now also can load Jar files from the internet. Use 1 or 2 to choose file or url. If leading argument is not an integer, it will behave as if in mode 1
 
-For loading over http/s specify entire url to jar or class file. 
+For loading over http/s specify entire url to the file.
 
 It was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
 
