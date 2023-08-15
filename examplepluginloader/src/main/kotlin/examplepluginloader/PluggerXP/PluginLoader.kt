@@ -142,7 +142,7 @@ object PluginLoader {
                 }catch(e: Exception){e.printStackTrace()}
             }
         }catch(e: Exception){e.printStackTrace()}
-        return plugIDs //<-- returns the uuids of the new plugins loaded
+        return plugIDs //<-- returns the uuids of the new plugins loaded to be launched by call plug loader
     }
 
     //gets URLS of bytecode files in directories, or URI as URL
@@ -177,7 +177,7 @@ object PluginLoader {
             val plugID = loadPluginClass(loader.copy(), pluginName, targetCNames)
             if(plugID!=null)plugIDs.add(plugID)//<-- if it worked, add uuid to the newly-loaded uuid list
         }
-        return plugIDs
+        return plugIDs //<-- return list of new plugins to be launched by callPlugLoader (returns to loadPluginsFromOneURI. End of "Step 4")
     }
     private fun loadPluginClass(loader: URLoader, pluginName: String, targetCNames: List<String> = listOf()): UUID? {
         //first, check our targets list
