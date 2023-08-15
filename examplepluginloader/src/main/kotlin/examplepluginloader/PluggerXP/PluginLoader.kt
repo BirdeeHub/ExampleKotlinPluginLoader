@@ -206,26 +206,22 @@ object PluginLoader {
         fun defineClassesFromHTTPurl(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
             val classList= mutableListOf<Pair<String,Boolean>>()
             try{
-                val urlBytes = getBytesFromURL(plugURL)
+                val httpClient = HttpClients.createDefault()
+                val httpGet = HttpGet(plugURL.toURI())
+                val response = httpClient.execute(httpGet)
+                val inputStream = response.entity.content
+                val urlBytes = readBytesToArray(inputStream)
+                inputStream.close()
+                response.close()
+                httpClient.close()
                 if(plugURL.toString().endsWith(".jar"))classList.addAll(defineClassesFromJarBytes(urlBytes, implements))
                 if(plugURL.toString().endsWith(".class")){
-                    val classInfo = defineClassFromBytes(urlBytes)
+                    val classInfo = defineClassFromBytes(urlBytes, implements)
                     val className = classInfo.first
                     if(className!=null)classList.add(Pair(className, classInfo.second))
                 }
             } catch (e: Exception) { e.printStackTrace() }
             return classList
-        }
-        private fun getBytesFromURL(plugURL: URL): ByteArray { //"org.apache.httpcomponents:httpclient:4.5.9"
-            val httpClient = HttpClients.createDefault()
-            val httpGet = HttpGet(plugURL.toURI())
-            val response = httpClient.execute(httpGet)
-            val inputStream = response.entity.content
-            val urlBytes = readBytesToArray(inputStream)
-            inputStream.close()
-            response.close()
-            httpClient.close()
-            return urlBytes
         }
         private fun defineClassesFromJarBytes(jarBytes: ByteArray, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
             val jarClassList = mutableListOf<Pair<String,Boolean>>()
