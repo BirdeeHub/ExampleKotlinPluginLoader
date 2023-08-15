@@ -206,41 +206,41 @@ object PluginLoader {
         fun copy() = URLoader(plugURL, parentCL, urCLCache.toMutableMap())
         //takes url, calls appropriate action based on protocol. Returns (name, isImplementation)
         fun defineAndGetClassInfo(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
+            val bytesOfStuff = mutableListOf<ByteArray?>()
+            val nameandimplements = mutableListOf<Pair<String,Boolean>>()
+            //Step 1: Get Bytes
             if(plugURL.protocol == "file")
-                return defineClassesFromFile(plugURL, implements)
+                bytesOfStuff.add(getBytesFromFile(plugURL))
             if(plugURL.protocol == "http" || plugURL.protocol == "https")
-                return defineClassesFromHTTPurl(plugURL, implements)
-            else return mutableListOf<Pair<String,Boolean>>()
+                bytesOfStuff.add(getBytesFromHTTPurl(plugURL))
+            //Step 2: define classes
+            bytesOfStuff.forEach { bytecodeBytes ->
+                if(bytecodeBytes!=null)nameandimplements.addAll(
+                    defineClassFromByteCodeFile(bytecodeBytes, plugURL, implements))
+            }
+            return nameandimplements
         }
 
         //Private functions
-        //these next 2 convert to byteArray then call defineClassFromByteCodeFile
-        private fun defineClassesFromFile(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
-            val classList= mutableListOf<Pair<String,Boolean>>()
-            try{
-                val fileinputstream = FileInputStream(File(plugURL.toURI()))
-                val fileBytes = fileinputstream.readAllBytes()
-                fileinputstream.close()
-                classList.addAll(defineClassFromByteCodeFile(fileBytes, plugURL, implements))
-            }catch(e: Exception){ e.printStackTrace()}
-            return classList
+        private fun getBytesFromFile(plugURL: URL): ByteArray {
+            val fileinputstream = FileInputStream(File(plugURL.toURI()))
+            val fileBytes = fileinputstream.readAllBytes()
+            fileinputstream.close()
+            return fileBytes
         }
-        private fun defineClassesFromHTTPurl(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String, Boolean>> {
-            val classList = mutableListOf<Pair<String, Boolean>>()
+        private fun getBytesFromHTTPurl(plugURL: URL): ByteArray? {
+            var urlBytes: ByteArray? = null
             try {
                 val urlConnection = plugURL.openConnection() as HttpURLConnection
                 urlConnection.requestMethod = "GET"
                 if (urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
                     val inputStream = urlConnection.inputStream
-                    val urlBytes = inputStream.readBytes()
+                    urlBytes = inputStream.readBytes()
                     inputStream.close()
                     urlConnection.disconnect()
-                    classList.addAll(defineClassFromByteCodeFile(urlBytes, plugURL, implements))
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            return classList
+            } catch (e: Exception) { e.printStackTrace() }
+            return urlBytes
         }
 
         //calls define on jar if jar or class if class
