@@ -195,11 +195,15 @@ object PluginLoader {
 //-------------------------------------END OF MAIN OBJECT--------PRIVATE CUSTOM CLASS LOADER BELOW------------------------------------------------------------------------
 
     //The custom class loader that allows for loading from URLs with no class names, and also copying itself (and can only load from 1 url)
-    private class URLoader(val plugURL: URL): URLClassLoader(arrayOf(plugURL), this::class.java.classLoader){
+    private class URLoader(val plugURL: URL, val parentCL: ClassLoader = PluginLoader::class.java.classLoader, private val urCLCache: MutableMap<String, Class<*>> = HashMap()): 
+        URLClassLoader(arrayOf(plugURL), parentCL) {
+        override fun findClass(name: String): Class<*> {
+            return urCLCache[name] ?: super.findClass(name)
+        }
         var pluginFace: Class<*> = MyPlugin::class.java
         override fun addURL(url: URL){}
         fun getURL(): URL = getURLs().get(0)
-        fun copy() = this
+        fun copy() = URLoader(plugURL, parentCL, urCLCache.toMutableMap())
         //takes url, calls appropriate action based on protocol. Returns (name, isImplementation)
         fun defineAndGetClassInfo(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
             if(plugURL.protocol == "file")
@@ -284,7 +288,8 @@ object PluginLoader {
                 override fun visit(version: Int, access: Int, name: String?, signature: String?, superName: String?, interfaces: Array<String>?) {
                     if(name!=null){
                         val launchName = name.replace('/', '.')
-                        defineClass(launchName, classBytes, 0, classBytes.size)
+                        val newClass = defineClass(launchName, classBytes, 0, classBytes.size)
+                        urCLCache[launchName] = newClass
                         var isSubtypeOfPlugin = interfaces?.contains(Type.getInternalName(implements)) ?: false
                         classInfo = Pair(launchName,isSubtypeOfPlugin)
                     }
