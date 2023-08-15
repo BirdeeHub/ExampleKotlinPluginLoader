@@ -151,36 +151,38 @@ object PluginLoader {
             val pluginPath: URL
             pluginPath = pluginPathURI.toURL()
             // if file:
-            if(pluginPath.protocol == "file"){
-                if((File(pluginPathURI)).exists()){
+            if(pluginPath.protocol == "file"){//<-- is file?
+                if((File(pluginPathURI)).exists()){//<-- exists?
                     val pluginFile = File(pluginPathURI)
-                    if(pluginFile.isDirectory()){
+                    if(pluginFile.isDirectory()){//<--  is directory?
                         // get all jar files in the directory and convert list to a mutable list so we can add any .class files, then add those too
                         val bytecodefiles = (pluginFile.listFiles { file -> file.name.endsWith(".jar") }
                             .map { it.toURI().toURL() }).toMutableList()
                         bytecodefiles.addAll(pluginFile.listFiles { file -> file.name.endsWith(".class") }.map { it.toURI().toURL() })
-                        return bytecodefiles
+                        return bytecodefiles //<-- return our list of bytecode files in directory as urls
                     } else return listOf(pluginPath) //<-- else if specific file was specified, return the url as a 1 element list
                 } else return listOf()
             // else if web http/s:
             } else if(pluginPath.protocol == "http" || pluginPath.protocol == "https" && 
                 (pluginPath.toString().endsWith(".jar")||pluginPath.toString().endsWith(".class"))) {
-                return listOf(pluginPath)
-            } else return listOf()
+                return listOf(pluginPath) //<-- you have to specify the whole URL
+            } else return listOf() // Otherwise: return empty list
         }catch(e: Exception){ e.printStackTrace(); return listOf() }
     }
 
     //Once you finally have the Class objects
     private fun loadPluginClasses(loader: URLoader, pluginNames: List<String>, targetCNames: List<String> = listOf()): MutableList<UUID> {
         val plugIDs = mutableListOf<UUID>()
-        pluginNames.forEach { pluginName -> // use copy of loader to allow individual closing
+        pluginNames.forEach { pluginName -> // use copy of loader for each plugin to allow individual closing
             val plugID = loadPluginClass(loader.copy(), pluginName, targetCNames)
             if(plugID!=null)plugIDs.add(plugID)//<-- if it worked, add uuid to the newly-loaded uuid list
         }
         return plugIDs
     }
     private fun loadPluginClass(loader: URLoader, pluginName: String, targetCNames: List<String> = listOf()): UUID? {
+        //first, check our targets list
         if(targetCNames.isEmpty()||(targetCNames.any { target -> ((pluginName == target)) })){
+            //then get instance, UUID, then update global list/maps. Return new UUID so user knows which were loaded
             val pluginInstance = loader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin
             val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
             pluginObjectMap[pluginUUID] = pluginInstance //add stuff into respective maps using UUID as the key
@@ -192,12 +194,13 @@ object PluginLoader {
 
 //-------------------------------------END OF MAIN OBJECT--------PRIVATE CUSTOM CLASS LOADER BELOW------------------------------------------------------------------------
 
-    //The custom class loader that allows for loading from bytes with no class names, and also copying itself (and can only load from 1 url)
+    //The custom class loader that allows for loading from URLs with no class names, and also copying itself (and can only load from 1 url)
     private class URLoader(val plugURL: URL): URLClassLoader(arrayOf(plugURL), this::class.java.classLoader){
         var pluginFace: Class<*> = MyPlugin::class.java
         override fun addURL(url: URL){}
         fun getURL(): URL = getURLs().get(0)
         fun copy() = this
+        //takes url, calls appropriate action based on protocol. Returns (name, isImplementation)
         fun defineAndGetClassInfo(plugURL: URL, implements: Class<*>? = pluginFace): List<Pair<String,Boolean>> {
             if(plugURL.protocol == "file")
                 return defineClassesFromFile(plugURL, implements)
@@ -271,10 +274,12 @@ object PluginLoader {
             return jarClassList
         }
 
-        //take byte arrays, gets info, adds class to loader to be run with name later. Uses "org.ow2.asm:asm:9.5". Since I needed this to get name,
-        private fun defineClassFromBytes(classBytes: ByteArray, implements: Class<*>? = pluginFace): Pair<String?,Boolean> {// may as well use to get subtype, and not need reflections
+        //take byte arrays, gets info, adds class to loader to be run with name later. Uses "org.ow2.asm:asm:9.5".
+        //Since I needed this to get name, may as well use to get subtype, and not need reflections
+        private fun defineClassFromBytes(classBytes: ByteArray, implements: Class<*>? = pluginFace): Pair<String?,Boolean> {
             var classInfo: Pair<String?,Boolean> = Pair(null, false)
-            val classReader = ClassReader(classBytes) // BEHOLD!! "org.ow2.asm:asm:9.5" !!!!!!!!!!!!!!!!!
+            // BEHOLD!! "org.ow2.asm:asm:9.5" !!!!!!!!!!!!!!!!!
+            val classReader = ClassReader(classBytes)
             classReader.accept(object : ClassVisitor(Opcodes.ASM9) {
                 override fun visit(version: Int, access: Int, name: String?, signature: String?, superName: String?, interfaces: Array<String>?) {
                     if(name!=null){
@@ -285,6 +290,7 @@ object PluginLoader {
                     }
                 }
             }, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
+            //Yaaaaaay! Reflections can reflect on this! A class? from bytes? EVERYTHING IS BYTES
             return classInfo
         }
     }
