@@ -252,7 +252,7 @@ object PluginLoader {
             return urlBytes
         }
 
-        //Now actually define the classes and load them.
+    //----Now actually define the classes and load them.---------------------------
         //call function for jar if jar or class if class
         private fun defineClassFromByteCodeFile(urlBytes: ByteArray, plugURL: URL, implements: Class<*>? = plugInFace): List<Pair<String,Boolean>> {
             val classList= mutableListOf<Pair<String,Boolean>>()
