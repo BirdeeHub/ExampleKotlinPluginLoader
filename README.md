@@ -4,7 +4,7 @@ Use it if your program needs to load plugins!
 
 You will need a copy of JDK 17. The kotlin runtime is in the jar.
 
-It can load any number of classes that implement MyPlugin that are defined inside the first package or (no package) of .jar and .class files.
+It can load classes that implement MyPlugin that are defined inside .jar and .class files.
 
 It can load them from file or directory and they can be in java or kotlin, and you can specify package.class names to select if you want.
 
@@ -12,7 +12,7 @@ It can also close them individually or all at once, and contains various useful 
 
 For optimum performance, do not load too many directories if they may have unrelated .jar or .class files in them.
 
-It now also can load Jar files from the internet. Use 1 or 2 to choose file or url. If leading argument is not an integer, it will behave as if in mode 1
+It now also can load bytecode from the internet. Use 1 or 2 to choose file or url. If leading argument is not an integer, it will behave as if in mode 1
 
 For loading over http/s specify entire url to the file. It cannot "search the directory" over http
 
@@ -28,7 +28,7 @@ I then kept returning to it when I got stuck on the bigger project and learned a
 
 **Instructions:**
 
-if you wish to use, you probably only need the thing i linked. Replace all on the word "My"
+If you wish to use, you probably only need the thing I linked. Replace all on the word "My"
 
 **To run the quick mockup:**
 
