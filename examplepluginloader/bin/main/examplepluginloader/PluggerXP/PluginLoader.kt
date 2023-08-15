@@ -129,11 +129,11 @@ object PluginLoader {
                 val loader = URLoader(plugURL)
                 val pluginNames = mutableListOf<String>()
 
-                try{ // Step 3: get Class names and if subtype at each url with ClassLoader
+                try{ // Step 3: get Class names and if it implements at each url with ClassLoader
                     pluginNames.addAll(loader.defineAndGetClassInfo(plugURL, MyPlugin::class.java)
                         .filter { (_,v) -> if(v==true)true else false }.map { it.first })
 
-                    // Step 4: loadPluginClasses(List<Class<out MyPlugin>>, URLoader, List<String>)
+                    // Step 4: loadPluginClasses(URLoader, List<String>, List<String>)
                     plugIDs.addAll(loadPluginClasses(loader, pluginNames, targetCNames))
                 }catch(e: Exception){e.printStackTrace()}
             }
