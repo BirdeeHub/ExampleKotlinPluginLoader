@@ -6,7 +6,7 @@ You will need a copy of JDK 17. The kotlin runtime is in the jar.
 
 It can load any number of classes that implement MyPlugin that are defined inside the first package or (no package) of .jar and .class files.
 
-It can load them from file or directory and they can be in java or kotlin, and you can specify package.class names if you want.
+It can load them from file or directory and they can be in java or kotlin, and you can specify package.class names to select if you want.
 
 It can also close them individually or all at once, and contains various useful reference functions
 
@@ -14,11 +14,13 @@ For optimum performance, do not load too many directories if they may have unrel
 
 It now also can load Jar files from the internet. Use 1 or 2 to choose file or url. If leading argument is not an integer, it will behave as if in mode 1
 
-For loading over http/s specify entire url to the file.
+For loading over http/s specify entire url to the file. It cannot "search the directory" over http
 
-It was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
+This was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
 
 I then built a quick mockup test for it to upload it, in case someone finds it useful
+
+I then kept returning to it when I got stuck on the bigger project and learned a ton about how class loaders work
 
 **The following is the link to the actual loader class:**
 
