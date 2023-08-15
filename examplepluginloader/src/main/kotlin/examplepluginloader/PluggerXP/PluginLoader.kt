@@ -272,7 +272,7 @@ object PluginLoader {
         //take byte arrays, gets info, adds class to loader to be run with name later. Uses "org.ow2.asm:asm:9.5". Since I needed this to get name,
         private fun defineClassFromBytes(classBytes: ByteArray, implements: Class<*>? = pluginFace): Pair<String?,Boolean> {// may as well use to get subtype, and not need reflections
             var classInfo: Pair<String?,Boolean> = Pair(null, false)
-            val classReader = ClassReader(classBytes)
+            val classReader = ClassReader(classBytes) // BEHOLD!! "org.ow2.asm:asm:9.5" !!!!!!!!!!!!!!!!!
             classReader.accept(object : ClassVisitor(Opcodes.ASM9) {
                 override fun visit(version: Int, access: Int, name: String?, signature: String?, superName: String?, interfaces: Array<String>?) {
                     if(name!=null){
