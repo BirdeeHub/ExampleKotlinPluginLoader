@@ -184,7 +184,7 @@ object PluginLoader {
             if(plugURL.toString().endsWith(".jar")){
                 val config = ConfigurationBuilder.build(loader.defineClassesFromJarBytes(urlBytes)).addUrls(plugURL).addClassLoaders(loader)
                 pluginClasses.addAll(Reflections(config).getSubTypesOf(MyPlugin::class.java))
-            } else if(plugURL.toString().endsWith(".class")){
+            } else if(plugURL.toString().endsWith(".class")){ //<-- havent gotten this one to work, but also meh... idk if the error is in define or in load and it works for .jar so...
                 val config = ConfigurationBuilder.build(loader.defineClassFromClassBytes(urlBytes)).addUrls(plugURL).addClassLoaders(loader)
                 pluginClasses.addAll(Reflections(config).getSubTypesOf(MyPlugin::class.java))
             }
