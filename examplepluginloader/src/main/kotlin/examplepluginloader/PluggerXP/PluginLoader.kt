@@ -135,7 +135,7 @@ object PluginLoader {
                 val loader = URLoader(plugURL)
                 val pluginNames = mutableListOf<String>()
 
-                try{ // Step 3: get Class names and if it implements at each url with ClassLoader
+                try{ // Step 3: get Class names and if it isSubtypeOf at each url with ClassLoader
                     // this is all defined in our custom class loader at end of file, and contains ASM dependency 
                     pluginNames.addAll(loader.defineAndGetClassInfo(plugURL, MyPlugin::class.java)
                         .filter { (_,v) -> if(v==true)true else false }.map { it.first }) //(GOODBYE REFLECTIONS!!!)
@@ -206,18 +206,20 @@ object PluginLoader {
         val parentCL: ClassLoader = PluginLoader::class.java.classLoader, 
         private val urCLCache: MutableMap<String, Class<*>> = HashMap()): 
         URLClassLoader(arrayOf(plugURL), parentCL) {
-
+        //------------------public functions----------------------
         override fun findClass(name: String): Class<*> {
             return urCLCache[name] ?: super.findClass(name)
         }
-        var plugInFace: Class<*> = MyPlugin::class.java
+        //we will create new copy for each plugin so we can close them 1 at a time
+        fun copy() = URLoader(plugURL, parentCL, urCLCache.toMutableMap())
         override fun addURL(url: URL){/* NO TOUCHY */}
         fun getURL(): URL = getURLs().get(0)
-        fun copy() = URLoader(plugURL, parentCL, urCLCache.toMutableMap()) //<-- we will create new copy for each class so we can close them 1 at a time
-        //takes url, calls appropriate action based on protocol. Returns (name, isImplementation)
-        fun defineAndGetClassInfo(plugURL: URL, implements: Class<*>? = plugInFace): List<Pair<String,Boolean>> {
+        //takes url, calls appropriate get bytes function based on protocol. 
+        //it then calls define from byte code file which Returns (name, isSubtypeOf)
+        var plugInFace: Class<*> = MyPlugin::class.java
+        fun defineAndGetClassInfo(plugURL: URL, isSubtypeOf: Class<*>? = plugInFace): List<Pair<String,Boolean>> {
             val bytesOfStuff = mutableListOf<ByteArray?>() //<-- get bytes from stuff
-            val nameandimplements = mutableListOf<Pair<String,Boolean>>() //<-- (name, isImplementation)
+            val nameandimplements = mutableListOf<Pair<String,Boolean>>() //<-- (name, isSubtypeOf)
             //Step 1: Get Bytes
             if(plugURL.protocol == "file")
                 bytesOfStuff.add(getBytesFromFile(plugURL))
@@ -226,7 +228,7 @@ object PluginLoader {
             //Step 2: define classes
             bytesOfStuff.forEach { bytecodeFileBytes ->
                 if(bytecodeFileBytes!=null)nameandimplements.addAll(
-                    defineClassFromByteCodeFile(bytecodeFileBytes, plugURL, implements))
+                    defineClassFromByteCodeFile(bytecodeFileBytes, plugURL, isSubtypeOf))
             }
             return nameandimplements
         }
@@ -262,13 +264,13 @@ object PluginLoader {
         //Private functions that actually load the stuff--------------------------------
 
         //call function for jar if jar or class if class
-        private fun defineClassFromByteCodeFile(urlBytes: ByteArray, plugURL: URL, implements: Class<*>? = plugInFace): List<Pair<String,Boolean>> {
+        private fun defineClassFromByteCodeFile(urlBytes: ByteArray, plugURL: URL, isSubtypeOf: Class<*>? = plugInFace): List<Pair<String,Boolean>> {
             val classList= mutableListOf<Pair<String,Boolean>>()
             try{
                 if(plugURL.toString().endsWith(".jar"))
-                    classList.addAll(defineClassesFromJarBytes(urlBytes, implements))
+                    classList.addAll(defineClassesFromJarBytes(urlBytes, isSubtypeOf))
                 if(plugURL.toString().endsWith(".class")){
-                    val classInfo = defineClassFromBytes(urlBytes, implements)
+                    val classInfo = defineClassFromBytes(urlBytes, isSubtypeOf)
                     val className = classInfo.first
                     if(className!=null)classList.add(Pair(className, classInfo.second))
                 }
@@ -277,14 +279,14 @@ object PluginLoader {
         }
 
         //This just calls defineClassFromBytes on jar entries
-        private fun defineClassesFromJarBytes(jarBytes: ByteArray, implements: Class<*>? = plugInFace): List<Pair<String,Boolean>> {
+        private fun defineClassesFromJarBytes(jarBytes: ByteArray, isSubtypeOf: Class<*>? = plugInFace): List<Pair<String,Boolean>> {
             val jarClassList = mutableListOf<Pair<String,Boolean>>()
             JarInputStream(ByteArrayInputStream(jarBytes)).use { jis ->
                 var entry = jis.getNextJarEntry()
                 while (entry!=null) {
                     if (!entry.isDirectory && entry.name.endsWith(".class")) {
                         try{
-                            val classInfo = defineClassFromBytes(jis.readAllBytes(), implements)
+                            val classInfo = defineClassFromBytes(jis.readAllBytes(), isSubtypeOf)
                             val className = classInfo.first
                             if(className!=null)jarClassList.add(Pair(className, classInfo.second))
                         } catch (e: Exception){ e.printStackTrace() }
@@ -298,7 +300,7 @@ object PluginLoader {
 
         //take byte arrays, gets info, adds class to loader to be run with name later. Uses "org.ow2.asm:asm:9.5".
         //Since I needed this to get name, may as well use to get subtype, and not need reflections
-        private fun defineClassFromBytes(classBytes: ByteArray, implements: Class<*>? = plugInFace): Pair<String?,Boolean> {
+        private fun defineClassFromBytes(classBytes: ByteArray, isSubtypeOf: Class<*>? = plugInFace): Pair<String?,Boolean> {
             var classInfo: Pair<String?,Boolean> = Pair(null, false)
             // BEHOLD!! "org.ow2.asm:asm:9.5" !!!!!!!!!!!!!!!!!
             val classReader = ClassReader(classBytes)
@@ -307,8 +309,11 @@ object PluginLoader {
                     if(name!=null){
                         val launchName = name.replace('/', '.')
                         urCLCache[launchName] = defineClass(launchName, classBytes, 0, classBytes.size)
-                        var isSubtypeOfPlugin = interfaces?.contains(Type.getInternalName(implements)) ?: false
-                        classInfo = Pair(launchName,isSubtypeOfPlugin)
+                        val isExtensionOfPlugin: Boolean
+                        if(superName==null || Type.getInternalName(isSubtypeOf)==null) isExtensionOfPlugin = false
+                        else isExtensionOfPlugin = (Type.getInternalName(isSubtypeOf) == superName)
+                        val isImplementationOfPlugin = interfaces?.contains(Type.getInternalName(isSubtypeOf)) ?: false
+                        classInfo = Pair(launchName,(isImplementationOfPlugin||isExtensionOfPlugin))
                     }
                 }
             }, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
