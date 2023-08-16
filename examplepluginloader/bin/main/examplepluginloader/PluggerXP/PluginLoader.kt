@@ -132,7 +132,7 @@ object PluginLoader {
             getJarURLs(pluginURI).forEach { plugURL ->
 
                 // Step 2: get ClassLoader for single URL and init list of plugin names
-                val loader = URLoader(plugURL)
+                val loader = URLoader(plugURL) //<-- this is a custom class loader
                 val pluginNames = mutableListOf<String>()
 
                 try{ // Step 3: get Class names and if it isSubtypeOf at each url with ClassLoader
