@@ -208,13 +208,14 @@ object PluginLoader {
     private class URLoader(val plugURL: URL, 
         val parentCL: ClassLoader = ClassLoader.getSystemClassLoader(), 
         private val urCLCache: MutableMap<String, Class<*>> = HashMap()): 
-        ClassLoader("URLoader", parentCL) {
+        URLClassLoader(arrayOf(plugURL), parentCL) {
         //------------------accessible functions----------------------
         override fun findClass(name: String): Class<*>? {
             return urCLCache[name] ?: super.findClass(name)
         }
-        fun close() {
+        override fun close() {
             urCLCache.clear()
+            super.close()
         }
         //we will create new copy for each plugin so we can close them 1 at a time
         fun copy() = URLoader(plugURL, parentCL, urCLCache.toMutableMap())

@@ -41,12 +41,12 @@ class MyProgram(api: MyAPI, var pluginPaths: List<String>, mode: Int){
         }
         val totalnumber: Int = PluginLoader.getPlugIDList().size
         println("All UUIDs: "+PluginLoader.getPlugIDList())
-        PluginLoader.getPlugIDList().forEach { plugID ->
+        /*PluginLoader.getPlugIDList().forEach { plugID ->
             println("Unloading: "+PluginLoader.getPlugin(plugID)?.getName()+" : "+plugID)
             PluginLoader.unloadPlugin(plugID)
             println("All UUIDs: "+PluginLoader.getPlugIDList())
-        }
-        println("loaded and unloaded $totalnumber plugin(s)")
+        }*/
+        println("loaded $totalnumber plugin(s)")
         println("duration in milliseconds: "+(System.currentTimeMillis() - startTime).toString())
         println("Goodbye!")
     }
