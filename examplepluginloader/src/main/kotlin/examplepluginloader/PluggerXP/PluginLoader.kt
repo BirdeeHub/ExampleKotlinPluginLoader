@@ -304,8 +304,7 @@ object PluginLoader {
                 override fun visit(version: Int, access: Int, name: String?, signature: String?, superName: String?, interfaces: Array<String>?) {
                     if(name!=null){
                         val launchName = name.replace('/', '.')
-                        val newClass = defineClass(launchName, classBytes, 0, classBytes.size)
-                        urCLCache[launchName] = newClass
+                        urCLCache[launchName] = defineClass(launchName, classBytes, 0, classBytes.size)
                         var isSubtypeOfPlugin = interfaces?.contains(Type.getInternalName(implements)) ?: false
                         classInfo = Pair(launchName,isSubtypeOfPlugin)
                     }
