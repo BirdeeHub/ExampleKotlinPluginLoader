@@ -8,7 +8,9 @@ It can load java and kotlin classes that implement MyPlugin that are defined ins
 
 It can load them from file or directory, and you can specify package.class names to select if you want.
 
-It can also close them individually or all at once, and contains various useful reference functions
+In theory, it can also close them individually or all at once, but this is proving to be quite difficult.
+
+and contains various useful reference functions
 
 For optimum performance, do not load too many directories if they may have unrelated .jar or .class files in them.
 

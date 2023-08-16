@@ -18,6 +18,7 @@ import java.net.HttpURLConnection
 import java.util.UUID
 import java.util.jar.JarInputStream
 import java.util.jar.JarEntry
+import java.util.jar.JarFile
 import java.nio.file.Path
 
 object PluginLoader {
@@ -203,19 +204,22 @@ object PluginLoader {
 
     //The custom class loader that allows for loading from SINGLE URL with no class names, and also copying itself.
     //if you want it to load from multiple urls you can add it into the calls for define class and make plugURL a mutable list to hold them,
-    //but like, if you want to close plugins separately they each need their own loader anyway so.....
+    //but like, if you want to close plugins separately they each need their own loader anyway so..... = PluginLoader::class.java.classLoader
     private class URLoader(val plugURL: URL, 
-        val parentCL: ClassLoader = PluginLoader::class.java.classLoader, 
+        val parentCL: ClassLoader = ClassLoader.getSystemClassLoader(), 
         private val urCLCache: MutableMap<String, Class<*>> = HashMap()): 
-        URLClassLoader(arrayOf(plugURL), parentCL) {
+        ClassLoader("URLoader", parentCL) {
         //------------------accessible functions----------------------
-        override fun findClass(name: String): Class<*> {
+        override fun findClass(name: String): Class<*>? {
             return urCLCache[name] ?: super.findClass(name)
+        }
+        fun close() {
+            urCLCache.clear()
         }
         //we will create new copy for each plugin so we can close them 1 at a time
         fun copy() = URLoader(plugURL, parentCL, urCLCache.toMutableMap())
-        override fun addURL(url: URL){/* NO TOUCHY */}
-        fun getURL(): URL = getURLs().get(0)
+        //override fun addURL(url: URL){/* NO TOUCHY */}
+        fun getURL(): URL = plugURL
         //takes url, calls appropriate get bytes function based on protocol. 
         //it then calls define from byte code file which Returns (name, isSubtypeOf)
         fun defineAndGetClassInfo(isSubtypeOf: Class<*>?): List<Pair<String,Boolean>> {

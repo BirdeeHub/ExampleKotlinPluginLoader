@@ -12,9 +12,9 @@ class MyProgram(api: MyAPI, var pluginPaths: List<String>, mode: Int){
             if(mode == 1)pluginPaths=listOf("./outputDir/plugins/")
             if(mode == 2)pluginPaths=listOf("https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar")
         } else {
-            optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
-            println("Target classes:")
-            optionalTargets.forEach { target -> println(target) }
+            //optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
+            //println("Target classes:")
+            //optionalTargets.forEach { target -> println(target) }
         }
         println("Paths to load from:")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
