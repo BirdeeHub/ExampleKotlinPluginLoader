@@ -318,7 +318,7 @@ object PluginLoader {
                             else isExtensionOfPlugin = (Type.getInternalName(isSubtypeOf) == superName)
                             val isImplementationOfPlugin = (interfaces?.contains(Type.getInternalName(isSubtypeOf)) ?: false)
                             classInfo = Pair(launchName,(isImplementationOfPlugin||isExtensionOfPlugin))
-                        } else classInfo = Pair(launchName,true)
+                        } else classInfo = Pair(launchName,false)
                     }
                 }
             }, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
