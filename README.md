@@ -2,7 +2,7 @@
 
 Use it if your program needs to load plugins!
 
-You will need a copy of JDK 17. The kotlin runtime is in the jar.
+You will need a copy of JDK 17. The kotlin runtime is in the jar, but you will need that and 1 dependency if you wish to compile.
 
 It can load java and kotlin classes that implement MyPlugin that are defined inside .jar and .class files.
 
@@ -34,7 +34,7 @@ If you wish to use, you probably only need the thing I linked. Replace all on th
 
 1st: go to root directory of the git repo.
 
-Build first with: ```gradle clean build shadowJar``` (if desired)
+Build first with: ```gradle build shadowJar``` (if desired)
 
 to run:
 
