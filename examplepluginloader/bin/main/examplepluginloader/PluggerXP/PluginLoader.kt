@@ -2,10 +2,10 @@ package examplepluginloader.PluggerXP
 
 import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
-import org.objectweb.asm.Type
+import org.objectweb.asm.Type //<-- these dependencies from here to:
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.Opcodes
+import org.objectweb.asm.Opcodes //<-- here are used in the last function of the file to do magic (and remove need for reflections)
 import java.io.InputStream
 import java.io.File
 import java.io.ByteArrayOutputStream
@@ -231,7 +231,7 @@ object PluginLoader {
             return nameandimplements
         }
 
-        //------------------Private functions-------------------------------
+        //------------------Private util functions-------------------------------
         //these 2 are utils for defineAndGetClassInfo. 
         //If you can get bytes of it, you can load it.
         //(assuming it has a url ending in .jar or .class, which getJarURLs already took care of)
@@ -259,7 +259,8 @@ object PluginLoader {
             return urlBytes
         }
 
-    //----Now actually define the classes and load them.---------------------------
+        //Private functions that actually load the stuff--------------------------------
+
         //call function for jar if jar or class if class
         private fun defineClassFromByteCodeFile(urlBytes: ByteArray, plugURL: URL, implements: Class<*>? = plugInFace): List<Pair<String,Boolean>> {
             val classList= mutableListOf<Pair<String,Boolean>>()
