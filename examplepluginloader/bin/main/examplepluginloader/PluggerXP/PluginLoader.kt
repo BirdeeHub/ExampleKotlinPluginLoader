@@ -308,7 +308,8 @@ object PluginLoader {
                 override fun visit(version: Int, access: Int, name: String?, signature: String?, superName: String?, interfaces: Array<String>?) {
                     if(name!=null){
                         val launchName = name.replace('/', '.')
-                        urCLCache[launchName] = defineClass(launchName, classBytes, 0, classBytes.size) //<-- defines classes before filter, because otherwise they will be unreachable
+                        //defines classes before filter, because otherwise they may be unreachable and why download them twice anyway
+                        urCLCache[launchName] = defineClass(launchName, classBytes, 0, classBytes.size)
                         if(isSubtypeOf!=null){
                             val isExtensionOfPlugin: Boolean
                             if(superName==null) isExtensionOfPlugin = false
