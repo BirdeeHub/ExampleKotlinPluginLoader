@@ -221,7 +221,7 @@ object PluginLoader {
             if(plugURL.protocol == "file")
                 bytesOfStuff.add(getBytesFromFile(plugURL))
             if(plugURL.protocol == "http" || plugURL.protocol == "https")
-            bytesOfStuff.add(getBytesFromHTTP(plugURL))
+                bytesOfStuff.add(getBytesFromHTTP(plugURL))
             //Step 2: define classes
             bytesOfStuff.forEach { bytecodeFileBytes ->
                 if(bytecodeFileBytes!=null)nameandimplements.addAll(
