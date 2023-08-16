@@ -221,7 +221,7 @@ object PluginLoader {
             if(plugURL.protocol == "file")
                 bytesOfStuff.add(getBytesFromFile(plugURL))
             if(plugURL.protocol == "http" || plugURL.protocol == "https")
-                bytesOfStuff.add(getBytesFromHTTPurl(plugURL))
+            bytesOfStuff.add(getBytesFromHTTP(plugURL))
             //Step 2: define classes
             bytesOfStuff.forEach { bytecodeFileBytes ->
                 if(bytecodeFileBytes!=null)nameandimplements.addAll(
@@ -243,7 +243,7 @@ object PluginLoader {
             fileinputstream.close()
             return fileBytes
         }
-        private fun getBytesFromHTTPurl(plugURL: URL): ByteArray? {
+        private fun getBytesFromHTTP(plugURL: URL): ByteArray? {
             var urlBytes: ByteArray? = null
             try {
                 val urlConnection = plugURL.openConnection() as HttpURLConnection
