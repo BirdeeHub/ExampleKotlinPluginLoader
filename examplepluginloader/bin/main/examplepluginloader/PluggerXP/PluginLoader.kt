@@ -162,7 +162,8 @@ object PluginLoader {
                         // get all jar files in the directory and convert list to a mutable list so we can add any .class files, then add those too
                         val bytecodefiles = (pluginFile.listFiles { file -> file.name.endsWith(".jar") }
                             .map { it.toURI().toURL() }).toMutableList()
-                        bytecodefiles.addAll(pluginFile.listFiles { file -> file.name.endsWith(".class") }.map { it.toURI().toURL() })
+                        bytecodefiles.addAll(pluginFile.listFiles { file -> file.name.endsWith(".class") }
+                            .map { it.toURI().toURL() })
                         return bytecodefiles //<-- return our list of bytecode files in directory as urls
                     } else return listOf(pluginPath) //<-- else if specific file was specified, return the url as a 1 element list
                 } else return listOf()
