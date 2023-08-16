@@ -20,7 +20,7 @@ class MyProgram(api: MyAPI, var pluginPaths: List<String>, mode: Int){
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
         println("Tests:")
         if(mode == 1){
-            PluginLoader.loadPlugins(api, pluginPaths, optionalTargets).forEach {plugID ->
+            PluginLoader.loadPluginFile(api, pluginPaths, optionalTargets).forEach {plugID ->
                 val plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
                 if(plugin!=null){
                     println(plugin.getName()) // MyPluginImplementation loaded

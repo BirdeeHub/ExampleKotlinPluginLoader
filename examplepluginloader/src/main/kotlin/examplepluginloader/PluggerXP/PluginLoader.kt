@@ -58,7 +58,7 @@ object PluginLoader {
         pluginNameMap.clear()
     }
     @Synchronized
-    fun loadPlugins(api: MyAPI, pluginPathStrings: List<String>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+    fun loadPluginFile(api: MyAPI, pluginPathStrings: List<String>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
         val pluginURIs = mutableListOf<URI>()
         pluginPathStrings.forEach { pluginPathString -> 
             try{ pluginURIs.add(File(pluginPathString).toURI()) 
