@@ -309,11 +309,13 @@ object PluginLoader {
                     if(name!=null){
                         val launchName = name.replace('/', '.')
                         urCLCache[launchName] = defineClass(launchName, classBytes, 0, classBytes.size)
-                        val isExtensionOfPlugin: Boolean
-                        if(superName==null || Type.getInternalName(isSubtypeOf)==null) isExtensionOfPlugin = false
-                        else isExtensionOfPlugin = (Type.getInternalName(isSubtypeOf) == superName)
-                        val isImplementationOfPlugin = interfaces?.contains(Type.getInternalName(isSubtypeOf)) ?: false
-                        classInfo = Pair(launchName,(isImplementationOfPlugin||isExtensionOfPlugin))
+                        if(isSubtypeOf!=null){
+                            val isExtensionOfPlugin: Boolean
+                            if(superName==null) isExtensionOfPlugin = false
+                            else isExtensionOfPlugin = (Type.getInternalName(isSubtypeOf) == superName)
+                            val isImplementationOfPlugin = interfaces?.contains(Type.getInternalName(isSubtypeOf)) ?: false
+                            classInfo = Pair(launchName,(isImplementationOfPlugin||isExtensionOfPlugin))
+                        } else classInfo = Pair(launchName,true)
                     }
                 }
             }, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
