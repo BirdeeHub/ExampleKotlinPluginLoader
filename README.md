@@ -1,36 +1,32 @@
 **A plugin loader example program in kotlin-jvm**
 
-Use it if your program needs to load plugins!
-
-You will need a copy of JDK 17. The kotlin runtime is in the jar, but you will need that and 1 dependency if you wish to compile.
+**THIS PLUGIN LOADER IS NOT YET VERY GOOD. IT CANNOT YET RELIABLY CLOSE THE PLUGINS IT CREATES, although I am trying**
 
 It can load java and kotlin classes that implement MyPlugin that are defined inside .jar and .class files.
 
 It can load them from file or directory, and you can specify package.class names to select if you want.
 
-In theory, it can also close them individually or all at once, but this is proving to be quite difficult.
+In theory, it SHOULD also close them individually or all at once, but this is proving to be quite difficult.
 
-and contains various useful reference functions
+It also contains various useful reference functions
 
 For optimum performance, do not load too many directories if they may have unrelated .jar or .class files in them.
 
-It now also can load bytecode from the internet. Use 1 or 2 to choose file or url. If leading argument is not an integer, it will behave as if in mode 1
+It also can load bytecode from the internet. Use 1 or 2 to choose file or url. If leading argument is not an integer, it will behave as if in mode 1
 
 For loading over http/s specify entire url to the file. It cannot "search the directory" over http
-
-This was a tiny part of another program but it came out so nicely I figured it could be useful to people before I finish the other project.
 
 I then built a quick mockup test for it to upload it, in case someone finds it useful
 
 I then kept returning to it when I got stuck on the bigger project and learned a ton about how class loaders work
+
+I then learned that I should have made a much better test because it took me a long time to figure out my stuff didnt actually close, and now I need to learn that.
 
 **The following is the link to the actual loader class:**
 
 [examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
 
 **Instructions:**
-
-If you wish to use, you probably only need the thing I linked. Replace all on the word "My" so that it matches YourPlugin and YourAPI after
 
 **To run the quick mockup:**
 
@@ -42,15 +38,15 @@ to run:
 
 stay in the same project root directory and run the following command:
 
-```java -jar ./outputDir/examplepluginloader-all.jar```
+```java -jar ./outputDir/examplepluginloader.jar```
 
 default runs plugins from ./outputDir/plugins/, so if you go to outputDir on the command line you will need to run the following
 
-```java -jar ./examplepluginloader-all.jar ./plugins/```
+```java -jar ./examplepluginloader.jar ./plugins/```
 
 the expected output is the following:
 
-for ```java -jar ./outputDir/examplepluginloader-all.jar```:
+for ```java -jar ./outputDir/examplepluginloader.jar```:
 ```
 Testing...
 Paths to load from:
@@ -60,21 +56,22 @@ API call test when launchPlugin(api) is called
 API call test when launchPlugin(api) is called (entering paths will set target to only plugin 1, removing this)
 MyPluginImplementation1 getName() Test
 file:/C:/Users/robin/Desktop/temp/examplepluginloader/./outputDir/plugins/exampleplugin.jar
-UUID: fbf33b50-50af-49db-b00a-41a72c97a272
+UUID: 07a9c17e-59d1-45de-be7e-03ba62ebca48
 MyPluginImplementation2 getName() Test (Filtering Demo)
 file:/C:/Users/robin/Desktop/temp/examplepluginloader/./outputDir/plugins/exampleplugin.jar
-UUID: fd067648-f31d-4d79-91ba-8f4d046ed6f3
-All UUIDs: [fbf33b50-50af-49db-b00a-41a72c97a272, fd067648-f31d-4d79-91ba-8f4d046ed6f3]
-Unloading: MyPluginImplementation1 getName() Test : fbf33b50-50af-49db-b00a-41a72c97a272
-All UUIDs: [fd067648-f31d-4d79-91ba-8f4d046ed6f3]
-Unloading: MyPluginImplementation2 getName() Test (Filtering Demo) : fd067648-f31d-4d79-91ba-8f4d046ed6f3
+UUID: b0999000-6451-4e41-a260-d01efcb38f4d
+All UUIDs: [07a9c17e-59d1-45de-be7e-03ba62ebca48, b0999000-6451-4e41-a260-d01efcb38f4d]
+type exit to attempt to close:
+exit
+Attempting to Unload: MyPluginImplementation1 getName() Test : 07a9c17e-59d1-45de-be7e-03ba62ebca48
+All UUIDs: [b0999000-6451-4e41-a260-d01efcb38f4d]
+Attempting to Unload: MyPluginImplementation2 getName() Test (Filtering Demo) : b0999000-6451-4e41-a260-d01efcb38f4d
 All UUIDs: []
-loaded and unloaded 2 plugin(s)
-duration in milliseconds: 152
+loaded 2 plugin(s)
 Goodbye!
 ```
 
-for ```java -jar ./outputDir/examplepluginloader-all.jar ./outputDir/plugins/```:
+for ```java -jar ./outputDir/examplepluginloader.jar ./outputDir/plugins/```:
 ```
 Testing...
 Target classes:
@@ -85,35 +82,33 @@ Tests:
 API call test when launchPlugin(api) is called
 MyPluginImplementation1 getName() Test
 file:/C:/Users/robin/Desktop/temp/examplepluginloader/./outputDir/plugins/exampleplugin.jar
-UUID: ce135b8c-8fb8-4abd-8be0-f988799aba88
-All UUIDs: [ce135b8c-8fb8-4abd-8be0-f988799aba88]
-Unloading: MyPluginImplementation1 getName() Test : ce135b8c-8fb8-4abd-8be0-f988799aba88
+UUID: 6ebcf168-c775-42de-9613-88dcb77e66f9
+All UUIDs: [6ebcf168-c775-42de-9613-88dcb77e66f9]
+type exit to attempt to close:
+exit
+Attempting to Unload: MyPluginImplementation1 getName() Test : 6ebcf168-c775-42de-9613-88dcb77e66f9
 All UUIDs: []
-loaded and unloaded 1 plugin(s)
-duration in milliseconds: 154
+loaded 1 plugin(s)
 Goodbye!
 ```
 
-for ```java -jar ./outputDir/examplepluginloader-all.jar 2```
+for ```java -jar ./outputDir/examplepluginloader.jar 2 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar```
 ```
 Testing...
+Target classes:
+exampleplugin.MyPluginImplementation1
 Paths to load from:
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar
 Tests:
 API call test when launchPlugin(api) is called
-API call test when launchPlugin(api) is called (entering paths will set target to only plugin 1, removing this)
 MyPluginImplementation1 getName() Test
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar
-UUID: 5cd9a690-cc00-4924-b64c-5e07931baafa
-MyPluginImplementation2 getName() Test (Filtering Demo)
-https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar
-UUID: b3cb5c9c-5001-4657-9c08-8f6d048552e7
-All UUIDs: [5cd9a690-cc00-4924-b64c-5e07931baafa, b3cb5c9c-5001-4657-9c08-8f6d048552e7]
-Unloading: MyPluginImplementation1 getName() Test : 5cd9a690-cc00-4924-b64c-5e07931baafa
-All UUIDs: [b3cb5c9c-5001-4657-9c08-8f6d048552e7]
-Unloading: MyPluginImplementation2 getName() Test (Filtering Demo) : b3cb5c9c-5001-4657-9c08-8f6d048552e7
+UUID: b7c6f9ea-af76-49f7-8785-20389f5e910a
+All UUIDs: [b7c6f9ea-af76-49f7-8785-20389f5e910a]
+type exit to attempt to close:
+exit
+Attempting to Unload: MyPluginImplementation1 getName() Test : b7c6f9ea-af76-49f7-8785-20389f5e910a
 All UUIDs: []
-loaded and unloaded 2 plugin(s)
-duration in milliseconds: 779
+loaded 1 plugin(s)
 Goodbye!
 ```

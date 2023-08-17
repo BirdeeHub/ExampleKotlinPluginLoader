@@ -6,15 +6,14 @@ import java.net.URL
 class MyProgram(api: MyAPI, var pluginPaths: List<String>, mode: Int){
     init{
         println("Testing...")
-        val startTime = System.currentTimeMillis()
         var optionalTargets: List<String> = listOf()
         if(pluginPaths.isEmpty()){
             if(mode == 1)pluginPaths=listOf("./outputDir/plugins/")
-            if(mode == 2)pluginPaths=listOf("https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/outputDir/plugins/exampleplugin.jar")
+            if(mode == 2)pluginPaths=listOf("https://github.com/BirdeeHub/minesweeper/raw/NotATutorial/app/minesweeper.jar")
         } else {
-            //optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
-            //println("Target classes:")
-            //optionalTargets.forEach { target -> println(target) }
+            optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
+            println("Target classes:")
+            optionalTargets.forEach { target -> println(target) }
         }
         println("Paths to load from:")
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
@@ -41,13 +40,15 @@ class MyProgram(api: MyAPI, var pluginPaths: List<String>, mode: Int){
         }
         val totalnumber: Int = PluginLoader.getPlugIDList().size
         println("All UUIDs: "+PluginLoader.getPlugIDList())
-        /*PluginLoader.getPlugIDList().forEach { plugID ->
-            println("Unloading: "+PluginLoader.getPlugin(plugID)?.getName()+" : "+plugID)
+        println("type q to attempt to close:")
+        var inputString: String? = ""
+        while(inputString!="q")inputString = readLine()
+        PluginLoader.getPlugIDList().forEach { plugID ->
+            println("Attempting to Unload: "+PluginLoader.getPlugin(plugID)?.getName()+" : "+plugID)
             PluginLoader.unloadPlugin(plugID)
             println("All UUIDs: "+PluginLoader.getPlugIDList())
-        }*/
+        }
         println("loaded $totalnumber plugin(s)")
-        println("duration in milliseconds: "+(System.currentTimeMillis() - startTime).toString())
         println("Goodbye!")
     }
 }
