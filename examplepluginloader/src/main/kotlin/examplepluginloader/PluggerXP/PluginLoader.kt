@@ -47,7 +47,8 @@ object PluginLoader {
         else if(namesmatchingUUID.size>1)return null //<-- this should never be able to happen. UUID is placed after creating instance, which would error for this
         else return namesmatchingUUID.get(0)
     }
-    //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant, get(0) will throw error if UUID not found because list will be empty
+    //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant, 
+    //get(0) will throw error if UUID not found because list will be empty
     fun getPluginLocation(plugID: UUID): URL? = try{ 
         classInfoByURLs.filter { it.value.classInfoAtURL
             ?.any { it.optUUID == plugID } ?: false }
@@ -207,17 +208,22 @@ object PluginLoader {
     private fun loadPluginClass(plugURL: URL, pluginName: String, targetCNames: List<String> = listOf()): UUID? {
         //first, check our targets list
         if(targetCNames.isEmpty()||(targetCNames.any { target -> ((pluginName == target)) })){
-            //then get instance, UUID, then update global list/maps. Return new UUID so user knows which were loaded
+            //then get instance, UUID, then update global list/maps. Return new UUID so user knows which were 
+            var loader: PluginClassLoader? = null
             try{
                 val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
-                val loader = PluginClassLoader(plugURL, pluginUUID)
+                loader = PluginClassLoader(plugURL, pluginUUID)
                 val pluginInstance = loader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in VM
                 classInfoByURLs[plugURL]?.getClassInfoByExtName(pluginName)?.optUUID = pluginUUID //<-- getClassInfoByName throws if name collision at url
-                pluginObjectMap[pluginUUID] = pluginInstance 
+                pluginObjectMap[pluginUUID] = pluginInstance
                 pluginCLMap[pluginUUID] = loader //<-- we keep track of PluginClassLoaders so we can close them later
                 plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
                 return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
-            }catch(e: Exception){e.printStackTrace(); return null}
+            }catch(e: Exception){
+                e.printStackTrace()
+                loader?.close() //<-- nothing else to remove because it throws first
+                return null
+            }
         } else return null
     }
 }
