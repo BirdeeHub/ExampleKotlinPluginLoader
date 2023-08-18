@@ -62,7 +62,7 @@ object PluginLoader {
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         pluginObjectMap.remove(plugID)
-        try{ //pluginCLMap[plugID]?.close() //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS
+        try{ pluginCLMap[plugID]?.close() //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS
         }catch (e: Exception){e.printStackTrace()}
         pluginCLMap.remove(plugID) //these don't throw.
         plugIDList.remove(plugID)
@@ -71,7 +71,7 @@ object PluginLoader {
     fun unloadAllPlugins() { //close and clear ALL everywhere
         pluginObjectMap.clear()
         pluginCLMap.forEach { loader -> try{ 
-            //loader.value.close() //<-- TODO: IMPLEMENT THIS  //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS
+            loader.value.close() //<-- TODO: IMPLEMENT THIS  //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS
             }catch (e: Exception){e.printStackTrace()}
         }
         pluginCLMap.clear() //these don't throw.
