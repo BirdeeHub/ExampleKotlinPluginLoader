@@ -1,6 +1,7 @@
 package examplepluginloader.PluggerXP
 
 import java.util.jar.JarInputStream
+import java.util.UUID
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.File
@@ -20,6 +21,7 @@ interface URLclassInfo {
     val xtnds: String?
     val imps: List<String>?
     fun isImpOf(internalName: String): Boolean
+    var optUUID: UUID?
 }
 class JByteCodeURLINFO(public val yourURL: URL){
     val isSupported: Boolean
@@ -30,6 +32,12 @@ class JByteCodeURLINFO(public val yourURL: URL){
             Type.getObjectType(internalName).getClassName()
         fun getInternalCName(obj: Class<*>): String = 
             Type.getInternalName(obj)
+    }
+    fun getClassInfoByName(name: String): URLclassInfo? {
+        val tempList = classInfoAtURL?.filter { it.name==name }
+        if(tempList==null || tempList.isEmpty() ) return null
+        else if(tempList.size>1) throw Exception("Multiple classes found at URL with same fully qualified name")
+        else return tempList[0]
     }
     init{
         val bytesOfStuff = mutableListOf<ByteArray?>()
@@ -126,6 +134,7 @@ class JByteCodeURLINFO(public val yourURL: URL){
             override val xtnds: String? = null
             override val imps: List<String>? = null
             override fun isImpOf(internalName: String): Boolean = false
+            override var optUUID: UUID? = null
         }
         val classReader = ClassReader(classStream)
         classReader.accept(object : ClassVisitor(Opcodes.ASM9) {
@@ -139,6 +148,7 @@ class JByteCodeURLINFO(public val yourURL: URL){
                     override val xtnds: String? = superName
                     override val imps: List<String>? = interfaces?.toList()
                     override fun isImpOf(internalName: String): Boolean = interfaces?.contains(internalName) ?: false
+                    override var optUUID: UUID? = null
                 };
             }
         }, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)

@@ -15,3 +15,5 @@ plugins {
 rootProject.name = "examplepluginloader"
 include("examplepluginloader")
 include("exampleplugin")
+include("exampleAPI")
+include("exampleParentLoader")

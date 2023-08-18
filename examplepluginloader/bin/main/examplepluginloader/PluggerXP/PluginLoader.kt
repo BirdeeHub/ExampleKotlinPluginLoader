@@ -3,6 +3,7 @@ package examplepluginloader.PluggerXP
 import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import examplepluginloader.PluggerXP.JByteCodeURLINFO
+import examplepluginloader.program.MyProgram
 import java.io.InputStream
 import java.io.File
 import java.io.ByteArrayOutputStream
@@ -19,25 +20,40 @@ import java.nio.file.Path
 
 object PluginLoader {
     //The custom class loader that has no parent, and knows where to find its dependency
-    private class URLoader(val plugURL: URL): 
-        URLClassLoader(arrayOf(plugURL, 
-        File(MyPlugin::class.java.protectionDomain.codeSource.location.toURI()).toURI().toURL()),ClassLoader.getSystemClassLoader()) {
-
+    private class PluginClassLoader(val plugURL: URL): 
+        URLClassLoader(arrayOf(plugURL),
+        MyProgram::class.java.classLoader) {
+        
     }
     //PRIVATE GLOBALS
     private val plugIDList = mutableListOf<UUID>() //<-- initialize our lists of stuff for loading and closing
-    private val pluginURLMap = mutableMapOf<UUID,URL>()
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
-    private val uRLoaderMap = mutableMapOf<UUID,URLoader>() //<-- we will close these to unload plugins
-    private val pluginNameMap = mutableMapOf<UUID,String>() //<-- it felt like I should include this
+    private val pluginCLMap = mutableMapOf<UUID,PluginClassLoader>() //<-- we will close these to unload plugins
     private val classInfoByURLs = mutableMapOf<URL,JByteCodeURLINFO>()
 
     //public getter functions
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
-    fun getPluginClassName(plugID: UUID): String? = pluginNameMap[plugID]
-    fun getPluginLocation(plugID: UUID): URL? = pluginURLMap[plugID]
+    fun getPluginClassName(plugID: UUID): String? { 
+        val namesmatchingUUID = mutableListOf<String>()
+        classInfoByURLs.filter { it.value.classInfoAtURL?.any { it.optUUID == plugID } ?: false }
+            .map { it.value.classInfoAtURL?.map {it.name} }
+            .forEach {listOfNames -> listOfNames
+                ?.forEach{ name -> 
+                    if(name!=null)namesmatchingUUID.add(name) 
+            } 
+        }
+        if(namesmatchingUUID.isEmpty())return null
+        else if(namesmatchingUUID.size>1)return null //<-- there should be no circumstance where this happens. a uuid is placed in the map only when we load the instance. It would have thrown then
+        else return namesmatchingUUID[0]
+    }
+    //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant, get(0) will throw error if UUID not found because list will be empty
+    fun getPluginLocation(plugID: UUID): URL? = try{ 
+        classInfoByURLs.filter { it.value.classInfoAtURL
+            ?.any { it.optUUID == plugID } ?: false }
+        .map { it.key }.get(0) 
+    }catch(e: Exception){null}
 
     //public unload and load functions (Synchronized)
     private val lock = Any() // Shared lock object
@@ -46,24 +62,20 @@ object PluginLoader {
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         pluginObjectMap.remove(plugID)
-        try{ uRLoaderMap[plugID]?.close() //<-- if already closed somehow, this can throw
+        try{ pluginCLMap[plugID]?.close() //<-- if already closed somehow, this can throw
         }catch (e: Exception){e.printStackTrace()}
-        uRLoaderMap.remove(plugID) //these don't throw.
+        pluginCLMap.remove(plugID) //these don't throw.
         plugIDList.remove(plugID)
-        pluginURLMap.remove(plugID)
-        pluginNameMap.remove(plugID)
     }
     @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
         pluginObjectMap.clear()
-        uRLoaderMap.forEach { loader -> try{ 
+        pluginCLMap.forEach { loader -> try{ 
             loader.value.close() //<-- if already closed somehow, this can throw
             }catch (e: Exception){e.printStackTrace()}
         }
-        uRLoaderMap.clear() //these don't throw.
+        pluginCLMap.clear() //these don't throw.
         plugIDList.clear()
-        pluginNameMap.clear()
-        pluginURLMap.clear()
     }
     @Synchronized
     fun loadPluginFile(api: MyAPI, pluginPathStrings: List<String>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
@@ -197,16 +209,16 @@ object PluginLoader {
         //first, check our targets list
         if(targetCNames.isEmpty()||(targetCNames.any { target -> ((pluginName == target)) })){
             //then get instance, UUID, then update global list/maps. Return new UUID so user knows which were loaded
-            val loader = URLoader(plugURL)
-            val pluginInstance = loader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin
-            val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
-            //add names to map by UUID
-            pluginURLMap[pluginUUID] = plugURL
-            pluginNameMap[pluginUUID] = pluginName
-            pluginObjectMap[pluginUUID] = pluginInstance 
-            uRLoaderMap[pluginUUID] = loader //<-- we keep track of uRLoaders so we can close them later
-            plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
-            return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
+            try{
+                val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
+                val loader = PluginClassLoader(plugURL)
+                val pluginInstance = loader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in VM
+                classInfoByURLs[plugURL]?.getClassInfoByName(pluginName)?.optUUID = pluginUUID //<-- getClassInfoByName throws if name collision at url
+                pluginObjectMap[pluginUUID] = pluginInstance 
+                pluginCLMap[pluginUUID] = loader //<-- we keep track of PluginClassLoaders so we can close them later
+                plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
+                return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
+            }catch(e: Exception){e.printStackTrace(); return null}
         } else return null
     }
 

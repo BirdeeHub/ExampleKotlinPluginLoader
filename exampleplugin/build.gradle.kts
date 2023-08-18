@@ -12,7 +12,7 @@ repositories {
 }
 dependencies {
     compileOnly(kotlin("stdlib"))
-    compileOnly(project(":examplepluginloader"))
+    compileOnly(project(":exampleAPI"))
     compileOnly("org.apache.commons:commons-math3:3.6.1")
     compileOnly("com.google.guava:guava:31.1-jre")
 }

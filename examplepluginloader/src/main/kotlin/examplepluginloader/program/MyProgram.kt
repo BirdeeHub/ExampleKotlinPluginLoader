@@ -1,9 +1,10 @@
 package examplepluginloader.program
 import examplepluginloader.api.MyAPI
 import examplepluginloader.api.MyPlugin
+import examplepluginloader.api.PluggerXP.MyAPIobj
 import examplepluginloader.PluggerXP.PluginLoader
 import java.net.URL
-class MyProgram(api: MyAPI, var pluginPaths: List<String>, mode: Int){
+class MyProgram(var pluginPaths: List<String>, mode: Int){
     init{
         println("Testing...")
         var optionalTargets: List<String> = listOf()
@@ -19,7 +20,7 @@ class MyProgram(api: MyAPI, var pluginPaths: List<String>, mode: Int){
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
         println("Tests:")
         if(mode == 1){
-            PluginLoader.loadPluginFile(api, pluginPaths, optionalTargets).forEach {plugID ->
+            PluginLoader.loadPluginFile(MyAPIobj(), pluginPaths, optionalTargets).forEach {plugID ->
                 val plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
                 if(plugin!=null){
                     println(plugin.getName()) // MyPluginImplementation loaded
@@ -29,7 +30,7 @@ class MyProgram(api: MyAPI, var pluginPaths: List<String>, mode: Int){
             }
         }
         if(mode == 2){
-            PluginLoader.loadPluginsFromURLs(api, pluginPaths.map { URL(it) }, optionalTargets).forEach {plugID ->
+            PluginLoader.loadPluginsFromURLs(MyAPIobj(), pluginPaths.map { URL(it) }, optionalTargets).forEach {plugID ->
                 val plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
                 if(plugin!=null){
                     println(plugin.getName()) // MyPluginImplementation loaded
