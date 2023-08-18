@@ -23,7 +23,8 @@ object PluginLoader {
     private class PluginClassLoader(val plugURL: URL): 
         URLClassLoader(arrayOf(plugURL),
         MyProgram::class.java.classLoader) {
-        
+        //TO DO: 
+        //change load class, find resource, find resources, find class, etc to instead call special versions in systemclassloader and provide UUID of plugin as argument
     }
     //PRIVATE GLOBALS
     private val plugIDList = mutableListOf<UUID>() //<-- initialize our lists of stuff for loading and closing
