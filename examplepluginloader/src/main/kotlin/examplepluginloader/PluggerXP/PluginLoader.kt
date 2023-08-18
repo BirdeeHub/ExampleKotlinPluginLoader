@@ -71,7 +71,7 @@ object PluginLoader {
         pluginObjectMap.clear()
         pluginCLMap.forEach { loader -> try{ 
             loader.value.close() //<-- TODO: IMPLEMENT THIS  //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS
-            }catch (e: Exception){e.printStackTrace()}
+            }catch (e: Exception){e.printStackTrace()} //original implementation threw. yours can catch it i guess idk
         }
         pluginCLMap.clear() //these don't throw.
         plugIDList.clear()
