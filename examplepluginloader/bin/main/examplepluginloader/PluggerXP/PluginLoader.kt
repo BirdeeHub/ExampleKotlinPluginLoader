@@ -22,9 +22,9 @@ import java.nio.file.Path
 object PluginLoader {
     private class PluginClassLoader(val plugURL: URL, val plugID: UUID): 
         ClassLoader(MyProgram::class.java.classLoader) {
-            init{(parent.parent as MySystemLoader).addPluginURLs(listOf(plugURL))}
-        fun close(){/* TO DO: Make this tell MySystemLoader our UUID and to lock us down */}
+        init{(parent.parent as MySystemLoader).addPluginURLs(listOf(plugURL))}
         fun getUUID()=plugID
+        fun close(){/* TO DO: Make this tell MySystemLoader our UUID and to lock us down */}
         //TO DO: 
         //change load class, find resource, find resources, find class, etc to instead call special versions in systemclassloader and provide UUID of plugin as argument
         //that way, MySystemLoader can prevent all ability for this loader to access resources
@@ -40,14 +40,12 @@ object PluginLoader {
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
-    //does not work //apparently the next 2 terrible functions dont work......
     fun getPluginClassName(plugID: UUID): String? { 
         val namesmatchingUUID = classInfoByURLs.mapNotNull { it.value.classInfoAtURL }.filter { it.any { it.optUUID == plugID } }.map{(_,v) -> v}.map { it.name }
         if(namesmatchingUUID.isEmpty())return null
         else if(namesmatchingUUID.size>1)return null //<-- this should never be able to happen. UUID is placed after creating instance, which would error for this
         else return namesmatchingUUID.get(0)
     }
-    //does not work
     //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant, get(0) will throw error if UUID not found because list will be empty
     fun getPluginLocation(plugID: UUID): URL? = try{ 
         classInfoByURLs.filter { it.value.classInfoAtURL
