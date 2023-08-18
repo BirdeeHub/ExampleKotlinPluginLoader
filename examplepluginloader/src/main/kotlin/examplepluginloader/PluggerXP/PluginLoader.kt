@@ -21,8 +21,8 @@ import java.nio.file.Path
 
 object PluginLoader {
     private class PluginClassLoader(val plugURL: URL, val plugID: UUID): 
-        ClassLoader(MyProgram::class.java.classLoader) {
-        init{(parent.parent as MySystemLoader).addPluginURLs(listOf(plugURL))}
+        ClassLoader(MyProgram::class.java.classLoader.parent) {
+        init{(parent as MySystemLoader).addPluginURLs(listOf(plugURL))} //<-- this classloader cannot load for itself. Pass to MySystemLoader
         fun getUUID()=plugID
         fun close(){/* TO DO: Make this tell MySystemLoader our UUID and to lock us down */}
         //TO DO: 
