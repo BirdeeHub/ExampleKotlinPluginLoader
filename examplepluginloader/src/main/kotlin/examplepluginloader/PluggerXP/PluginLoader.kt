@@ -51,8 +51,8 @@ object PluginLoader {
     //get(0) will throw error if UUID not found because list will be empty
     fun getPluginLocation(plugID: UUID): URL? = try{ 
         classInfoByURLs.filter { it.value.classInfoAtURL
-            ?.any { it.optUUID == plugID } ?: false }
-        .map { it.key }.get(0) 
+            ?.any { it.optUUID == plugID } ?: false 
+        }.map { it.key }.get(0) 
     }catch(e: Exception){null}
 
     //public unload and load functions (Synchronized)
