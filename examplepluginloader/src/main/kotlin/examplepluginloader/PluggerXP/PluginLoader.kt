@@ -156,11 +156,11 @@ object PluginLoader {
                     classInfoByURLs[plugURL]=JByteCodeURLINFO(plugURL)
                     //Step 3: filter out instances of our plugin and add to names list
                     classInfoByURLs[plugURL]?.classInfoAtURL?.filter{ 
-                        it.isImpOf(JByteCodeURLINFO.getInternalCName(MyPlugin::class.java)) 
-                        }?.map {it.name}?.forEach { name -> 
-                            if(name!=null)
+                            it.isImpOf(JByteCodeURLINFO.getInternalCName(MyPlugin::class.java)) 
+                        }?.mapNotNull {it.name}
+                            ?.forEach { name -> 
                                 pluginNames.add(JByteCodeURLINFO.getExtClassName(name))
-                        }
+                            }
                     // Step 4: create plugin instances and populate the globals at the top of file
                     plugIDs.addAll(loadPluginClasses(plugURL, pluginNames, targetCNames))
                 }catch(e: Exception){e.printStackTrace()}
