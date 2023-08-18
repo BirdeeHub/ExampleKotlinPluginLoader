@@ -34,7 +34,7 @@ object PluginLoader {
     private val plugIDList = mutableListOf<UUID>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
     private val pluginCLMap = mutableMapOf<UUID,PluginClassLoader>() //<-- we will close these to unload plugins
-    private val classInfoByURLs = mutableMapOf<URL,JByteCodeURLINFO>()
+    private val classInfoByURLs = mutableMapOf<URL,JByteCodeURLINFO>() //<-- I made a reflections with ASM that works over web
 
     //public getter functions
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception

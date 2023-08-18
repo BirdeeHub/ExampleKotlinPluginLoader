@@ -6,9 +6,9 @@ plugins {
 repositories {
     mavenCentral()
     gradlePluginPortal()
-    flatDir {
-        dirs("../outputDir/")
-    }
+//    flatDir {
+//        dirs("../outputDir/API/")
+//    }
 }
 dependencies {
     compileOnly(kotlin("stdlib"))

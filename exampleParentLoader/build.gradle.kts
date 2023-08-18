@@ -12,7 +12,7 @@ dependencies {
     api(kotlin("stdlib"))
     api("org.apache.commons:commons-math3:3.6.1")
     api(project(":exampleAPI"))
-    api("org.ow2.asm:asm:9.5") //<-- this kicks reflection's butt!
+    api("org.ow2.asm:asm:9.5")
     api("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
     api("org.reflections:reflections:0.10.2")
     api("com.google.guava:guava:31.1-jre")
