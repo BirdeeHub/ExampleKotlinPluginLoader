@@ -33,8 +33,8 @@ class JByteCodeURLINFO(public val yourURL: URL){
         fun getInternalCName(obj: Class<*>): String = 
             Type.getInternalName(obj)
     }
-    fun getClassInfoByName(name: String): URLclassInfo? {
-        val tempList = classInfoAtURL?.filter { it.name==name }
+    fun getClassInfoByExtName(name: String): URLclassInfo? {
+        val tempList = classInfoAtURL?.filter { it.name == name.replace('.','/') }
         if(tempList==null || tempList.isEmpty() ) return null
         else if(tempList.size>1) throw Exception("Multiple classes found at URL with same fully qualified name")
         else return tempList[0]

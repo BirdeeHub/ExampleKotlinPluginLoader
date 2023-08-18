@@ -12,6 +12,7 @@ dependencies {
     compileOnly(kotlin("stdlib"))
     compileOnly("org.apache.commons:commons-math3:3.6.1")
     compileOnly(project(":exampleAPI"))
+    compileOnly(project(":exampleParentLoader"))
     compileOnly("org.ow2.asm:asm:9.5") //<-- this kicks reflection's butt!
     compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
     compileOnly("org.reflections:reflections:0.10.2")

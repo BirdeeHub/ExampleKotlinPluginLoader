@@ -4,6 +4,7 @@ import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To mak
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import examplepluginloader.PluggerXP.JByteCodeURLINFO
 import examplepluginloader.program.MyProgram
+import examplepluginloader.systemloader.MySystemLoader
 import java.io.InputStream
 import java.io.File
 import java.io.ByteArrayOutputStream
@@ -19,12 +20,15 @@ import java.nio.file.Path
 
 
 object PluginLoader {
-    //The custom class loader that has no parent, and knows where to find its dependency
-    private class PluginClassLoader(val plugURL: URL): 
-        URLClassLoader(arrayOf(plugURL),
-        MyProgram::class.java.classLoader) {
+    private class PluginClassLoader(val plugURL: URL, val plugID: UUID): 
+        ClassLoader(MyProgram::class.java.classLoader) {
+            init{(parent.parent as MySystemLoader).addPluginURLs(listOf(plugURL))}
+        fun close(){/* TO DO: Make this tell MySystemLoader our UUID and to lock us down */}
+        fun getUUID()=plugID
         //TO DO: 
         //change load class, find resource, find resources, find class, etc to instead call special versions in systemclassloader and provide UUID of plugin as argument
+        //that way, MySystemLoader can prevent all ability for this loader to access resources
+        //make close notify parent that it has been closed for shutdown sequence
     }
     //PRIVATE GLOBALS
     private val plugIDList = mutableListOf<UUID>() //<-- initialize our lists of stuff for loading and closing
@@ -36,19 +40,14 @@ object PluginLoader {
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
+    //does not work //apparently the next 2 terrible functions dont work......
     fun getPluginClassName(plugID: UUID): String? { 
-        val namesmatchingUUID = mutableListOf<String>()
-        classInfoByURLs.filter { it.value.classInfoAtURL?.any { it.optUUID == plugID } ?: false }
-            .map { it.value.classInfoAtURL?.map {it.name} }
-            .forEach {listOfNames -> listOfNames
-                ?.forEach{ name -> 
-                    if(name!=null)namesmatchingUUID.add(name) 
-            } 
-        }
+        val namesmatchingUUID = classInfoByURLs.mapNotNull { it.value.classInfoAtURL }.filter { it.any { it.optUUID == plugID } }.map{(_,v) -> v}.map { it.name }
         if(namesmatchingUUID.isEmpty())return null
-        else if(namesmatchingUUID.size>1)return null //<-- there should be no circumstance where this happens. a uuid is placed in the map only when we load the instance. It would have thrown then
-        else return namesmatchingUUID[0]
+        else if(namesmatchingUUID.size>1)return null //<-- this should never be able to happen. UUID is placed after creating instance, which would error for this
+        else return namesmatchingUUID.get(0)
     }
+    //does not work
     //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant, get(0) will throw error if UUID not found because list will be empty
     fun getPluginLocation(plugID: UUID): URL? = try{ 
         classInfoByURLs.filter { it.value.classInfoAtURL
@@ -63,7 +62,7 @@ object PluginLoader {
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         pluginObjectMap.remove(plugID)
-        try{ pluginCLMap[plugID]?.close() //<-- if already closed somehow, this can throw
+        try{ //pluginCLMap[plugID]?.close() //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS
         }catch (e: Exception){e.printStackTrace()}
         pluginCLMap.remove(plugID) //these don't throw.
         plugIDList.remove(plugID)
@@ -72,7 +71,7 @@ object PluginLoader {
     fun unloadAllPlugins() { //close and clear ALL everywhere
         pluginObjectMap.clear()
         pluginCLMap.forEach { loader -> try{ 
-            loader.value.close() //<-- if already closed somehow, this can throw
+            //loader.value.close() //<-- TODO: IMPLEMENT THIS  //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS
             }catch (e: Exception){e.printStackTrace()}
         }
         pluginCLMap.clear() //these don't throw.
@@ -212,9 +211,9 @@ object PluginLoader {
             //then get instance, UUID, then update global list/maps. Return new UUID so user knows which were loaded
             try{
                 val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
-                val loader = PluginClassLoader(plugURL)
+                val loader = PluginClassLoader(plugURL, pluginUUID)
                 val pluginInstance = loader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in VM
-                classInfoByURLs[plugURL]?.getClassInfoByName(pluginName)?.optUUID = pluginUUID //<-- getClassInfoByName throws if name collision at url
+                classInfoByURLs[plugURL]?.getClassInfoByExtName(pluginName)?.optUUID = pluginUUID //<-- getClassInfoByName throws if name collision at url
                 pluginObjectMap[pluginUUID] = pluginInstance 
                 pluginCLMap[pluginUUID] = loader //<-- we keep track of PluginClassLoaders so we can close them later
                 plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
@@ -222,5 +221,4 @@ object PluginLoader {
             }catch(e: Exception){e.printStackTrace(); return null}
         } else return null
     }
-
 }

@@ -25,6 +25,7 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
                 if(plugin!=null){
                     println(plugin.getName()) // MyPluginImplementation loaded
                     println(PluginLoader.getPluginLocation(plugID))
+                    println(PluginLoader.getPluginClassName(plugID))
                     println("UUID: "+PluginLoader.getPluginUUID(plugin))
                 }
             }
@@ -35,6 +36,7 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
                 if(plugin!=null){
                     println(plugin.getName()) // MyPluginImplementation loaded
                     println(PluginLoader.getPluginLocation(plugID))
+                    println(PluginLoader.getPluginClassName(plugID))
                     println("UUID: "+PluginLoader.getPluginUUID(plugin))
                 }
             }
