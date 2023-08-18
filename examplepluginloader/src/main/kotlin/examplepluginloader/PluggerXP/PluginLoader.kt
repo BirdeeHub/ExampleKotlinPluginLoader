@@ -41,7 +41,8 @@ object PluginLoader {
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     fun getPluginClassName(plugID: UUID): String? { 
-        val namesmatchingUUID = classInfoByURLs.mapNotNull { it.value.classInfoAtURL }.filter { it.any { it.optUUID == plugID } }.map{(_,v) -> v}.map { it.name }
+        val namesmatchingUUID = classInfoByURLs.mapNotNull { it.value.classInfoAtURL }
+            .filter { it.any { it.optUUID == plugID } }.map{(_,v) -> v}.map { it.name }
         if(namesmatchingUUID.isEmpty())return null
         else if(namesmatchingUUID.size>1)return null //<-- this should never be able to happen. UUID is placed after creating instance, which would error for this
         else return namesmatchingUUID.get(0)
