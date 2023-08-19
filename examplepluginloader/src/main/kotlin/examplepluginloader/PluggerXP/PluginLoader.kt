@@ -44,7 +44,7 @@ object PluginLoader {
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     fun getPluginClassName(plugID: UUID): String? { 
         val namesmatchingUUID = mutableListOf<String?>()
-        classInfoByURLs.mapNotNull { (_,v) -> v.classInfoAtURL }.forEach { 
+        classInfoByURLs.mapNotNull { it.value.classInfoAtURL }.forEach {
             it.forEach { 
                 if(it.optUUID==plugID){
                     namesmatchingUUID.add(it.name)
