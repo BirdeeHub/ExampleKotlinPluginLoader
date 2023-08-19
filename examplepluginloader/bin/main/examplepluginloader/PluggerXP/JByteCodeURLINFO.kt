@@ -11,6 +11,7 @@ import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
+import kotlin.collections.forEach
 
 interface URLclassInfo {
     val urURL: URL

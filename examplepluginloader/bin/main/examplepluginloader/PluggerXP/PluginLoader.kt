@@ -21,12 +21,14 @@ import java.nio.file.Path
 
 object PluginLoader {
     private class PluginClassLoader(val plugURL: URL, val plugID: UUID): 
-        ClassLoader(MyProgram::class.java.classLoader.parent) {
-        init{(parent as MySystemLoader).addPluginURLs(listOf(plugURL))} //<-- this classloader cannot load for itself. Pass to MySystemLoader
+        ClassLoader(PluginLoader::class.java.classLoader.parent) { //PluginLoader is running under MyProgramLoader. Get parent, which is MySystemLoader
+        //this classloader should not load for itself. That way we can cut it off. Pass URL to MySystemLoader
+        init{(parent as MySystemLoader).addPluginURLs(listOf(plugURL))}
         fun getUUID()=plugID
         fun close(){/* TO DO: Make this tell MySystemLoader our UUID and to lock us down */}
         //TO DO: 
         //change load class, find resource, find resources, find class, etc to instead call special versions in systemclassloader and provide UUID of plugin as argument
+        //these versions must not be able to delegate straight to the bootloader, instead they must go through the parent loader
         //that way, MySystemLoader can prevent all ability for this loader to access resources
         //make close notify parent that it has been closed for shutdown sequence
     }
@@ -41,8 +43,14 @@ object PluginLoader {
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     fun getPluginClassName(plugID: UUID): String? { 
-        val namesmatchingUUID = classInfoByURLs.mapNotNull { it.value.classInfoAtURL }
-            .filter { it.any { it.optUUID == plugID } }.map{(_,v) -> v}.map { it.name }
+        val namesmatchingUUID = mutableListOf<String?>()
+        classInfoByURLs.mapNotNull { (_,v) -> v.classInfoAtURL }.forEach { 
+            it.forEach { 
+                if(it.optUUID==plugID){
+                    namesmatchingUUID.add(it.name)
+                }
+            }
+        }
         if(namesmatchingUUID.isEmpty())return null
         else if(namesmatchingUUID.size>1)return null //<-- this should never be able to happen. UUID is placed after creating instance, which would error for this
         else return namesmatchingUUID.get(0)
