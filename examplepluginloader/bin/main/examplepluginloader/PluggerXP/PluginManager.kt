@@ -3,19 +3,11 @@ package examplepluginloader.PluggerXP
 import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import examplepluginloader.PluggerXP.JByteCodeURLINFO
-import examplepluginloader.program.MyProgram
-import examplepluginloader.systemloader.MySystemLoader
 import java.io.InputStream
 import java.io.File
-import java.io.ByteArrayOutputStream
-import java.io.ByteArrayInputStream
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.net.URL
 import java.net.URI
-import java.net.URLClassLoader
 import java.util.UUID
-import java.util.Enumeration
 import java.nio.file.Path
 
 
