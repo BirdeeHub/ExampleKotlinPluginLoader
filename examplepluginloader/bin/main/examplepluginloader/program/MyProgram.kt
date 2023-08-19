@@ -2,7 +2,7 @@ package examplepluginloader.program
 import examplepluginloader.api.MyAPI
 import examplepluginloader.api.MyPlugin
 import examplepluginloader.api.PluggerXP.MyAPIobj
-import examplepluginloader.PluggerXP.PluginLoader
+import examplepluginloader.PluggerXP.PluginManager
 import java.net.URL
 class MyProgram(var pluginPaths: List<String>, mode: Int){
     init{
@@ -20,36 +20,36 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
         println("Tests:")
         if(mode == 1){
-            PluginLoader.loadPluginFile(MyAPIobj(), pluginPaths, optionalTargets).forEach {plugID ->
-                val plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
+            PluginManager.loadPluginFile(MyAPIobj(), pluginPaths, optionalTargets).forEach {plugID ->
+                val plugin: MyPlugin? = PluginManager.getPlugin(plugID)
                 if(plugin!=null){
                     println(plugin.getName()) // MyPluginImplementation loaded
-                    println(PluginLoader.getPluginLocation(plugID))
-                    println(PluginLoader.getPluginClassName(plugID))
-                    println("UUID: "+PluginLoader.getPluginUUID(plugin))
+                    println(PluginManager.getPluginLocation(plugID))
+                    println(PluginManager.getPluginClassName(plugID))
+                    println("UUID: "+PluginManager.getPluginUUID(plugin))
                 }
             }
         }
         if(mode == 2){
-            PluginLoader.loadPluginsFromURLs(MyAPIobj(), pluginPaths.map { URL(it) }, optionalTargets).forEach {plugID ->
-                val plugin: MyPlugin? = PluginLoader.getPlugin(plugID)
+            PluginManager.loadPluginsFromURLs(MyAPIobj(), pluginPaths.map { URL(it) }, optionalTargets).forEach {plugID ->
+                val plugin: MyPlugin? = PluginManager.getPlugin(plugID)
                 if(plugin!=null){
                     println(plugin.getName()) // MyPluginImplementation loaded
-                    println(PluginLoader.getPluginLocation(plugID))
-                    println(PluginLoader.getPluginClassName(plugID))
-                    println("UUID: "+PluginLoader.getPluginUUID(plugin))
+                    println(PluginManager.getPluginLocation(plugID))
+                    println(PluginManager.getPluginClassName(plugID))
+                    println("UUID: "+PluginManager.getPluginUUID(plugin))
                 }
             }
         }
-        val totalnumber: Int = PluginLoader.getPlugIDList().size
-        println("All UUIDs: "+PluginLoader.getPlugIDList())
+        val totalnumber: Int = PluginManager.getPlugIDList().size
+        println("All UUIDs: "+PluginManager.getPlugIDList())
         println("type q to attempt to close:")
         var inputString: String? = ""
         while(inputString!="q")inputString = readLine()
-        PluginLoader.getPlugIDList().forEach { plugID ->
-            println("Attempting to Unload: "+PluginLoader.getPlugin(plugID)?.getName()+" : "+plugID)
-            PluginLoader.unloadPlugin(plugID)
-            println("All UUIDs: "+PluginLoader.getPlugIDList())
+        PluginManager.getPlugIDList().forEach { plugID ->
+            println("Attempting to Unload: "+PluginManager.getPlugin(plugID)?.getName()+" : "+plugID)
+            PluginManager.unloadPlugin(plugID)
+            println("All UUIDs: "+PluginManager.getPlugIDList())
         }
         println("loaded $totalnumber plugin(s)")
         println("Goodbye!")
