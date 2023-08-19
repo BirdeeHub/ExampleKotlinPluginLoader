@@ -46,9 +46,7 @@ object PluginLoader {
         val namesmatchingUUID = mutableListOf<String?>()
         classInfoByURLs.mapNotNull { it.value.classInfoAtURL }.forEach {
             it.forEach { 
-                if(it.optUUID==plugID){
-                    namesmatchingUUID.add(it.name)
-                }
+                if(it.optUUID==plugID) namesmatchingUUID.add(it.name)
             }
         }
         if(namesmatchingUUID.isEmpty())return null
