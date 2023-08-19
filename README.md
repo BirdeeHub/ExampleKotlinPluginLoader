@@ -35,3 +35,5 @@ and its implementations should ALSO cut off access if asked by the classloader.
 the main program will retain a reference to the class loader 
 
 and any objects passed as listeners, and close them when asked, PER PLUGIN
+
+Im also going to need to create an api object factory because I need a copy of the api per plugin
