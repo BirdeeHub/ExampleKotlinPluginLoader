@@ -25,9 +25,7 @@ interface URLclassInfo {
     var optUUID: UUID?
 }
 class JByteCodeURLINFO(public val yourURL: URL){
-    val isSupported: Boolean
-    val classInfoAtURL: List<URLclassInfo>?
-    val rescInJar: List<URL>?
+    //utility
     companion object {
         fun getExtClassName(internalName: String): String = 
             Type.getObjectType(internalName).getClassName()
@@ -40,6 +38,10 @@ class JByteCodeURLINFO(public val yourURL: URL){
         else if(tempList.size>1) throw Exception("Multiple classes found at URL with same fully qualified name")
         else return tempList[0]
     }
+    //main logic
+    val isSupported: Boolean
+    val classInfoAtURL: List<URLclassInfo>?
+    val rescInJar: List<URL>?
     init{
         val bytesOfStuff = mutableListOf<ByteArray?>()
         if(yourURL.protocol == "file")
