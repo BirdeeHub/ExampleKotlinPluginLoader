@@ -1,8 +1,8 @@
-package examplepluginloader.PluggerXP
+package examplepluginloader.Plugger
 import examplepluginloader.api.MyAPI
-import examplepluginloader.api.plugin.PluginManaging
+import examplepluginloader.api.plugin.ManagePlugins
 import java.util.UUID
 class MyAPIobj(val plugID: UUID) : MyAPI {
     override fun test(): String {return "API call test when launchPlugin(api) is called"}
-    override fun plugin(): PluginManaging = PlugMngrObj(plugID)
+    override fun plugin(): ManagePlugins = PlugMngrObj(plugID)
 }

@@ -1,8 +1,8 @@
 package examplepluginloader.program
 import examplepluginloader.api.MyAPI
 import examplepluginloader.api.MyPlugin
-import examplepluginloader.PluggerXP.MyAPIobj
-import examplepluginloader.PluggerXP.PluginManager
+import examplepluginloader.Plugger.MyAPIobj
+import examplepluginloader.Plugger.PluginManager
 import java.net.URL
 class MyProgram(var pluginPaths: List<String>, mode: Int){
     init{

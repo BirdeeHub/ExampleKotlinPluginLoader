@@ -1,4 +1,4 @@
-package examplepluginloader.PluggerXP
+package examplepluginloader.Plugger
 
 import java.util.jar.JarInputStream
 import java.util.UUID

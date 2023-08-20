@@ -1,4 +1,4 @@
-package examplepluginloader.PluggerXP
+package examplepluginloader.Plugger
 
 import java.net.URLClassLoader
 import java.net.URL

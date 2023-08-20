@@ -1,9 +1,9 @@
-package examplepluginloader.PluggerXP
+package examplepluginloader.Plugger
 
 import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import examplepluginloader.api.plugin.PluginUnloadHandler
-import examplepluginloader.PluggerXP.JByteCodeURLINFO
+import examplepluginloader.Plugger.JByteCodeURLINFO
 import java.io.InputStream
 import java.io.File
 import java.net.URL

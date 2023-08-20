@@ -1,4 +1,4 @@
-package examplepluginloader.PluggerXP
+package examplepluginloader.Plugger
 import examplepluginloader.api.plugin.Plugistration
 import java.util.UUID
 class UnloadPlugistration(val plugID: UUID): Plugistration{
