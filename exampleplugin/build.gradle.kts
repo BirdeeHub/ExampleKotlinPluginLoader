@@ -27,5 +27,6 @@ tasks {
     jar {
         manifest { attributes( "Main-Class" to "MySweep.MineSweeper" ) }
         destinationDirectory.set(file("../plugins/"))
+        archiveFileName.set("examplePlugins.jar")
     }
 }
