@@ -78,29 +78,27 @@ class JByteCodeURLINFO(public val yourURL: URL){
             else rescInJar=uRLRes.toList()
         }
     }
-    private fun getBytesFromHTTP(yourURL: URL): ByteArray? =
-        try {
-            val urlBytes: ByteArray?
-            val urlConnection = yourURL.openConnection() as HttpURLConnection
-            urlConnection.requestMethod = "GET"
-            if (urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
-                val inputStream = urlConnection.inputStream
-                urlBytes = inputStream.readBytes()
-                inputStream.close()
-                urlConnection.disconnect()
-            } else urlBytes = null
-            urlBytes
-        } catch (e: Exception) { e.printStackTrace(); null }
+    private fun getBytesFromHTTP(yourURL: URL): ByteArray? = try {
+        val urlBytes: ByteArray?
+        val urlConnection = yourURL.openConnection() as HttpURLConnection
+        urlConnection.requestMethod = "GET"
+        if (urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
+            val inputStream = urlConnection.inputStream
+            urlBytes = inputStream.readBytes()
+            inputStream.close()
+            urlConnection.disconnect()
+        } else urlBytes = null
+        urlBytes
+    } catch (e: Exception) { e.printStackTrace(); null }
 
     //call function for jar if jar or class if class
-    private fun CIfromBCode(yourURL: URL, urlBytes: ByteArray): Pair<List<URLclassInfo>?, List<URL>?> =
-        try{
-            if(yourURL.toString().endsWith(".jar"))
-                CIfromfromJar(urlBytes)
-            else if(yourURL.toString().endsWith(".class")){
-                Pair(listOf(getCINFO(ByteArrayInputStream(urlBytes))), null)
-            } else Pair(null, null)
-        } catch (e: Exception) { e.printStackTrace(); Pair(null, null) }
+    private fun CIfromBCode(yourURL: URL, urlBytes: ByteArray): Pair<List<URLclassInfo>?, List<URL>?> = try{
+        if(yourURL.toString().endsWith(".jar"))
+            CIfromfromJar(urlBytes)
+        else if(yourURL.toString().endsWith(".class")){
+            Pair(listOf(getCINFO(ByteArrayInputStream(urlBytes))), null)
+        } else Pair(null, null)
+    } catch (e: Exception) { e.printStackTrace(); Pair(null, null) }
     
     //This just calls defineClassFromBytes on jar entries
     private fun CIfromfromJar(jarBytes: ByteArray): Pair<List<URLclassInfo>?, List<URL>?> {
