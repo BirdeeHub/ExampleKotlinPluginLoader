@@ -21,14 +21,15 @@ object PluginManager {
     private val pluginAPIobjs = mutableMapOf<UUID,MyAPI>()
     private val shutdownRegistrations = mutableMapOf<UUID,PluginUnloadHandler>()
 
-    //public getter functions
+    //public functions
+    fun registerShutdownHook(plugID: UUID, unldHndlr: PluginUnloadHandler) { shutdownRegistrations[plugID] = unldHndlr }
+    fun shudownRegistered(plugID: UUID): Boolean = if(shutdownRegistrations[plugID]!=null) true else false
+    fun shutdownderegister(plugID: UUID) = shutdownRegistrations.remove(plugID)
+
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     fun getPluginAPIobj(plugID: UUID): MyAPI? = pluginAPIobjs[plugID]
-    fun registerShutdownHook(plugID: UUID, unldHndlr: PluginUnloadHandler) { shutdownRegistrations[plugID] = unldHndlr }
-    fun shudownRegistered(plugID: UUID): Boolean = if(shutdownRegistrations[plugID]!=null) true else false
-    fun shutdownderegister(plugID: UUID) = shutdownRegistrations.remove(plugID)
     fun getPluginClassName(plugID: UUID): String? { 
         val namesmatchingUUID = mutableListOf<String?>()
         classInfoByURLs.mapNotNull { it.value.classInfoAtURL }.forEach {
