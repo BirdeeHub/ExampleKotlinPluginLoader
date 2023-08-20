@@ -1,32 +1,32 @@
 **A plugin loader example program in kotlin-jvm**
 
-**THIS PLUGIN LOADER IS NOT YET VERY GOOD. IT CANNOT YET RELIABLY CLOSE THE PLUGINS IT CREATES, although I am trying**
+**This plugin loader does not yet allow plugins to define a shutdown hook to shut down currently running threads**
 
-it can however load from local or over the internet. so thats kinda cool.
+**but it will at least prevent them from accessing anything else when close is called**
+
+it can also load from local or over the internet. so thats kinda cool.
 
 [examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
 
-The plan. Make PluginClassLoader and MySystemLoader as described in the comments within them. 
+the parent loader "MySystemLoader" loads the program loader, which is more or less just normal but with the api classpath included
 
-And then write a listener to tell the programs to close any isolated processes that would just keep spinning. 
+the parent loader "MySystemLoader" also is to be the parent of PluginLoader. 
 
-And then maybe logging, but this is actually part of a plugin for another program that has plugins, and that program has logging so, maybe not.
+PluginLoader contains wrapper functions for the normal ones that can be toggled off.
 
-the parent loader loads the program loader, which is more or less just normal but with the api classpath included
+It contains PluginClassLoader, which has all of its core functions overridden to use the wrapper functions in PluginLoader
 
-the parent loader "MySystemLoader" also loads the plugin loader. 
+create a new pluginLoader for a plugin, and then use the internal PluginClassLoader when you actually load the plugin
 
-MySystemLoader contains extra wrapper functions for the normal ones that take a uuid and can be toggled off.
+PluginClassLoader doesnt load anything for itself. PluginLoader does it, and can revoke access when close() is called.
 
-The plugin loader can only access its parent classloader MySystemLoader and nothing else.
+If the plugin is loaded from pluginClassLoader, this means pluginLoader can completely prevent the plugin from loading classes.
 
-Then, when close is called, it tells MySystemLoader to cut it off for its UUID.
+The system loader can access the api and exports all dependencies. 
 
-The system loader can access the api and all dependencies. The plugins can access the parent loaders classpath, 
+The plugins can access the main program through the api object, such as any listeners and queries created as interfaces in the api. 
 
-and the main program through the api object, such as any listeners and queries created as interfaces in the api. 
-
-It will not be passed any other references to the main program.
+They will not be passed any other references to the main program.
 
 The main program can define interfaces in the api object and pass it to the plugin for the plugin to query, 
 

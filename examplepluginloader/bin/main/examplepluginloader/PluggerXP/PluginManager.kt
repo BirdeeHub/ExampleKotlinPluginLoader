@@ -203,11 +203,13 @@ object PluginManager {
             var loader: PluginLoader? = null
             try{
                 val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
-                loader = PluginLoader(plugURL, pluginUUID)
-                val pluginInstance = loader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in VM
+                loader = PluginLoader(plugURL, pluginUUID, PluginManager::class.java.classLoader.parent) //PluginManager is running under MyProgramLoader. Get parent, which is MySystemLoader
+                //plugins are actually loaded by a second loader inside the first, to which we can shut off all access using aPluginLoader.close
+                //so as a result, when launching we use loader.pluginCLoader
+                val pluginInstance = loader.pluginCLoader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in VM
                 classInfoByURLs[plugURL]?.getClassInfoByExtName(pluginName)?.optUUID = pluginUUID //<-- getClassInfoByName throws if name collision at url
                 pluginObjectMap[pluginUUID] = pluginInstance
-                pluginCLMap[pluginUUID] = loader //<-- we keep track of PluginClassLoaders so we can close them later
+                pluginCLMap[pluginUUID] = loader //<-- we keep track of PluginLoaders so we can close them later
                 plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
                 return pluginUUID //<-- return uuid to add to the newly-loaded uuid list
             }catch(e: Exception){
