@@ -15,53 +15,42 @@ class PluginLoader(val plugURL: URL, val plugID: UUID, val parentCL: ClassLoader
         pluginIsLoaded=false
         super.close()
     }
-    fun findPluginClass(name: String): Class<*> {
-        if(pluginIsLoaded) return findClass(name)
+    fun findPluginClass(name: String): Class<*> =
+        if(pluginIsLoaded) findClass(name)
         else throw ClassNotFoundException(name)
-    }
-    fun loadPluginClass(name: String): Class<*>{
-        if(pluginIsLoaded) return loadClass(name)
+    fun loadPluginClass(name: String): Class<*> =
+        if(pluginIsLoaded) loadClass(name)
         else throw ClassNotFoundException(name)
-    }
-    fun findPluginResource(name: String): URL{
-        if(pluginIsLoaded) return findResource(name)
+    fun findPluginResource(name: String): URL =
+        if(pluginIsLoaded) findResource(name)
         else throw ClassNotFoundException(name)
-    }
-    fun getPluginResource(name: String): URL{
-        if(pluginIsLoaded) return getResource(name)
+    fun getPluginResource(name: String): URL =
+        if(pluginIsLoaded) getResource(name)
         else throw ClassNotFoundException(name)
-    }
-    fun getPluginResourceAsStream(name: String): InputStream {
-        if(pluginIsLoaded) return getResourceAsStream(name)
+    fun getPluginResourceAsStream(name: String): InputStream =
+        if(pluginIsLoaded) getResourceAsStream(name)
         else throw ClassNotFoundException(name)
-    }
-    fun getPluginResources(name: String): Enumeration<URL>{
-        if(pluginIsLoaded) return getResources(name)
+    fun getPluginResources(name: String): Enumeration<URL> =
+        if(pluginIsLoaded) getResources(name)
         else throw ClassNotFoundException(name)
-    }
+
     //this classloader should not load for itself. That way we can cut it off.
     class PluginClassLoader(val plugID: UUID, parentCL: ClassLoader): 
     ClassLoader(parentCL) { 
         fun addPluginURLs(plugURLs: List<URL>) = 
             (parent as PluginLoader).addPluginURLs(plugURLs)
         fun getUUID()=plugID
-        override protected fun findClass(name: String): Class<*> { 
-            return (parent as PluginLoader).findPluginClass(name)
-        }
-        override fun loadClass(name: String): Class<*> { 
-            return (parent as PluginLoader).loadPluginClass(name)
-        }
-        override fun findResource(name: String): URL{
-            return (parent as PluginLoader).findPluginResource(name)
-        }
-        override fun getResource(name: String): URL{
-            return (parent as PluginLoader).getPluginResource(name)
-        }
-        override fun getResourceAsStream(name: String): InputStream {
-            return (parent as PluginLoader).getPluginResourceAsStream(name)
-        }
-        override fun getResources(name: String): Enumeration<URL> {
-            return (parent as PluginLoader).getPluginResources(name)
-        }
+        override protected fun findClass(name: String): Class<*> = 
+            (parent as PluginLoader).findPluginClass(name)
+        override fun loadClass(name: String): Class<*> = 
+            (parent as PluginLoader).loadPluginClass(name)
+        override fun findResource(name: String): URL = 
+            (parent as PluginLoader).findPluginResource(name)
+        override fun getResource(name: String): URL = 
+            (parent as PluginLoader).getPluginResource(name)
+        override fun getResourceAsStream(name: String): InputStream = 
+            (parent as PluginLoader).getPluginResourceAsStream(name)
+        override fun getResources(name: String): Enumeration<URL> = 
+            (parent as PluginLoader).getPluginResources(name)
     }
 }
