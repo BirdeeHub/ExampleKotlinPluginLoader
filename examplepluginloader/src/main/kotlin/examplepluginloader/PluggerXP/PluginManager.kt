@@ -33,9 +33,9 @@ object PluginManager {
         else if(namesmatchingUUID.size>1)return null //<-- this should never be able to happen. UUID is placed after creating instance, which would error for this
         else return namesmatchingUUID.get(0)
     }
-    //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant, 
-    //get(0) will throw error if UUID not found because list will be empty
     fun getPluginLocation(plugID: UUID): URL? = try{ 
+        //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant, 
+        //get(0) will throw error if UUID not found because list will be empty
         classInfoByURLs.filter { it.value.classInfoAtURL
             ?.any { it.optUUID == plugID } ?: false 
         }.map { it.key }.get(0) 
