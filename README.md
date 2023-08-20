@@ -28,10 +28,14 @@ They will not be passed any other references to the main program.
 
 The main program can define interfaces in the api object and pass it to the plugin for the plugin to query, 
 
-and its implementations should ALSO cut off access if asked by the classloader.
-
 the main program will retain a reference to the class loader 
 
 and any objects passed as listeners, and close them when asked, PER PLUGIN
 
-Im also going to need to create an api object factory because I need a copy of the api per plugin
+When you call shutdown, the plugin will not be able to load any new classes. 
+
+But we cannot stop ones currently running. 
+
+To fix this, you can implement an UnloadPluginHandler and register it with the 
+
+registerShutdownSequence(unldHndlr: PluginUnloadHandler): Plugistration function in examplepluginloader.api.PluginManaging

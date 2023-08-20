@@ -1,7 +1,7 @@
 package examplepluginloader.program
 import examplepluginloader.api.MyAPI
 import examplepluginloader.api.MyPlugin
-import examplepluginloader.api.PluggerXP.MyAPIobj
+import examplepluginloader.PluggerXP.MyAPIobj
 import examplepluginloader.PluggerXP.PluginManager
 import java.net.URL
 class MyProgram(var pluginPaths: List<String>, mode: Int){
@@ -20,10 +20,10 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
         pluginPaths.forEach { pluginPath -> println(pluginPath) }
         println("Tests:")
         if(mode == 1){
-            PluginManager.loadPluginFile(MyAPIobj(), pluginPaths, optionalTargets).forEach {plugID ->
+            PluginManager.loadPluginFile(pluginPaths, optionalTargets).forEach {plugID ->
                 val plugin: MyPlugin? = PluginManager.getPlugin(plugID)
                 if(plugin!=null){
-                    println(plugin.getName()) // MyPluginImplementation loaded
+                    println(plugin.getName())
                     println(PluginManager.getPluginLocation(plugID))
                     println(PluginManager.getPluginClassName(plugID))
                     println("UUID: "+PluginManager.getPluginUUID(plugin))
@@ -31,10 +31,10 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
             }
         }
         if(mode == 2){
-            PluginManager.loadPluginsFromURLs(MyAPIobj(), pluginPaths.map { URL(it) }, optionalTargets).forEach {plugID ->
+            PluginManager.loadPluginsFromURLs(pluginPaths.map { URL(it) }, optionalTargets).forEach {plugID ->
                 val plugin: MyPlugin? = PluginManager.getPlugin(plugID)
                 if(plugin!=null){
-                    println(plugin.getName()) // MyPluginImplementation loaded
+                    println(plugin.getName())
                     println(PluginManager.getPluginLocation(plugID))
                     println(PluginManager.getPluginClassName(plugID))
                     println("UUID: "+PluginManager.getPluginUUID(plugin))

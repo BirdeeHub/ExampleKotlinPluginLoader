@@ -2,6 +2,7 @@ package examplepluginloader.PluggerXP
 
 import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To make a plugin, implement the interface and its functions
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
+import examplepluginloader.api.plugin.PluginUnloadHandler
 import examplepluginloader.PluggerXP.JByteCodeURLINFO
 import java.io.InputStream
 import java.io.File
@@ -17,11 +18,17 @@ object PluginManager {
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
     private val pluginCLMap = mutableMapOf<UUID,PluginLoader>() //<-- we will close these to unload plugins
     private val classInfoByURLs = mutableMapOf<URL,JByteCodeURLINFO>() //<-- I made a reflections with ASM that works over web
+    private val pluginAPIobjs = mutableMapOf<UUID,MyAPI>()
+    private val shutdownRegistrations = mutableMapOf<UUID,PluginUnloadHandler>()
 
     //public getter functions
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
+    fun getPluginAPIobj(plugID: UUID): MyAPI? = pluginAPIobjs[plugID]
+    fun registerShutdownHook(plugID: UUID, unldHndlr: PluginUnloadHandler) { shutdownRegistrations[plugID] = unldHndlr }
+    fun shudownRegistered(plugID: UUID): Boolean = if(shutdownRegistrations[plugID]!=null) true else false
+    fun shutdownderegister(plugID: UUID) = shutdownRegistrations.remove(plugID)
     fun getPluginClassName(plugID: UUID): String? { 
         val namesmatchingUUID = mutableListOf<String?>()
         classInfoByURLs.mapNotNull { it.value.classInfoAtURL }.forEach {
@@ -53,7 +60,11 @@ object PluginManager {
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         pluginObjectMap.remove(plugID)
-        try{ pluginCLMap[plugID]?.close() //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS
+        try{ shutdownRegistrations[plugID]?.pluginUnloaded()
+        }catch (e: Exception){e.printStackTrace()}
+        shutdownRegistrations.remove(plugID)
+        pluginAPIobjs.remove(plugID)
+        try{ pluginCLMap[plugID]?.close()
         }catch (e: Exception){e.printStackTrace()}
         pluginCLMap.remove(plugID) //these don't throw.
         plugIDList.remove(plugID)
@@ -61,58 +72,63 @@ object PluginManager {
     @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
         pluginObjectMap.clear()
-        pluginCLMap.forEach { loader -> try{ 
-            loader.value.close() //<-- TODO: IMPLEMENT THIS  //<-- TODO: IMPLEMENT THIS //<-- TODO: IMPLEMENT THIS
+        shutdownRegistrations.forEach { try{ 
+            it.value.pluginUnloaded() 
+            }catch (e: Exception){e.printStackTrace()}
+        }
+        pluginAPIobjs.clear()
+        pluginCLMap.forEach { try{ 
+            it.value.close()
             }catch (e: Exception){e.printStackTrace()} //original implementation threw. yours can catch it i guess idk
         }
         pluginCLMap.clear() //these don't throw.
         plugIDList.clear()
     }
     @Synchronized
-    fun loadPluginFile(api: MyAPI, pluginPathStrings: List<String>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+    fun loadPluginFile(pluginPathStrings: List<String>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
         val pluginURIs = mutableListOf<URI>()
         pluginPathStrings.forEach { pluginPathString -> 
             try{ pluginURIs.add(File(pluginPathString).toURI()) 
             } catch(e: Exception) { e.printStackTrace() }
         }
-        return callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
+        return callPlugLoader(pluginURIs, targetPluginFullClassNames)
     }
     @Synchronized
-    fun loadPluginsFromURLs(api: MyAPI, pluginURLs: List<URL>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+    fun loadPluginsFromURLs(pluginURLs: List<URL>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
         val pluginURIs = mutableListOf<URI>()
         pluginURLs.forEach { pluginURL -> 
             try{ pluginURIs.add(pluginURL.toURI())
             } catch(e: Exception) { e.printStackTrace() }
         }
-        return callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
+        return callPlugLoader(pluginURIs, targetPluginFullClassNames)
     }
     @Synchronized
-    fun loadPluginsFromPaths(api: MyAPI, pluginPaths: List<Path>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+    fun loadPluginsFromPaths(pluginPaths: List<Path>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
         val pluginURIs = mutableListOf<URI>()
         pluginPaths.forEach { pluginPath -> 
             try{ pluginURIs.add(pluginPath.toUri())
             } catch(e: Exception) { e.printStackTrace() }
         }
-        return callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
+        return callPlugLoader(pluginURIs, targetPluginFullClassNames)
     }
     @Synchronized
-    fun loadPluginsFromFiles(api: MyAPI, pluginFiles: List<File>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+    fun loadPluginsFromFiles(pluginFiles: List<File>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
         val pluginURIs = mutableListOf<URI>()
         pluginFiles.forEach { pluginFile -> 
             try{ pluginURIs.add(pluginFile.toURI())
             } catch(e: Exception) { e.printStackTrace() }
         }
-        return callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
+        return callPlugLoader(pluginURIs, targetPluginFullClassNames)
     }
     @Synchronized
-    fun loadPluginsFromURIs(api: MyAPI, pluginURIs: List<URI>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> = 
-        callPlugLoader(api, pluginURIs, targetPluginFullClassNames)
+    fun loadPluginsFromURIs(pluginURIs: List<URI>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> = 
+        callPlugLoader(pluginURIs, targetPluginFullClassNames)
 
 //------------------------------------INTERNAL---------------------------INTERNAL---------------------------INTERNAL--------------------------------------------------
 
     //End of public functions
     //main load class function
-    private fun callPlugLoader(api: MyAPI, pluginURIs: List<URI>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
+    private fun callPlugLoader(pluginURIs: List<URI>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
         val pluginUUIDs = mutableListOf<UUID>()
         val pluginsToRemove = mutableListOf<UUID>()
         for(pluginURI in pluginURIs){ //for each, call loadPluginsFromOneURI(pluginURI: URI, targetClassNames: List<String>): MutableList<UUID>
@@ -120,12 +136,15 @@ object PluginManager {
             pluginUUIDs.addAll(plugIDs) //<-- add new IDs to list
             for (plugID in plugIDs) { //<-- our list from loadPluginsFromOneURI
                 try {
-                    val pluginInstance = pluginObjectMap[plugID]
-                    if(pluginInstance!=null)pluginInstance.launchPlugin(api) //<-- launchplugin(api) must be defined when you implement MyPlugin
-                    else pluginsToRemove.add(plugID) //<-- if not launchable, 
+                    val api = pluginAPIobjs[plugID]
+                    if(api!=null){
+                        val pluginInstance = pluginObjectMap[plugID]
+                        if(pluginInstance!=null)pluginInstance.launchPlugin(api) //<-- launchplugin(api) must be defined when you implement MyPlugin
+                        else pluginsToRemove.add(plugID) //<-- if not launchable, 
+                    } else pluginsToRemove.add(plugID) //<-- add to separate list for deletion
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    pluginsToRemove.add(plugID) //<-- add to separate list so that we arent modifying our collection while iterating over it
+                    pluginsToRemove.add(plugID) //so that we arent modifying our collection while iterating over it
                 }
             }
         }
@@ -208,6 +227,7 @@ object PluginManager {
                 //so as a result, when launching we use loader.pluginCLoader
                 val pluginInstance = loader.pluginCLoader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in VM
                 classInfoByURLs[plugURL]?.getClassInfoByExtName(pluginName)?.optUUID = pluginUUID //<-- getClassInfoByName throws if name collision at url
+                pluginAPIobjs[pluginUUID] = MyAPIobj(pluginUUID) //<-- create a new api obj for each one so that we can manage them individually
                 pluginObjectMap[pluginUUID] = pluginInstance
                 pluginCLMap[pluginUUID] = loader //<-- we keep track of PluginLoaders so we can close them later
                 plugIDList.add(pluginUUID) //<-- add new uuid to the actual UUID list
