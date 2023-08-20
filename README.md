@@ -6,8 +6,6 @@
 
 it can also load from local or over the internet. so thats kinda cool.
 
-[examplepluginloader.PluggerXP.PluginLoader](examplepluginloader/src/main/kotlin/examplepluginloader/PluggerXP/PluginLoader.kt)
-
 the parent loader "MySystemLoader" loads the program loader, which is more or less just normal but with the api classpath included
 
 the parent loader "MySystemLoader" also is to be the parent of PluginLoader. 
