@@ -79,7 +79,7 @@ object PluginManager {
         pluginAPIobjs.clear()
         pluginCLMap.forEach { try{ 
             it.value.close()
-            }catch (e: Exception){e.printStackTrace()} //original implementation threw. yours can catch it i guess idk
+            }catch (e: Exception){e.printStackTrace()}
         }
         pluginCLMap.clear() //these don't throw.
         plugIDList.clear()
