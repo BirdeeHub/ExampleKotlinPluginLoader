@@ -1,9 +1,5 @@
 **A plugin loader example program in kotlin-jvm**
 
-**This plugin loader does not yet allow plugins to define a shutdown hook to shut down currently running threads**
-
-**but it will at least prevent them from accessing anything else when close is called**
-
 it can also load from local or over the internet. so thats kinda cool.
 
 the parent loader "MySystemLoader" loads the program loader, which is more or less just normal but with the api classpath included
