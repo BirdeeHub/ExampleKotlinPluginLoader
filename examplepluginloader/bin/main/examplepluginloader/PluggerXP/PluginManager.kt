@@ -40,12 +40,11 @@ object PluginManager {
             ?.any { it.optUUID == plugID } ?: false 
         }.map { it.key }.get(0) 
     }catch(e: Exception){null}
-    fun clearInfoCacheForURL(pluginURL: URL){
-        // for when you changed the name of the class that implements MyPlugin without restarting the program
-        // we have it keep the cache on remove because there may be more than 1 plugin per url, and also
-        //if we hang onto it, on reloads we can avoid doing the first of 2 downloads where we check for class names to run
-        classInfoByURLs.remove(pluginURL)
-    }
+
+    // for when you changed the name of the class that implements MyPlugin without restarting the program
+    // we have it keep the cache on remove because there may be more than 1 plugin per url, and also
+    //if we hang onto it, on reloads we can avoid doing the first of 2 downloads where we check for class names to run
+    fun clearInfoCacheForURL(pluginURL: URL) = classInfoByURLs.remove(pluginURL)
 
     //public unload and load functions (Synchronized)
     private val lock = Any() // Shared lock object
