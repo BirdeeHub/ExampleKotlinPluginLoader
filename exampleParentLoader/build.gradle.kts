@@ -31,7 +31,7 @@ tasks {
     }
     // make it output to the shared output directory to make it easier to run it with the plugin (the example program uses the loader to load from ./ by default unless you specify)
     shadowJar {
-        destinationDirectory.set(file("../outputDir/"))
-        archiveFileName.set("exampleparentloader.jar")
+        destinationDirectory.set(file("../PluginSystemExampleOut/"))
+        archiveFileName.set("entryPoint.jar")
     }
 }

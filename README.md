@@ -2,11 +2,15 @@
 
 it can also load from local or over the internet. so thats kinda cool.
 
-the parent loader "MySystemLoader" loads the program loader, which is more or less just normal but with the api classpath included
+the parent loader "MySystemLoader" is more or less just normal but with the api classpath included
 
-the parent loader "MySystemLoader" also is to be the parent of PluginLoader. 
+The system loader exports the api and all dependencies. 
 
-PluginLoader contains wrapper functions for the normal ones that can be toggled off.
+it runs the program which has the program and the plugin loading and management logic in its classpath, and inherits the api interfaces
+
+the parent loader "MySystemLoader" also is to be the parent of PluginLoader so that it also inherits the api
+
+PluginLoader contains wrapper functions for the normal ones that can be toggled off. It also contains another class loader.
 
 It contains PluginClassLoader, which has all of its core functions overridden to use the wrapper functions in PluginLoader
 
@@ -15,8 +19,6 @@ create a new pluginLoader for a plugin, and then use the internal PluginClassLoa
 PluginClassLoader doesnt load anything for itself. PluginLoader does it, and can revoke access when close() is called.
 
 If the plugin is loaded from pluginClassLoader, this means pluginLoader can completely prevent the plugin from loading classes.
-
-The system loader can access the api and exports all dependencies. 
 
 The plugins can access the main program through the api object, such as any listeners and queries created as interfaces in the api. 
 

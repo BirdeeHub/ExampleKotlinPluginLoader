@@ -9,10 +9,10 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
         println("Testing...")
         var optionalTargets: List<String> = listOf()
         if(pluginPaths.isEmpty()){
-            if(mode == 1)pluginPaths=listOf("./outputDir/plugins/")
+            if(mode == 1)pluginPaths=listOf("./plugins/")
             if(mode == 2)pluginPaths=listOf("https://github.com/BirdeeHub/minesweeper/raw/NotATutorial/app/minesweeper.jar")
         } else {
-            optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
+            optionalTargets=listOf("exampleplugin.MyPluginImplementation1", "MySweep.PluginLoading")
             println("Target classes:")
             optionalTargets.forEach { target -> println(target) }
         }

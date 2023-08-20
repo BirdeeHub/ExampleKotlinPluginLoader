@@ -22,7 +22,7 @@ java {
 tasks {
     // make it output to the shared output directory to make it easier to run it with the plugin
     jar {
-        destinationDirectory.set(file("../outputDir/API/"))
+        destinationDirectory.set(file("../PluginSystemExampleOut/API/"))
         archiveFileName.set("exampleAPI.jar")
     }
 }
