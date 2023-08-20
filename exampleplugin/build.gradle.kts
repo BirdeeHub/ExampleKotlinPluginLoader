@@ -25,6 +25,7 @@ java {
 tasks {
     // make it output to the shared output directory to make it easier to run it with the plugin (the example program uses the loader to load from ./ by default unless you specify)
     jar {
+        manifest { attributes( "Main-Class" to "MySweep.MineSweeper" ) }
         destinationDirectory.set(file("../plugins/"))
     }
 }

@@ -12,7 +12,7 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
             if(mode == 1)pluginPaths=listOf("./plugins/")
             if(mode == 2)pluginPaths=listOf("https://github.com/BirdeeHub/minesweeper/raw/NotATutorial/app/minesweeper.jar")
         } else {
-            optionalTargets=listOf("exampleplugin.MyPluginImplementation1", "MySweep.PluginLoading")
+            optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
             println("Target classes:")
             optionalTargets.forEach { target -> println(target) }
         }
