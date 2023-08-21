@@ -1,5 +1,7 @@
 **A plugin loader example program in kotlin-jvm**
 
+dont worry, theres no java. I copy pasted a game I made to use as an example plugin
+
 it can also load from local or over the internet. so thats kinda cool.
 
 the parent loader "MySystemLoader" is more or less just normal but with the api classpath included
