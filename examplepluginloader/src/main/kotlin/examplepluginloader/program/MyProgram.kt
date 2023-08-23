@@ -14,7 +14,7 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
         if(pluginPaths.isEmpty()){
             if(mode == 1)pluginPaths=listOf("./plugins/")
             if(mode == 2)pluginPaths=listOf("https://github.com/BirdeeHub/minesweeper/raw/NotATutorial/app/minesweeper.jar")
-            optionalTargets=listOf("exampleplugin.MyPluginImplementation1", "exampleplugin.MyPluginImplementation2")
+            //optionalTargets=listOf("exampleplugin.MyPluginImplementation1", "exampleplugin.MyPluginImplementation2")
         } else {
             //optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
             println("Target classes:")
