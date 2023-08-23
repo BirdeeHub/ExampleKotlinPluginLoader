@@ -45,7 +45,8 @@ class JByteCodeURLINFO(public val yourURL: URL){
     val classInfoAtURL: List<URLclassInfo>?
     val rescInJar: List<URL>?
 
-    //You can fairly safely ignore how this works. The stuff at the top is what is important.
+
+    //You can fairly safely ignore how this part works. The stuff at the top is what is important.
     init{
         val bytesOfStuff = mutableListOf<ByteArray?>()
         if(yourURL.protocol == "file")
