@@ -8,12 +8,11 @@ import java.util.Enumeration
 class PluginLoader(val plugURL: URL, val plugID: UUID, val parentCL: ClassLoader): URLClassLoader(arrayOf(plugURL), parentCL){
     //this loader actually loads the stuff for the plugin, and can cut it off.
     private var pluginIsLoaded = true
-    //val pluginCLoader: PluginClassLoader = PluginClassLoader(plugID, this)
     fun getUUID()=plugID
     fun addPluginURLs(pluginURLs: List<URL>) = pluginURLs.forEach { plugURL -> this.addURL(plugURL) }
     override fun close(){
-        pluginIsLoaded=false
         super.close()
+        pluginIsLoaded=false
     }
     override protected fun findClass(name: String): Class<*> = 
         if(pluginIsLoaded) super.findClass(name)
