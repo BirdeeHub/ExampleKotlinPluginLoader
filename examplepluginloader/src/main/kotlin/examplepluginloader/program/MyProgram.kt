@@ -6,14 +6,17 @@ import examplepluginloader.Plugger.PluginManager
 import java.net.URL
 class MyProgram(var pluginPaths: List<String>, mode: Int){
     init{
+        println("type s to attempt to load:")
+        var aString: String? = ""
+        while(aString!="s")aString = readLine()
         println("Testing...")
         var optionalTargets: List<String> = listOf()
         if(pluginPaths.isEmpty()){
             if(mode == 1)pluginPaths=listOf("./plugins/")
             if(mode == 2)pluginPaths=listOf("https://github.com/BirdeeHub/minesweeper/raw/NotATutorial/app/minesweeper.jar")
-            //optionalTargets=listOf("exampleplugin.MyPluginImplementation1", "exampleplugin.MyPluginImplementation2")
+            optionalTargets=listOf("exampleplugin.MyPluginImplementation1", "exampleplugin.MyPluginImplementation2")
         } else {
-            optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
+            //optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
             println("Target classes:")
             optionalTargets.forEach { target -> println(target) }
         }
@@ -44,7 +47,7 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
         }
         val totalList = PluginManager.getPlugIDList()
         println("All UUIDs: "+PluginManager.getPlugIDList())
-        println("type q to attempt to close:")
+        println("type q to attempt to unload:")
         var inputString: String? = ""
         while(inputString!="q")inputString = readLine()
         totalList.forEach { plugID ->
@@ -55,6 +58,9 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
             println("All UUIDs: "+PluginManager.getPlugIDList())
         }
         println("loaded ${totalList.size} plugin(s)")
+        println("type q to attempt to close:")
+        var bString: String? = ""
+        while(bString!="q")bString = readLine()
         println("Goodbye!")
     }
 }

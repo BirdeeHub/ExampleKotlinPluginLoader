@@ -9,14 +9,14 @@ repositories {
     gradlePluginPortal()
 }
 dependencies {
-    api(kotlin("stdlib"))
-    api("org.apache.commons:commons-math3:3.6.1")
-    api(project(":exampleAPI"))
-    api("org.ow2.asm:asm:9.5")
-    api("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
-    api("org.reflections:reflections:0.10.2")
-    api("com.google.guava:guava:31.1-jre")
-    api("org.slf4j:slf4j-nop:1.7.32")
+    implementation(kotlin("stdlib"))
+    implementation("org.apache.commons:commons-math3:3.6.1")
+    implementation(project(":exampleAPI"))
+    implementation("org.ow2.asm:asm:9.5")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
+    implementation("org.reflections:reflections:0.10.2")
+    implementation("com.google.guava:guava:31.1-jre")
+    implementation("org.slf4j:slf4j-nop:1.7.32")
 }
 // Apply a specific Java toolchain to ease working on different environments.
 java {
