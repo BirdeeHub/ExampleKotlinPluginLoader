@@ -1,7 +1,5 @@
 **A plugin loader example program in kotlin-jvm**
 
-dont worry, theres no java. I copy pasted a game I made to use as an example plugin.
-
 it can also load from local or over the internet. so thats kinda cool.
 
 I learned to use a profiler and found out that **IT STILL DOES NOT UNLOAD APPARENTLY** 
@@ -10,15 +8,26 @@ I learned to use a profiler and found out that **IT STILL DOES NOT UNLOAD APPARE
 
 **HELP** Im pretty stuck at this point. I dont see any more references to remove....
 
-Start at exampleParentLoader, it sets up 2 classloaders, 
+-------------------------------------------------------------------------------------
 
-1 that is overall parent, 1 that is for main program with overall parent as parent
+Main is in exampleParentLoader:
 
-in examplepluginloader is the main logic. It has the classloader for the plugins, 
+Main.kt sets up the shared parent which has the api in its classpath, It is parent for both the program's loader and the plugin loaders. Main.kt then launches the program with the program loader.
 
-which can cut off loading access and has the overall parent loader as its parent.
+The only api functions of note are a shutdown hook, and the interface to implement to make a plugin. 
 
-PluginManager manages it, api allows plugins to exist and also get shutdown handler event.
+The hook from the user is passed to PluginManager in a "plugistration" implementation
+
+Main logic in examplepluginloader:
+
+PluginLoader.kt is the loader for the plugins, 1 new one is created for each one.
+
+PluginManager manages the instances and has the functions for opening and closing
+
+
+
+--------------------------------------------------------------------------------------------------
+
 
 This is part of another project and AAAAAAAAAAHHHHHHHHHHH..............
 
