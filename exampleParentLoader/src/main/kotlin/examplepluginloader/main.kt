@@ -10,12 +10,12 @@ fun main(args: Array<String>) {
         mode = Integer.parseInt(args[0])
         mutArgs.removeAt(0)
     } catch (e: Exception){ mode = 1 }
-    val programLocation = File(File(
-        FindLocationOfTheThing::class.java.protectionDomain.codeSource.location.toURI())
-        .getParent()).toPath().resolve("MyProgram").resolve("examplepluginloader.jar").toUri().toURL()
     val apiPath = File(File(
         FindLocationOfTheThing::class.java.protectionDomain.codeSource.location.toURI())
         .getParent()).toPath().resolve("API").resolve("exampleAPI.jar").toUri().toURL()
+    val programLocation = File(File(
+        FindLocationOfTheThing::class.java.protectionDomain.codeSource.location.toURI())
+        .getParent()).toPath().resolve("MyProgram").resolve("examplepluginloader.jar").toUri().toURL()
     val sysloader = URLClassLoader(arrayOf(apiPath), ClassLoader.getSystemClassLoader())
     val programloader = URLClassLoader(arrayOf(programLocation), sysloader)
     programloader.loadClass("examplepluginloader.program.MyProgram").getConstructor(List::class.java, Int::class.java).newInstance(mutArgs.toList(), mode)
