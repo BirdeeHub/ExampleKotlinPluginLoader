@@ -10,9 +10,11 @@ I learned to use a profiler and found out that **IT STILL DOES NOT UNLOAD APPARE
 
 -------------------------------------------------------------------------------------
 
-Main is in exampleParentLoader:
+Main is in entryPoint:
 
 Main.kt sets up the shared parent which has the api in its classpath, It is parent for both the program's loader and the plugin loaders. Main.kt then launches the program with the program loader.
+
+Minimal API in exampleAPI
 
 The only api functions of note are a shutdown hook, and the interface to implement to make a plugin. 
 
