@@ -18,7 +18,4 @@ public class PluginLoading implements MyPlugin {
             }
         });
     }
-    public String getName() {
-        return "minesweeper";
-    }
 }

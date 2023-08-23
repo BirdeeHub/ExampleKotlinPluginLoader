@@ -11,7 +11,7 @@ dependencies {
     compileOnly(kotlin("stdlib"))
     compileOnly("org.apache.commons:commons-math3:3.6.1")
     compileOnly(project(":exampleAPI"))
-    compileOnly(project(":exampleParentLoader"))
+    compileOnly(project(":entryPoint"))
     compileOnly("org.ow2.asm:asm:9.5")
     compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
     compileOnly("org.reflections:reflections:0.10.2")
@@ -26,7 +26,7 @@ java {
 tasks {
     // make it output to the shared output directory to make it easier to run it with the plugin (the example program uses the loader to load from ./ by default unless you specify)
     jar {
-        destinationDirectory.set(file("../PluginSystemExampleOut/MyProgram/"))
+        destinationDirectory.set(file("../ExampleOut/MyProgram/"))
         archiveFileName.set("examplepluginloader.jar")
     }
 }

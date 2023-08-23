@@ -27,7 +27,6 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
             PluginManager.loadPluginFile(pluginPaths, optionalTargets).forEach {plugID ->
                 val plugin: MyPlugin? = PluginManager.getPlugin(plugID)
                 if(plugin!=null){
-                    println(plugin.getName())
                     println(PluginManager.getPluginLocation(plugID))
                     println(PluginManager.getPluginClassName(plugID))
                     println("UUID: "+PluginManager.getPluginUUID(plugin))
@@ -38,7 +37,6 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
             PluginManager.loadPluginsFromURLs(pluginPaths.map { URL(it) }, optionalTargets).forEach {plugID ->
                 val plugin: MyPlugin? = PluginManager.getPlugin(plugID)
                 if(plugin!=null){
-                    println(plugin.getName())
                     println(PluginManager.getPluginLocation(plugID))
                     println(PluginManager.getPluginClassName(plugID))
                     println("UUID: "+PluginManager.getPluginUUID(plugin))
@@ -51,7 +49,7 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
         var inputString: String? = ""
         while(inputString!="q")inputString = readLine()
         totalList.forEach { plugID ->
-            println("Attempting to Unload: "+PluginManager.getPlugin(plugID)?.getName()+" : "+plugID)
+            println("Attempting to Unload: "+" : "+plugID)
             try{
                 PluginManager.unloadPlugin(plugID)
             }catch(e: Exception){e.printStackTrace()}

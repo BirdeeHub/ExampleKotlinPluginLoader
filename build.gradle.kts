@@ -12,7 +12,7 @@ java {
 }
 tasks {
     clean {
-        delete("PluginSystemExampleOut/")
+        delete("ExampleOut/")
         delete("plugins/examplePlugins.jar")
     }
 }
