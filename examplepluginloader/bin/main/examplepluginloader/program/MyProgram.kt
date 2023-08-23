@@ -13,7 +13,7 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
         var optionalTargets: List<String> = listOf()
         if(pluginPaths.isEmpty()){
             if(mode == 1)pluginPaths=listOf("./plugins/")
-            if(mode == 2)pluginPaths=listOf("https://github.com/BirdeeHub/minesweeper/raw/NotATutorial/app/minesweeper.jar")
+            if(mode == 2)pluginPaths=listOf("https://github.com/BirdeeHub/ExampleKotlinPluginLoader/raw/main/plugins/examplePlugins.jar")
             //optionalTargets=listOf("exampleplugin.MyPluginImplementation1", "exampleplugin.MyPluginImplementation2")
         } else {
             //optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
