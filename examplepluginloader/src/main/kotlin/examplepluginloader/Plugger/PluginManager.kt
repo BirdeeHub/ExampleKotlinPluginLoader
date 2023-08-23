@@ -19,12 +19,16 @@ object PluginManager {
     private val pluginCLMap = mutableMapOf<UUID,PluginLoader>() //<-- we will close these to unload plugins
     private val classInfoByURLs = mutableMapOf<URL,JByteCodeURLINFO>() //<-- I made a reflections with ASM that works over web
     private val pluginAPIobjs = mutableMapOf<UUID,MyAPI>()
-    private val shutdownRegistrations = mutableMapOf<UUID,PluginUnloadHandler>()
+    private val shutdownRegistrations = mutableListOf<UnloadPlugistration>()
 
     //shutdown hook management functions
-    fun registerShutdownHook(plugID: UUID, unldHndlr: PluginUnloadHandler) { shutdownRegistrations[plugID] = unldHndlr }
-    fun shudownRegistered(plugID: UUID): Boolean = if(shutdownRegistrations[plugID]!=null) true else false
-    fun shutdownderegister(plugID: UUID) = shutdownRegistrations.remove(plugID)
+    fun registerShutdownHook(plugID: UUID, unldHndlr: PluginUnloadHandler): UnloadPlugistration {
+        val reg = UnloadPlugistration(plugID, unldHndlr)
+        shutdownRegistrations.add(reg)
+        return reg
+    }
+    fun shudownRegistered(registration: UnloadPlugistration): Boolean = shutdownRegistrations.contains(registration)
+    fun shutdownderegister(registration: UnloadPlugistration) = shutdownRegistrations.remove(registration)
     //public getter functions
     fun getPlugIDList(): List<UUID> = plugIDList.toList() //<-- return a copy of the List rather than the List itself to prevent concurrent modification exception
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
@@ -60,11 +64,21 @@ object PluginManager {
     fun unloadPlugins(plugIDs: List<UUID>) = plugIDs.forEach { plugID -> unloadPlugin(plugID) }
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
-        pluginObjectMap.remove(plugID)
-        try{ shutdownRegistrations[plugID]?.pluginUnloaded()
-        }catch (e: Exception){e.printStackTrace()}
-        shutdownRegistrations.remove(plugID)
+        shutdownRegistrations.forEach {
+            if(it.plugID==plugID){ try{ 
+                    it.unldHndlr.pluginUnloaded() 
+                }catch(e: Exception){e.printStackTrace()}
+            }
+        }
+        val iterator = shutdownRegistrations.iterator()
+        while (iterator.hasNext()) {
+            val reg = iterator.next()
+            if (reg.plugID == plugID) {
+                iterator.remove()
+            }
+        }
         pluginAPIobjs.remove(plugID)
+        pluginObjectMap.remove(plugID)
         try{ pluginCLMap[plugID]?.close()
         }catch (e: Exception){e.printStackTrace()}
         pluginCLMap.remove(plugID) //these don't throw.
@@ -72,12 +86,10 @@ object PluginManager {
     }
     @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
-        pluginObjectMap.clear()
-        shutdownRegistrations.forEach { try{ 
-            it.value.pluginUnloaded() 
-            }catch (e: Exception){e.printStackTrace()}
-        }
+        shutdownRegistrations.forEach { try{ it.unldHndlr.pluginUnloaded() }catch(e: Exception){} }
+        shutdownRegistrations.clear()
         pluginAPIobjs.clear()
+        pluginObjectMap.clear()
         pluginCLMap.forEach { try{ 
             it.value.close()
             }catch (e: Exception){e.printStackTrace()}
@@ -224,9 +236,7 @@ object PluginManager {
             try{
                 val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
                 loader = PluginLoader(plugURL, pluginUUID, PluginManager::class.java.classLoader.parent) //PluginManager is running under MyProgramLoader. Get parent, which is MySystemLoader
-                //plugins are actually loaded by a second loader inside the first, to which we can shut off all access using aPluginLoader.close
-                //so as a result, when launching we use loader.pluginCLoader
-                val pluginInstance = loader.pluginCLoader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in VM
+                val pluginInstance = loader.loadClass(pluginName).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in VM
                 classInfoByURLs[plugURL]?.getClassInfoByExtName(pluginName)?.optUUID = pluginUUID //<-- getClassInfoByName throws if name collision at url
                 pluginAPIobjs[pluginUUID] = MyAPIobj(pluginUUID) //<-- create a new api obj for each one so that we can manage them individually
                 pluginObjectMap[pluginUUID] = pluginInstance

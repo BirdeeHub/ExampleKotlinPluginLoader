@@ -11,6 +11,7 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
         if(pluginPaths.isEmpty()){
             if(mode == 1)pluginPaths=listOf("./plugins/")
             if(mode == 2)pluginPaths=listOf("https://github.com/BirdeeHub/minesweeper/raw/NotATutorial/app/minesweeper.jar")
+            //optionalTargets=listOf("exampleplugin.MyPluginImplementation1", "exampleplugin.MyPluginImplementation2")
         } else {
             optionalTargets=listOf("exampleplugin.MyPluginImplementation1")
             println("Target classes:")
@@ -41,17 +42,19 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
                 }
             }
         }
-        val totalnumber: Int = PluginManager.getPlugIDList().size
+        val totalList = PluginManager.getPlugIDList()
         println("All UUIDs: "+PluginManager.getPlugIDList())
         println("type q to attempt to close:")
         var inputString: String? = ""
         while(inputString!="q")inputString = readLine()
-        PluginManager.getPlugIDList().forEach { plugID ->
+        totalList.forEach { plugID ->
             println("Attempting to Unload: "+PluginManager.getPlugin(plugID)?.getName()+" : "+plugID)
-            PluginManager.unloadPlugin(plugID)
+            try{
+                PluginManager.unloadPlugin(plugID)
+            }catch(e: Exception){e.printStackTrace()}
             println("All UUIDs: "+PluginManager.getPlugIDList())
         }
-        println("loaded $totalnumber plugin(s)")
+        println("loaded ${totalList.size} plugin(s)")
         println("Goodbye!")
     }
 }

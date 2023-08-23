@@ -4,8 +4,6 @@ import examplepluginloader.api.plugin.PluginUnloadHandler
 import examplepluginloader.api.plugin.Plugistration
 import java.util.UUID
 class PlugMngrObj(val plugID: UUID) : ManagePlugins {
-    override fun registerShutdownSequence(unldHndlr: PluginUnloadHandler): Plugistration {
+    override fun registerShutdownSequence(unldHndlr: PluginUnloadHandler): Plugistration =
         PluginManager.registerShutdownHook(plugID, unldHndlr)
-        return UnloadPlugistration(plugID)
-    }
 }
