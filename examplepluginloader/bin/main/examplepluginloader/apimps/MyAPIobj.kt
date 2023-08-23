@@ -1,4 +1,4 @@
-package examplepluginloader.Plugger
+package examplepluginloader.apimps
 import examplepluginloader.api.MyAPI
 import examplepluginloader.api.plugin.ManagePlugins
 import java.util.UUID

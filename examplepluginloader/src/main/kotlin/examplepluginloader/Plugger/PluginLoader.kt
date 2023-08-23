@@ -14,22 +14,28 @@ class PluginLoader(val plugURL: URL, val plugID: UUID, val parentCL: ClassLoader
         super.close()
         pluginIsLoaded=false
     }
-    override protected fun findClass(name: String): Class<*> = 
-        if(pluginIsLoaded) super.findClass(name)
+    override protected fun findClass(name: String): Class<*> {
+        if(pluginIsLoaded) return super.findClass(name)
         else throw ClassNotFoundException(name)
-    override fun loadClass(name: String): Class<*> = 
-        if(pluginIsLoaded) super.loadClass(name)
+    }
+    override fun loadClass(name: String): Class<*> {
+        if(pluginIsLoaded) return super.loadClass(name)
         else throw ClassNotFoundException(name)
-    override fun findResource(name: String): URL = 
-        if(pluginIsLoaded) super.findResource(name)
+    }
+    override fun findResource(name: String): URL {
+        if(pluginIsLoaded) return super.findResource(name)
         else throw ClassNotFoundException(name)
-    override fun getResource(name: String): URL = 
-        if(pluginIsLoaded) super.getResource(name)
+    }
+    override fun getResource(name: String): URL {
+        if(pluginIsLoaded) return super.getResource(name)
         else throw ClassNotFoundException(name)
-    override fun getResourceAsStream(name: String): InputStream = 
-        if(pluginIsLoaded) super.getResourceAsStream(name)
+    }
+    override fun getResourceAsStream(name: String): InputStream {
+        if(pluginIsLoaded) return super.getResourceAsStream(name)
         else throw ClassNotFoundException(name)
-    override fun getResources(name: String): Enumeration<URL> = 
-        if(pluginIsLoaded) super.getResources(name)
+    }
+    override fun getResources(name: String): Enumeration<URL> {
+        if(pluginIsLoaded) return super.getResources(name)
         else throw ClassNotFoundException(name)
+    }
 }

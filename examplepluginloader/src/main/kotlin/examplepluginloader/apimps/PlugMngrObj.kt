@@ -1,7 +1,8 @@
-package examplepluginloader.Plugger
+package examplepluginloader.apimps
 import examplepluginloader.api.plugin.ManagePlugins
 import examplepluginloader.api.plugin.PluginUnloadHandler
 import examplepluginloader.api.plugin.Plugistration
+import examplepluginloader.Plugger.PluginManager
 import java.util.UUID
 import java.net.URL
 class PlugMngrObj(val plugID: UUID) : ManagePlugins {

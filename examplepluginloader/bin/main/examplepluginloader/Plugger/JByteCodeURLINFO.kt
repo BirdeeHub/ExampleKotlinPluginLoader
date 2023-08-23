@@ -13,6 +13,8 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import kotlin.collections.forEach
 
+//This gets class info from a url and then after that just contains a list of the following interface and 3 functions
+
 interface URLclassInfo {
     val urURL: URL
     val version: Int

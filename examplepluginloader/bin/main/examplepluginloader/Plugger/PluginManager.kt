@@ -4,6 +4,8 @@ import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To mak
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import examplepluginloader.api.plugin.PluginUnloadHandler
 import examplepluginloader.Plugger.JByteCodeURLINFO
+import examplepluginloader.apimps.UnloadPlugistration
+import examplepluginloader.apimps.MyAPIobj
 import java.io.InputStream
 import java.io.File
 import java.net.URL
