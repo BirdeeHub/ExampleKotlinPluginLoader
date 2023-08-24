@@ -16,6 +16,8 @@ gradle is used for build, so just ```gradle build shadowJar```
 
 Default plugin directory when you run it assumes you are at project root but you can specify.
 
+```java -jar ExampleOut/entryPoint.jar```
+
 ----------------------------------------------------------------------------------------------
 
 I learned to use a profiler and found out that **IT STILL DOES NOT UNLOAD APPARENTLY** 
