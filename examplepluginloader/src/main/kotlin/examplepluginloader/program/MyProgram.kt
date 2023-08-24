@@ -56,7 +56,6 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
             println("All UUIDs: "+PluginManager.getPlugIDList())
         }
         //PluginManager.unloadAllPlugins()
-        //System.gc()
         println("loaded ${totalList.size} plugin(s)")
         println("type q to attempt to close:")
         var bString: String? = ""
