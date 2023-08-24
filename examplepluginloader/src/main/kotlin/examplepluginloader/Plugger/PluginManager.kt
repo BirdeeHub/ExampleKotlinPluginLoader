@@ -11,6 +11,7 @@ import java.io.File
 import java.net.URL
 import java.net.URI
 import java.util.UUID
+import java.util.WeakHashMap
 import java.nio.file.Path
 
 //Singleton class, for easy referencing, and preventing duplication of references.
@@ -18,7 +19,7 @@ object PluginManager {
     //PRIVATE GLOBALS
     private val plugIDList = mutableListOf<UUID>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
-    private val pluginCLMap = mutableMapOf<UUID,PluginLoader>() //<-- we will close these to unload plugins
+    private val pluginCLMap: WeakHashMap<UUID,PluginLoader> = WeakHashMap<UUID,PluginLoader>() //<-- we will close these to unload plugins
     private val classInfoByURLs = mutableMapOf<URL,JByteCodeURLINFO>() //<-- I made a reflections with ASM that works over web, which shouldnt hold any references
     private val pluginAPIobjs = mutableMapOf<UUID,MyAPI>() //<-- these have the references of each api object i pass to a plugin
     private val shutdownRegistrations = mutableListOf<UnloadPlugistration>() //<-- These have a reference to a plugin defined shutdown handler
@@ -86,8 +87,9 @@ object PluginManager {
             plugIDList.remove(plugID)
         }
         System.gc()
-        Thread.sleep(500)
-        System.gc()
+        try{
+            Thread.sleep(1000)
+        }catch(e: InterruptedException){}
     }
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
@@ -111,8 +113,6 @@ object PluginManager {
         pluginCLMap.remove(plugID) //these don't throw.
         plugIDList.remove(plugID)
         System.gc()
-        Thread.sleep(500)
-        System.gc()
     }
     @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
@@ -130,8 +130,9 @@ object PluginManager {
         pluginCLMap.clear() //these don't throw.
         plugIDList.clear()
         System.gc()
-        Thread.sleep(500)
-        System.gc()
+        try{
+            Thread.sleep(1000)
+        }catch(e: InterruptedException){}
     }
     @Synchronized
     fun loadPluginFile(pluginPathStrings: List<String>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {
