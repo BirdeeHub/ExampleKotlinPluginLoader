@@ -2,7 +2,9 @@
 
 It should be pretty readable for Java coders. 
 
-The return types are after the function, the question marks mean "can be null"
+The return types are after the function, the question marks mean "can be null", 
+
+vals cant be reassigned, vars can, class ClassName(): URLClassLoader() {} means ClassName extends URLClassLoader
 
 and PluginManager.kt is a static class (marked with object keyword at start)
 
