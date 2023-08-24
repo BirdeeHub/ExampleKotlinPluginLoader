@@ -28,7 +28,7 @@ Is the way I wrote my custom class loader in PluginLoader preventing it from bei
 
 -------------------------------------------------------------------------------------
 
-There are only 2 files over about 60 lines. And one of them, you shouldnt need to look at more than the top 45 lines
+There are only 2 files over about 60 lines. And for one of those, you shouldnt need to look at more than the top 45 lines
 
 (other than the java minesweeper game in example plugins, which isnt relevant. The bug happens with or without it.) 
 
