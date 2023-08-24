@@ -13,7 +13,7 @@ import java.net.URI
 import java.util.UUID
 import java.nio.file.Path
 
-
+//Singleton class, for easy referencing, and preventing duplication of references.
 object PluginManager {
     //PRIVATE GLOBALS
     private val plugIDList = mutableListOf<UUID>() //<-- initialize our lists of stuff for loading and closing
