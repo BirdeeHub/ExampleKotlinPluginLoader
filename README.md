@@ -30,6 +30,8 @@ https://github.com/BirdeeHub/ExampleKotlinPluginLoader/tree/main/examplepluginlo
 
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/tree/main/examplepluginloader/src/main/kotlin/examplepluginloader/Plugger/PluginManager.kt
 
+If the ONLY reason is Swing, then I guess it is ok. But I thought the only reason was swing, and then I improved it, so now I am not sure.
+
 -------------------------------------------------------------------------------------
 
 There are only 2 files over about 60 lines. And for one of those, you shouldnt need to look at more than the top 45 lines
