@@ -19,9 +19,9 @@ object PluginManager {
     private val plugIDList = mutableListOf<UUID>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
     private val pluginCLMap = mutableMapOf<UUID,PluginLoader>() //<-- we will close these to unload plugins
-    private val classInfoByURLs = mutableMapOf<URL,JByteCodeURLINFO>() //<-- I made a reflections with ASM that works over web
-    private val pluginAPIobjs = mutableMapOf<UUID,MyAPI>()
-    private val shutdownRegistrations = mutableListOf<UnloadPlugistration>()
+    private val classInfoByURLs = mutableMapOf<URL,JByteCodeURLINFO>() //<-- I made a reflections with ASM that works over web, which shouldnt hold any references
+    private val pluginAPIobjs = mutableMapOf<UUID,MyAPI>() //<-- these have the references of each api object i pass to a plugin
+    private val shutdownRegistrations = mutableListOf<UnloadPlugistration>() //<-- These have a reference to a plugin defined shutdown handler
 
     //shutdown hook management functions
     fun registerShutdownHook(plugID: UUID, unldHndlr: PluginUnloadHandler): UnloadPlugistration {
