@@ -67,8 +67,8 @@ object PluginManager {
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         shutdownRegistrations.forEach {
-            if(it.plugID==plugID){ try{ 
-                    it.unldHndlr.pluginUnloaded() 
+            if(it.plugID==plugID){ 
+                try{ it.unldHndlr?.pluginUnloaded() 
                 }catch(e: Exception){e.printStackTrace()}
             }
         }
@@ -85,19 +85,24 @@ object PluginManager {
         }catch (e: Exception){e.printStackTrace()}
         pluginCLMap.remove(plugID) //these don't throw.
         plugIDList.remove(plugID)
+        System.gc()
     }
     @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
-        shutdownRegistrations.forEach { try{ it.unldHndlr.pluginUnloaded() }catch(e: Exception){} }
+        shutdownRegistrations.forEach { 
+            try{ it.unldHndlr?.pluginUnloaded() 
+            }catch(e: Exception){} 
+        }
         shutdownRegistrations.clear()
         pluginAPIobjs.clear()
         pluginObjectMap.clear()
         pluginCLMap.forEach { try{ 
-            it.value.close()
+                it.value.close()
             }catch (e: Exception){e.printStackTrace()}
         }
         pluginCLMap.clear() //these don't throw.
         plugIDList.clear()
+        System.gc()
     }
     @Synchronized
     fun loadPluginFile(pluginPathStrings: List<String>, targetPluginFullClassNames: List<String> = listOf()): List<UUID> {

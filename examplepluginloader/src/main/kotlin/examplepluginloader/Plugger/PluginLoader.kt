@@ -12,6 +12,8 @@ class PluginLoader(val plugURL: URL, val plugID: UUID, val parentCL: ClassLoader
     fun addPluginURLs(pluginURLs: List<URL>) = pluginURLs.forEach { plugURL -> this.addURL(plugURL) }
     override fun close(){
         super.close()
+        this.clearAssertionStatus()
+        System.gc()
         pluginIsLoaded=false
     }
     override protected fun findClass(name: String): Class<*> {
