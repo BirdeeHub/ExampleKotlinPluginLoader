@@ -10,6 +10,8 @@ Other than that, it is all java, and java classes and JVM
 
 it can also load from local or over the internet. so thats kinda cool.
 
+----------------------------------------------------------------------------------------------
+
 I learned to use a profiler and found out that **IT STILL DOES NOT UNLOAD APPARENTLY** 
 
 (yes even if theres no minesweeper in the plugins jar and only the 2 super basic ones.)
