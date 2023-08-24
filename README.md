@@ -8,6 +8,12 @@ I learned to use a profiler and found out that **IT STILL DOES NOT UNLOAD APPARE
 
 **HELP** Im pretty stuck at this point. I dont see any more references to remove....
 
+Basically, I know that you cannot be holding any remaining references to the class.
+
+But I thought I removed them all. 
+
+Is the way I wrote my custom class loader in PluginLoader preventing it from being garbage collected somehow?
+
 -------------------------------------------------------------------------------------
 
 Main is in entryPoint:
