@@ -32,6 +32,8 @@ But I thought I removed them all....
 
 Is the way I wrote my custom class loader in PluginLoader preventing it from being garbage collected somehow?
 
+or is it that im doing the managing from a singleton and not a classloader somehow?
+
 The parts of note are at the following locations:
 
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/blob/main/entryPoint/src/main/kotlin/examplepluginloader/main.kt
