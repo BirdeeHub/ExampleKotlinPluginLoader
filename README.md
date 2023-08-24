@@ -34,6 +34,8 @@ Is the way I wrote my custom class loader in PluginLoader preventing it from bei
 
 or is it that im doing the managing from a singleton and not a classloader somehow?
 
+or is it somewhere in the api implementation I pass to the plugin?
+
 The parts of note are at the following locations:
 
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/blob/main/entryPoint/src/main/kotlin/examplepluginloader/main.kt
