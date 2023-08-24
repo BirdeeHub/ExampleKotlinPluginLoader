@@ -1,5 +1,13 @@
 **A plugin loader example program in kotlin-jvm**
 
+It should be pretty readable for Java coders. 
+
+The return types are after the function, the question marks mean "can be null"
+
+and PluginManager.kt is a static class (marked with object keyword at start)
+
+Other than that, it is all java, and java classes and JVM
+
 it can also load from local or over the internet. so thats kinda cool.
 
 I learned to use a profiler and found out that **IT STILL DOES NOT UNLOAD APPARENTLY** 
