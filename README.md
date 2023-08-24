@@ -14,13 +14,13 @@ I learned to use a profile better, and also changed a couple more things,
 
 and now it unloads everything except for JUST the classloader that was used for minesweeper.
 
-but there are no longer any active instances
+but there are no longer any active instances other than the 1 loader itself. it closes the other 2.
 
-**HELP** Im pretty stuck at this point. 
+**HELP** Im pretty stuck at this point. It says theres an assertion lock but i barely know what that is...
 
 I just want it to release the plugin jar file so that you can edit it without closing the program...
 
-Why is everything now unloading after being dereferenced, EXCEPT for PluginLoader?
+Why is everything now unloading after being dereferenced, EXCEPT for 1 of the instances of PluginLoader?
 
 The parts of note are at the following locations:
 
