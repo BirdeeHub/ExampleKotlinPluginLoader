@@ -13,8 +13,6 @@ dependencies {
     compileOnly(project(":exampleAPI"))
     compileOnly(project(":entryPoint"))
     compileOnly("org.ow2.asm:asm:9.5")
-    compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
-    compileOnly("org.reflections:reflections:0.10.2")
     compileOnly("com.google.guava:guava:31.1-jre")
 }
 // Apply a specific Java toolchain to ease working on different environments.

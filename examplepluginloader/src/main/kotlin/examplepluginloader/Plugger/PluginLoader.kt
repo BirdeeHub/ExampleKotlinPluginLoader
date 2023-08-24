@@ -6,12 +6,12 @@ import java.io.InputStream
 import java.util.UUID
 import java.util.Enumeration
 class PluginLoader(val plugURL: URL, val plugID: UUID, val parentCL: ClassLoader): URLClassLoader(arrayOf(plugURL), parentCL){
+    init{this.setDefaultAssertionStatus(false)}
     //this loader actually loads the stuff for the plugin, and can cut it off.
     private var pluginIsLoaded = true
     fun getUUID()=plugID
     fun addPluginURLs(pluginURLs: List<URL>) = pluginURLs.forEach { plugURL -> this.addURL(plugURL) }
     override fun close(){
-        this.setDefaultAssertionStatus(false)
         this.clearAssertionStatus()
         super.close()
         pluginIsLoaded=false
