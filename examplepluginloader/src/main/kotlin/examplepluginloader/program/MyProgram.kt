@@ -48,15 +48,15 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
         println("type q to attempt to unload:")
         var inputString: String? = ""
         while(inputString!="q")inputString = readLine()
-        totalList.forEach { plugID ->
+        /*totalList.forEach { plugID ->
             println("Attempting to Unload: "+" : "+plugID)
             try{
                 PluginManager.unloadPlugin(plugID)
             }catch(e: Exception){e.printStackTrace()}
             println("All UUIDs: "+PluginManager.getPlugIDList())
-        }
-        //PluginManager.unloadAllPlugins()
-        //System.gc()
+        }*/
+        PluginManager.unloadAllPlugins()
+        System.gc()
         println("loaded ${totalList.size} plugin(s)")
         println("type q to attempt to close:")
         var bString: String? = ""
