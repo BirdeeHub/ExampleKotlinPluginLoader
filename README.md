@@ -12,6 +12,10 @@ The 3 weird filtering functions do work correctly, which are probably the only o
 
 it can also load from local or over the internet. so thats kinda cool.
 
+gradle is used for build, so just ```gradle build shadowJar```
+
+Default plugin directory when you run it assumes you are at project root but you can specify.
+
 ----------------------------------------------------------------------------------------------
 
 I learned to use a profiler and found out that **IT STILL DOES NOT UNLOAD APPARENTLY** 
@@ -77,7 +81,6 @@ JByteCodeURLINFO.kt just gets class names in a jar. Top 45 lines of that file sh
 It should not hold any references to the plugin even when stored in Plugin Manager as it is, and all input streams are closed. 
 
 --------------------------------------------------------------------------------------------------
-
 
 This is part of another project and AAAAAAAAAAHHHHHHHHHHH..............
 
