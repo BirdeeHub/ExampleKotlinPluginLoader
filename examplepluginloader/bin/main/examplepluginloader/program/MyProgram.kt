@@ -55,6 +55,7 @@ class MyProgram(var pluginPaths: List<String>, mode: Int){
             }catch(e: Exception){e.printStackTrace()}
             println("All UUIDs: "+PluginManager.getPlugIDList())
         }
+        //PluginManager.unloadAllPlugins()
         println("loaded ${totalList.size} plugin(s)")
         println("type q to attempt to close:")
         var bString: String? = ""

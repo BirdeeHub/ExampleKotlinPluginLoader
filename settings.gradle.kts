@@ -15,5 +15,6 @@ plugins {
 rootProject.name = "examplepluginloader"
 include("examplepluginloader")
 include("exampleplugin")
+include("MinesweeperPlugin")
 include("exampleAPI")
 include("entryPoint")

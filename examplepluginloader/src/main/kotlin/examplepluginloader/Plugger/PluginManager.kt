@@ -63,7 +63,32 @@ object PluginManager {
     //public unload and load functions (Synchronized)
     private val lock = Any() // Shared lock object
     @Synchronized
-    fun unloadPlugins(plugIDs: List<UUID>) = plugIDs.forEach { plugID -> unloadPlugin(plugID) }
+    fun unloadPlugins(plugIDs: List<UUID>){ //close and remove EVERYWHERE
+        shutdownRegistrations.forEach {
+            if(plugIDs.contains(it.plugID)){ 
+                try{ it.unldHndlr?.pluginUnloaded() 
+                }catch(e: Exception){e.printStackTrace()}
+            }
+        }
+        val iterator = shutdownRegistrations.iterator()
+        while (iterator.hasNext()) {
+            val reg = iterator.next()
+            if (plugIDs.contains(reg.plugID)) {
+                iterator.remove()
+            }
+        }
+        plugIDs.forEach { plugID ->
+            pluginAPIobjs.remove(plugID)
+            pluginObjectMap.remove(plugID)
+            try{ pluginCLMap[plugID]?.close()
+            }catch (e: Exception){e.printStackTrace()}
+            pluginCLMap.remove(plugID) //these don't throw.
+            plugIDList.remove(plugID)
+        }
+        System.gc()
+        Thread.sleep(500)
+        System.gc()
+    }
     @Synchronized
     fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
         shutdownRegistrations.forEach {
@@ -86,6 +111,8 @@ object PluginManager {
         pluginCLMap.remove(plugID) //these don't throw.
         plugIDList.remove(plugID)
         System.gc()
+        Thread.sleep(500)
+        System.gc()
     }
     @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
@@ -102,6 +129,8 @@ object PluginManager {
         }
         pluginCLMap.clear() //these don't throw.
         plugIDList.clear()
+        System.gc()
+        Thread.sleep(500)
         System.gc()
     }
     @Synchronized
