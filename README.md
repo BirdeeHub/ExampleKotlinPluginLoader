@@ -28,6 +28,10 @@ Is the way I wrote my custom class loader in PluginLoader preventing it from bei
 
 -------------------------------------------------------------------------------------
 
+There are only 2 files over about 60 lines. (other than the java minesweeper game in example plugins) 
+
+Outline is as follows:
+
 Main is in entryPoint:
 
 Main.kt sets up the shared parent which has the api in its classpath, It is parent for both the program's loader and the plugin loaders. Main.kt then launches the program with the program loader.
@@ -44,7 +48,11 @@ PluginLoader.kt is the loader for the plugins, 1 new one is created for each one
 
 PluginManager manages the instances and has the functions for opening and closing
 
+side note:
 
+JByteCodeURLINFO.kt just gets class names in a jar. Top 45 lines of that file should be all you need.
+
+It should not hold any references to the plugin even when stored in Plugin Manager as it is, and all input streams are closed. 
 
 --------------------------------------------------------------------------------------------------
 
