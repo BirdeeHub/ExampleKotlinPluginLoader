@@ -56,6 +56,8 @@ PluginLoader.kt is the loader for the plugins, 1 new one is created for each one
 
 PluginManager manages the instances and has the functions for opening and closing
 
+MyProgram calls functions from PluginManager, and prints output.
+
 side note:
 
 JByteCodeURLINFO.kt just gets class names in a jar. Top 45 lines of that file should be all you need.
