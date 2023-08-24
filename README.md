@@ -10,7 +10,7 @@ I learned to use a profiler and found out that **IT STILL DOES NOT UNLOAD APPARE
 
 Basically, I know that you cannot be holding any remaining references to the class.
 
-But I thought I removed them all. 
+But I thought I removed them all....
 
 Is the way I wrote my custom class loader in PluginLoader preventing it from being garbage collected somehow?
 
@@ -20,7 +20,7 @@ Main is in entryPoint:
 
 Main.kt sets up the shared parent which has the api in its classpath, It is parent for both the program's loader and the plugin loaders. Main.kt then launches the program with the program loader.
 
-Minimal API in exampleAPI
+Minimal API in exampleAPI:
 
 The only api functions of note are a shutdown hook, and the interface to implement to make a plugin. 
 
@@ -42,6 +42,8 @@ This is part of another project and AAAAAAAAAAHHHHHHHHHHH..............
 I just want to finally get to write the main features at this point..... 
 
 But i want a working base....
+
+The parts of note are at the following locations
 
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/blob/main/entryPoint/src/main/kotlin/examplepluginloader/main.kt
 
