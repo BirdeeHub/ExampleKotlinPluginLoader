@@ -26,6 +26,12 @@ But I thought I removed them all....
 
 Is the way I wrote my custom class loader in PluginLoader preventing it from being garbage collected somehow?
 
+The parts of note are at the following locations:
+
+https://github.com/BirdeeHub/ExampleKotlinPluginLoader/blob/main/entryPoint/src/main/kotlin/examplepluginloader/main.kt
+
+https://github.com/BirdeeHub/ExampleKotlinPluginLoader/tree/main/examplepluginloader/src/main/kotlin/examplepluginloader
+
 -------------------------------------------------------------------------------------
 
 There are only 2 files over about 60 lines. And for one of those, you shouldnt need to look at more than the top 45 lines
@@ -36,6 +42,8 @@ Most of them are closer to 10 lines
 
 Outline is as follows:
 
+------
+
 Main is in entryPoint:
 
 Main.kt sets up the shared parent which has the api in its classpath. 
@@ -44,11 +52,15 @@ It is parent for both the program's loader and the plugin loaders.
 
 Main.kt then launches the program with the program loader.
 
+-------
+
 Minimal API in exampleAPI:
 
 The only api functions of note are a shutdown hook, and the interface to implement to make a plugin. 
 
 The hook from the user is passed to PluginManager in a "plugistration" implementation
+
+--------
 
 Main logic in examplepluginloader:
 
@@ -71,10 +83,4 @@ This is part of another project and AAAAAAAAAAHHHHHHHHHHH..............
 
 I just want to finally get to write the main features at this point..... 
 
-But i want a working base....
-
-The parts of note are at the following locations
-
-https://github.com/BirdeeHub/ExampleKotlinPluginLoader/blob/main/entryPoint/src/main/kotlin/examplepluginloader/main.kt
-
-https://github.com/BirdeeHub/ExampleKotlinPluginLoader/tree/main/examplepluginloader/src/main/kotlin/examplepluginloader
+But I want a working base....
