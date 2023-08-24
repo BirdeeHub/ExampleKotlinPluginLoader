@@ -2,18 +2,6 @@
 
 It should be pretty readable for Java coders. 
 
-The return types are after the function, the ? mean "can be null", 
-
-vals cant be reassigned, vars can, class ClassName(): URLClassLoader() {} means ClassName extends URLClassLoader
-
-and PluginManager.kt is a static class (marked with object keyword at start)
-
-Other than that, it is all java, and java classes and JVM
-
-There is 3 usages of .filter {} and .map {} that might be a bit confusing but those work fine.
-
-it can also load from local or over the internet. so thats kinda cool.
-
 gradle is used for build, so just ```gradle build shadowJar```
 
 Default plugin directory when you run it assumes you are at project root but you can specify.
@@ -22,27 +10,25 @@ Default plugin directory when you run it assumes you are at project root but you
 
 ----------------------------------------------------------------------------------------------
 
-I learned to use a profiler and found out that **IT STILL DOES NOT UNLOAD APPARENTLY** 
+I learned to use a profile better, and also changed a couple more things, 
 
-(yes even if theres no minesweeper in the plugins jar and only the 2 super basic ones.)
+and now it unloads everything except for JUST the classloader that was used for minesweeper.
 
-**HELP** Im pretty stuck at this point. I dont see any more references to remove....
+but there are no longer any active instances
 
-Basically, I know that you cannot be holding any remaining references to the class.
+**HELP** Im pretty stuck at this point. 
 
-But I thought I removed them all....
+I just want it to release the plugin jar file so that you can edit it without closing the program...
 
-Is the way I wrote my custom class loader in PluginLoader preventing it from being garbage collected somehow?
-
-or is it that im doing the managing from a singleton and not a classloader somehow?
-
-or is it somewhere in the api implementation I pass to the plugin?
+Why is everything now unloading after being dereferenced, EXCEPT for PluginLoader?
 
 The parts of note are at the following locations:
 
 https://github.com/BirdeeHub/ExampleKotlinPluginLoader/blob/main/entryPoint/src/main/kotlin/examplepluginloader/main.kt
 
-https://github.com/BirdeeHub/ExampleKotlinPluginLoader/tree/main/examplepluginloader/src/main/kotlin/examplepluginloader
+https://github.com/BirdeeHub/ExampleKotlinPluginLoader/tree/main/examplepluginloader/src/main/kotlin/examplepluginloader/Plugger/PluginLoader.kt
+
+https://github.com/BirdeeHub/ExampleKotlinPluginLoader/tree/main/examplepluginloader/src/main/kotlin/examplepluginloader/Plugger/PluginManager.kt
 
 -------------------------------------------------------------------------------------
 
@@ -99,3 +85,19 @@ But I want a working base....
 And scrapping it all and using OSGi (which I just heard of)... 
 
 I really really wanted to learn how to do this....
+
+--------------------------------------------------------------------------------------------------
+
+**For Java Coders**
+
+The return types are after the function, the ? mean "can be null", 
+
+vals cant be reassigned, vars can, class ClassName(): URLClassLoader() {} means ClassName extends URLClassLoader
+
+and PluginManager.kt is a static class (marked with object keyword at start)
+
+Other than that, it is all java, and java classes and JVM
+
+There is 3 usages of .filter {} and .map {} that might be a bit confusing but those work fine.
+
+it can also load from local or over the internet. so thats kinda cool.
