@@ -8,7 +8,7 @@ and PluginManager.kt is a static class (marked with object keyword at start)
 
 Other than that, it is all java, and java classes and JVM
 
-The 3 weird filtering functions do work correctly, which are probably the only other part that isnt just java.
+There is 3 usages of .filter {} and .map {} that might be a bit confusing but those work fine.
 
 it can also load from local or over the internet. so thats kinda cool.
 
