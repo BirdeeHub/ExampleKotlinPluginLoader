@@ -11,7 +11,7 @@ public class PluginLoading implements MyPlugin {
         api.plugin().registerShutdownSequence(new PluginUnloadHandler(){
             public void pluginUnloaded(){
                 for (Frame frame : Frame.getFrames()) {
-                    frame.dispose();
+                    if(frame instanceof isDMTGable)frame.dispose();
                 }
             }
         });

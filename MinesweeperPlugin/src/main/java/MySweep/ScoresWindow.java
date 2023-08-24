@@ -27,7 +27,7 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.KeyboardFocusManager;
 
-public class ScoresWindow extends JFrame {
+public class ScoresWindow extends JFrame implements isDMTGable {
     private final ScoreEntry thisBoard;
     private JToggleButton clickableToggle = new JToggleButton("click?");
     private boolean clickable;
@@ -125,7 +125,7 @@ public class ScoresWindow extends JFrame {
         this.ParentFrame=ParentFrame;//<-- we need this to close it later if new board is chosen
         initComponents();
     }
-    void toggleDarkMode(){
+    public void toggleDarkMode(){
         repaint();
         setDarkMode();
     }

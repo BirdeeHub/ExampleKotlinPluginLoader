@@ -21,7 +21,7 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
 
-public class OpeningWindow extends JFrame {//<-- its a JFrame
+public class OpeningWindow extends JFrame implements isDMTGable {//<-- its a JFrame
     private JTextField WidthField;
     private JTextField HeightField;//<-- we create the actual instances to go in these in the constructor
     private JTextField BombNumber;
@@ -74,7 +74,7 @@ public class OpeningWindow extends JFrame {//<-- its a JFrame
             OpeningWindow.this.dispose();
         }catch(NumberFormatException e){TitleLabel.setText("Invalid field(s)");}
     } 
-    void toggleDarkMode(){//<-- MineSweeper.toggleDarkMode() calls this function
+    public void toggleDarkMode(){//<-- MineSweeper.toggleDarkMode() calls this function
         setDarkMode();//<-- and it calls this, which is defined at the end of the file
         repaint();
     }

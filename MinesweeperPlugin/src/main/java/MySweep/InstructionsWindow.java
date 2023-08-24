@@ -24,7 +24,7 @@ import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JToggleButton;
 
-public class InstructionsWindow extends javax.swing.JFrame {
+public class InstructionsWindow extends javax.swing.JFrame implements isDMTGable {
     //initialize variables
     private final Color PURPLE = new Color(58, 0, 82);
     private final Color LIGHTPRPL = new Color(215, 196, 255);
@@ -39,7 +39,7 @@ public class InstructionsWindow extends javax.swing.JFrame {
     private JToggleButton DMToggleButton = new JToggleButton();
     private JLabel TitleLabel = new JLabel();
     private JLabel instructions = new JLabel();
-    void toggleDarkMode(){
+    public void toggleDarkMode(){
         setDarkMode();
     }
     //constructors

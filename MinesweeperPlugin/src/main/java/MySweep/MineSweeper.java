@@ -14,14 +14,8 @@ class MineSweeper {
         Frame[] frames = Frame.getFrames();//<-- this is how you get all classes that extend Frame in a program. JFrames extend Frame
         DarkMode = !DarkMode;//<-- toggle our DarkModeVariable
         for (Frame frame : frames) {//<-- a fancy for loop. "for each frame in frames array"
-            if(frame instanceof MainGameWindow){//<-- check if it is a specific type you can cast it as the correct window
-                ((MainGameWindow)frame).toggleDarkMode();//<-- cast as correct window, and run the function from that instance of the class.
-            }else if(frame instanceof InstructionsWindow){
-                ((InstructionsWindow)frame).toggleDarkMode();
-            }else if(frame instanceof OpeningWindow){
-                ((OpeningWindow)frame).toggleDarkMode();
-            }else if(frame instanceof ScoresWindow){
-                ((ScoresWindow)frame).toggleDarkMode();
+            if(frame instanceof isDMTGable){//<-- check if it is a specific type you can cast it as the correct window
+                ((isDMTGable)frame).toggleDarkMode();//<-- cast as correct window, and run the function from that instance of the class.
             }
         }
     }

@@ -35,7 +35,7 @@ import javax.swing.JPanel;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 //This is the main game board display window. contains action listeners and displays control buttons, and a Grid instance, which is the game board.
-public class MainGameWindow extends javax.swing.JFrame {
+public class MainGameWindow extends javax.swing.JFrame implements isDMTGable {
     //--------------Initialize-----------------------------
     private final int Fieldx, Fieldy, bombCount, lives;//you may wonder why I have so many classes. This is because, well...
     private final Color PURPLE = new Color(58, 0, 82);//its java what did you expect. so you create a new minefield to store mutable game state.
@@ -89,7 +89,7 @@ public class MainGameWindow extends javax.swing.JFrame {
     private JButton HowToPlay = new JButton("Help");
     private JToggleButton toggleQuestionMarking = new JToggleButton("?'s?");
     private JButton ScoreBoard = new JButton("HiSc");
-    void toggleDarkMode(){
+    public void toggleDarkMode(){
         grid.toggleDarkMode();
         this.setDarkMode();
     }
