@@ -16,7 +16,7 @@ gradle is used for build, so just ```gradle build shadowJar```
 
 Default plugin directory when you run it assumes you are at project root but you can specify.
 
-```java -jar ExampleOut/entryPoint.jar 1 <path to plugins>```
+```java -jar ExampleOut/entryPoint.jar 1 <optional path to plugins>```
 
 ----------------------------------------------------------------------------------------------
 
