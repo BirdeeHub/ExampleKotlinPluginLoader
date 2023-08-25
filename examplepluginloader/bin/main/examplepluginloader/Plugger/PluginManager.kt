@@ -37,17 +37,13 @@ object PluginManager {
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     fun getPluginAPIobj(plugID: UUID): MyAPI? = pluginAPIobjs[plugID]
-    fun getPluginClassName(plugID: UUID): String? { 
-        val namesmatchingUUID = mutableListOf<String?>()
-        classInfoByURLs.mapNotNull { it.value.classInfoAtURL }.forEach {
-            it.forEach { 
-                if(it.optUUID==plugID) namesmatchingUUID.add(it.name)
-            }
-        }
-        if(namesmatchingUUID.isEmpty())return null
-        else if(namesmatchingUUID.size>1)return null //<-- this should never be able to happen. UUID is placed after creating instance, which would error for this
-        else return namesmatchingUUID.get(0)
-    }
+    fun getPluginClassName(plugID: UUID): String? = try{ 
+        val name = JByteCodeURLINFO.consolidateClassLists(classInfoByURLs.mapNotNull {it.value})
+            .filter { it.optUUID == plugID }
+            .mapNotNull { it.name }
+        if(name.size != 1) null
+        else name.get(0)
+    }catch(e: Exception){null}
     fun getPluginLocation(plugID: UUID): URL? = try{ 
         //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant, 
         //get(0) will throw error if UUID not found because list will be empty

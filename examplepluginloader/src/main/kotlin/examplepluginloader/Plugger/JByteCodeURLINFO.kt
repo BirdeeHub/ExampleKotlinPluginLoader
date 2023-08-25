@@ -20,6 +20,11 @@ class JByteCodeURLINFO(public val yourURL: URL){
             Type.getObjectType(internalName).getClassName()
         fun getInternalCName(obj: Class<*>): String = 
             Type.getInternalName(obj)
+        fun consolidateClassLists(infos: List<JByteCodeURLINFO>): List<URLclassInfo> { 
+            val infoList = mutableListOf<URLclassInfo>()
+            infos.forEach { if(it.classInfoAtURL!=null)infoList.addAll(it.classInfoAtURL) }
+            return infoList
+        }
     }
     fun getClassInfoByExtName(name: String): URLclassInfo? {
         val tempList = classInfoAtURL?.filter { it.name == name.replace('.','/') }

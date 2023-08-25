@@ -5,5 +5,8 @@ import examplepluginloader.Plugger.PluginManager
 import java.util.UUID
 class UnloadPlugistration(val plugID: UUID, var unldHndlr: PluginUnloadHandler?): Plugistration{
     override fun isRegistered(): Boolean = PluginManager.shudownRegistered(this)
-    override fun deregister() { PluginManager.shutdownderegister(this); unldHndlr=null }
+    override fun deregister() { 
+        PluginManager.shutdownderegister(this)
+        unldHndlr=null 
+    }
 }
