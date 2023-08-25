@@ -10,8 +10,6 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Opcodes
 object URLInfoGetter {
-    //You can fairly safely ignore how this part works. The stuff at the top is what is important.
-    //get from url:
     fun getInfo(yourURL: URL): Triple<Boolean, List<URLclassInfo>?, List<URL>?>{
         val isSupported: Boolean
         val classInfoAtURL: List<URLclassInfo>?
