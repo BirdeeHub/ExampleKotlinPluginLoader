@@ -60,6 +60,37 @@ object PluginManager {
     //public unload and load functions (Synchronized)
     private val lock = Any() // Shared lock object
     @Synchronized
+    fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
+        shutdownRegistrations.forEach {
+            if(it.plugID==plugID){ 
+                try{ it.unldHndlr?.pluginUnloaded() 
+                }catch(e: Exception){e.printStackTrace()}
+            }
+        }
+        val iterator = shutdownRegistrations.iterator()
+        while (iterator.hasNext()) {
+            val reg = iterator.next()
+            if (reg.plugID == plugID) {
+                iterator.remove()
+            }
+        }
+        pluginAPIobjs.remove(plugID)
+        pluginObjectMap.remove(plugID)
+        try{ pluginCLMap[plugID]?.close()
+        }catch (e: Exception){e.printStackTrace()}
+        pluginCLMap.remove(plugID) //these don't throw.
+        plugIDList.remove(plugID)
+        //no, this doesnt entirely work if you only GC 1 time...
+        System.gc()
+        try{
+            Thread.sleep(250)
+        }catch(e: InterruptedException){}
+        System.gc()
+        try{
+            Thread.sleep(250)
+        }catch(e: InterruptedException){}
+    }
+    @Synchronized
     fun unloadPlugins(plugIDs: List<UUID>){ //close and remove EVERYWHERE
         shutdownRegistrations.forEach {
             if(plugIDs.contains(it.plugID)){ 
@@ -90,37 +121,6 @@ object PluginManager {
         System.gc()
         try{
             Thread.sleep(750)
-        }catch(e: InterruptedException){}
-    }
-    @Synchronized
-    fun unloadPlugin(plugID: UUID){ //close and remove EVERYWHERE
-        shutdownRegistrations.forEach {
-            if(it.plugID==plugID){ 
-                try{ it.unldHndlr?.pluginUnloaded() 
-                }catch(e: Exception){e.printStackTrace()}
-            }
-        }
-        val iterator = shutdownRegistrations.iterator()
-        while (iterator.hasNext()) {
-            val reg = iterator.next()
-            if (reg.plugID == plugID) {
-                iterator.remove()
-            }
-        }
-        pluginAPIobjs.remove(plugID)
-        pluginObjectMap.remove(plugID)
-        try{ pluginCLMap[plugID]?.close()
-        }catch (e: Exception){e.printStackTrace()}
-        pluginCLMap.remove(plugID) //these don't throw.
-        plugIDList.remove(plugID)
-        //no, this doesnt entirely work if you only GC 1 time...
-        System.gc()
-        try{
-            Thread.sleep(250)
-        }catch(e: InterruptedException){}
-        System.gc()
-        try{
-            Thread.sleep(250)
         }catch(e: InterruptedException){}
     }
     @Synchronized
