@@ -84,7 +84,11 @@ object PluginManager {
         }
         System.gc()
         try{
-            Thread.sleep(1000)
+            Thread.sleep(500)
+        }catch(e: InterruptedException){}
+        System.gc()
+        try{
+            Thread.sleep(750)
         }catch(e: InterruptedException){}
     }
     @Synchronized
@@ -109,6 +113,13 @@ object PluginManager {
         pluginCLMap.remove(plugID) //these don't throw.
         plugIDList.remove(plugID)
         System.gc()
+        try{
+            Thread.sleep(250)
+        }catch(e: InterruptedException){}
+        System.gc()
+        try{
+            Thread.sleep(250)
+        }catch(e: InterruptedException){}
     }
     @Synchronized
     fun unloadAllPlugins() { //close and clear ALL everywhere
@@ -127,7 +138,11 @@ object PluginManager {
         plugIDList.clear()
         System.gc()
         try{
-            Thread.sleep(1000)
+            Thread.sleep(500)
+        }catch(e: InterruptedException){}
+        System.gc()
+        try{
+            Thread.sleep(750)
         }catch(e: InterruptedException){}
     }
     @Synchronized

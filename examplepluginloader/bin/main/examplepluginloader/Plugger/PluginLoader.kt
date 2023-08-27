@@ -15,10 +15,6 @@ class PluginLoader(val plugURL: URL, val plugID: UUID, val parentCL: ClassLoader
         this.clearAssertionStatus()
         super.close()
         pluginIsLoaded=false
-        System.gc()
-        try{
-            Thread.sleep(500)
-        }catch(e: InterruptedException){}
     }
     override protected fun findClass(name: String): Class<*> {
         if(pluginIsLoaded) return super.findClass(name)
