@@ -37,6 +37,8 @@ object PluginManager {
     fun getPlugin(plugID: UUID): MyPlugin? = pluginObjectMap[plugID]
     fun getPluginUUID(plugin: MyPlugin): UUID? = pluginObjectMap.entries.find { it.value == plugin }?.key
     fun getPluginAPIobj(plugID: UUID): MyAPI? = pluginAPIobjs[plugID]
+    fun getCNamesAtURL(plugURL: URL): List<String>? =
+        classInfoByURLs[plugURL]?.classInfoAtURL?.filter { it.optUUID!=null }?.mapNotNull { it.name }
     fun getPluginClassName(plugID: UUID): String? = try{ 
         val name = JByteCodeURLINFO.consolidateClassLists(classInfoByURLs.mapNotNull {it.value})
             .filter { it.optUUID == plugID }

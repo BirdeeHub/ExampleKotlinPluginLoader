@@ -10,9 +10,9 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Opcodes
 object URLInfoGetter {
-    fun getInfo(yourURL: URL): Triple<Boolean, List<URLclassInfo>?, List<URL>?>{
+    fun getInfo(yourURL: URL): Triple<Boolean, List<JByteCodeURLINFO.URLclassInfo>?, List<URL>?>{
         val isSupported: Boolean
-        val classInfoAtURL: List<URLclassInfo>?
+        val classInfoAtURL: List<JByteCodeURLINFO.URLclassInfo>?
         val rescInJar: List<URL>?
         val bytesOfStuff = mutableListOf<ByteArray?>()
         if(yourURL.protocol == "file")
@@ -26,10 +26,10 @@ object URLInfoGetter {
             rescInJar=null
         } else {
             isSupported = true
-            val uRLCIs = mutableListOf<URLclassInfo>()
+            val uRLCIs = mutableListOf<JByteCodeURLINFO.URLclassInfo>()
             val uRLRes = mutableListOf<URL>()
             bytesOfStuff.forEach { urlBytes -> 
-                var cinfo: List<URLclassInfo>? = null
+                var cinfo: List<JByteCodeURLINFO.URLclassInfo>? = null
                 var rinfo: List<URL>? = null
                 if(urlBytes!=null){
                     val urlInfo = CIfromBCode(yourURL,urlBytes)
@@ -64,7 +64,7 @@ object URLInfoGetter {
     } catch (e: Exception) { e.printStackTrace(); null }
 
     //call function for jar if jar or class if class
-    private fun CIfromBCode(yourURL: URL, urlBytes: ByteArray): Pair<List<URLclassInfo>?, List<URL>?> = try{
+    private fun CIfromBCode(yourURL: URL, urlBytes: ByteArray): Pair<List<JByteCodeURLINFO.URLclassInfo>?, List<URL>?> = try{
         if(yourURL.toString().endsWith(".jar"))
             CIfromfromJar(yourURL, urlBytes)
         else if(yourURL.toString().endsWith(".class")){
@@ -73,8 +73,8 @@ object URLInfoGetter {
     } catch (e: Exception) { e.printStackTrace(); Pair(null, null) }
     
     //This just calls defineClassFromBytes on jar entries
-    private fun CIfromfromJar(yourURL: URL, jarBytes: ByteArray): Pair<List<URLclassInfo>?, List<URL>?> {
-        val jarClassList = mutableListOf<URLclassInfo>()
+    private fun CIfromfromJar(yourURL: URL, jarBytes: ByteArray): Pair<List<JByteCodeURLINFO.URLclassInfo>?, List<URL>?> {
+        val jarClassList = mutableListOf<JByteCodeURLINFO.URLclassInfo>()
         val jarresourcelist = mutableListOf<URL>()
         JarInputStream(ByteArrayInputStream(jarBytes)).use { jis ->
             var entry = jis.getNextJarEntry()
@@ -97,12 +97,12 @@ object URLInfoGetter {
     }
 
     //take byte arrays of .class files, Uses "org.ow2.asm:asm:9.5" to get info
-    private fun getCINFO(yourURL: URL, classStream: InputStream): URLclassInfo {
-        var classInfo: URLclassInfo = URLclassInfo(yourURL, -1, -1, null, null, null, null, null)
+    private fun getCINFO(yourURL: URL, classStream: InputStream): JByteCodeURLINFO.URLclassInfo {
+        var classInfo: JByteCodeURLINFO.URLclassInfo = JByteCodeURLINFO.URLclassInfo(yourURL, -1, -1, null, null, null, null, null)
         val classReader = ClassReader(classStream)
         classReader.accept(object : ClassVisitor(Opcodes.ASM9) {
             override fun visit(version: Int, access: Int, name: String?, signature: String?, superName: String?, interfaces: Array<String>?) {
-                classInfo = URLclassInfo(yourURL, version, access, name, signature, superName, interfaces?.toList(), null)
+                classInfo = JByteCodeURLINFO.URLclassInfo(yourURL, version, access, name, signature, superName, interfaces?.toList(), null)
             }
         }, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
         return classInfo

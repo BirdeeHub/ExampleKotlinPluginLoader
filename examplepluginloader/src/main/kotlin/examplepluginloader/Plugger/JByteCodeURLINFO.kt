@@ -14,6 +14,18 @@ class JByteCodeURLINFO(public val yourURL: URL){
         classInfoAtURL = info.second
         rescInJar = info.third
     }
+    class URLclassInfo(
+        val urURL: URL,
+        val version: Int,
+        val access: Int,
+        val name: String?,
+        val signature: String?,
+        val xtnds: String?,
+        val imps: List<String>?,
+        var optUUID: UUID?
+    ){
+        fun isImpOf(internalName: String): Boolean = imps?.contains(internalName) ?: false
+    }
     //utility
     companion object {
         fun getExtClassName(internalName: String): String = 
@@ -32,16 +44,4 @@ class JByteCodeURLINFO(public val yourURL: URL){
         else if(tempList.size>1) throw Exception("Multiple classes found at URL with same fully qualified name")
         else return tempList[0]
     }
-}
-class URLclassInfo(
-    val urURL: URL,
-    val version: Int,
-    val access: Int,
-    val name: String?,
-    val signature: String?,
-    val xtnds: String?,
-    val imps: List<String>?,
-    var optUUID: UUID?
-){
-    fun isImpOf(internalName: String): Boolean = imps?.contains(internalName) ?: false
 }
