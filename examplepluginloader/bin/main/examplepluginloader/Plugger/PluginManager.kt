@@ -82,6 +82,7 @@ object PluginManager {
             pluginCLMap.remove(plugID) //these don't throw.
             plugIDList.remove(plugID)
         }
+        //no, this doesnt entirely work if you only GC 1 time...
         System.gc()
         try{
             Thread.sleep(500)
@@ -112,6 +113,7 @@ object PluginManager {
         }catch (e: Exception){e.printStackTrace()}
         pluginCLMap.remove(plugID) //these don't throw.
         plugIDList.remove(plugID)
+        //no, this doesnt entirely work if you only GC 1 time...
         System.gc()
         try{
             Thread.sleep(250)
@@ -136,6 +138,7 @@ object PluginManager {
         }
         pluginCLMap.clear() //these don't throw.
         plugIDList.clear()
+        //no, this doesnt entirely work if you only GC 1 time...
         System.gc()
         try{
             Thread.sleep(500)
