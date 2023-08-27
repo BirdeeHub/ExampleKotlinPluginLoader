@@ -209,6 +209,7 @@ object PluginManager {
                 val pluginNames = mutableListOf<String>()
                 try{ // Step 2: get Class info at each url with JByteCodeURLINFO
                             //WITHOUT LOADING THEM
+                    if(plugURL.protocol=="file")clearInfoCacheForURL(plugURL)
                     if(classInfoByURLs[plugURL] == null)
                         classInfoByURLs[plugURL]=JByteCodeURLINFO(plugURL)
                     //Step 3: filter out instances of our plugin and add to names list
