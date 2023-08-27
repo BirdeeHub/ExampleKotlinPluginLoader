@@ -45,7 +45,7 @@ object PluginManager {
         else name.get(0)
     }catch(e: Exception){null}
     fun getPluginLocation(plugID: UUID): URL? = try{ 
-        //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant, 
+        //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant here, 
         //get(0) will throw error if UUID not found because list will be empty
         classInfoByURLs.filter { it.value.classInfoAtURL
             ?.any { it.optUUID == plugID } ?: false 
