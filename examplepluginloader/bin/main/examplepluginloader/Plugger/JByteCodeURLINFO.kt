@@ -88,16 +88,15 @@ class JByteCodeURLINFO(public val yourURL: URL){
         }else null
     //add other protocols here if desired
     private fun getBytesFromHTTP(yourURL: URL): ByteArray? = try {
-        val urlBytes: ByteArray?
         val urlConnection = yourURL.openConnection() as HttpURLConnection
         urlConnection.requestMethod = "GET"
         if (urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = urlConnection.inputStream
-            urlBytes = inputStream.readBytes()
+            val urlBytes = inputStream.readBytes()
             inputStream.close()
             urlConnection.disconnect()
-        } else urlBytes = null
-        urlBytes
+            urlBytes
+        } else null
     } catch (e: Exception) { e.printStackTrace(); null }
     //This just calls defineClassFromBytes on jar entries
     private fun bytesFromfromJar(jarBytes: ByteArray): Pair<Map<String,ByteArray>?, Map<String,ByteArray>?> {
