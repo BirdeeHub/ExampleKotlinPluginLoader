@@ -245,7 +245,7 @@ object PluginManager {
                         updateCacheForURL(plugURL, JByteCodeURLINFO(plugURL).classInfoAtURL)
                     }
                     //Step 3: map to name and add to the list to pass to loadPluginClasses
-                    val pluginNames = classInfoByURLs[plugURL]?.mapNotNull {it.name}
+                    val pluginNames = classInfoByURLs[plugURL]?.filter { !it.isBlocked }?.mapNotNull {it.name}
                     // Step 4: create plugin instances and populate the globals at the top of file
                     if(pluginNames!=null)plugIDs.addAll(loadPluginClasses(plugURL, pluginNames, targetCNames))
                 }catch(e: Exception){e.printStackTrace()}

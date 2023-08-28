@@ -20,8 +20,13 @@ class JByteCodeURLINFO(public val yourURL: URL){
     private val classBytes: Map<String,ByteArray>
     private val urlDangerInfos = mutableListOf<CInfo>()
     abstract class CInfo {
+        var isBlocked = false
         abstract val urURL: URL
         abstract val entryName: String
+        fun sameItemAs(other: Any?)=
+            if(this == other) true
+            else if(other !is CInfo) false
+            else (other.urURL == this.urURL && other.entryName == this.entryName)
         override fun equals(other: Any?): Boolean =
             if(this == other) true
             else if(other !is CInfo) false
