@@ -16,7 +16,7 @@ class JByteCodeURLINFO(public val yourURL: URL){
     val protocolSupported: Boolean
     val classInfoAtURL: List<URLclassInfo>
     private val rescInJar: Map<String,ByteArray>
-    private val urlBytes: ByteArray?
+    val urlBytes: ByteArray?
     private val classBytes: Map<String,ByteArray>
     private val urlDangerInfos = mutableListOf<CInfo>()
     abstract class CInfo {

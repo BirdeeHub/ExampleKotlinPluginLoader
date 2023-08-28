@@ -17,8 +17,8 @@ class MyPluginImplementation2 : MyPlugin{
         val thread = Thread {
             try {
                 while(looptest){
-                    Thread.sleep(1000)
-                    print(1)
+                    Thread.sleep(2000)
+                    print(2)
                 }
                 println("thread finished!")
             } catch (e: InterruptedException) {
@@ -27,14 +27,14 @@ class MyPluginImplementation2 : MyPlugin{
         }
         api.plugin().registerShutdownSequence(object: PluginUnloadHandler{
             override fun pluginUnloaded() {
+                looptest = false
+                thread.interrupt()
                 Frame.getFrames().forEach { frame ->
                     if(frame is PluginFrame){
                         frame.removeAll()
                         frame.dispose()
                     }
                 }
-                looptest = false
-                thread.interrupt()
             }
         })
         thread.start()
