@@ -23,15 +23,14 @@ class JByteCodeURLINFO(public val yourURL: URL){
         var isBlocked = false
         abstract val urURL: URL
         abstract val entryName: String
-        fun sameItemAs(other: Any?)=
-            if(this == other) true
+        fun sameItemAs(other: Any?): Boolean =
+            if(this === other) true
             else if(other !is CInfo) false
             else (other.urURL == this.urURL && other.entryName == this.entryName)
         override fun equals(other: Any?): Boolean =
-            if(this == other) true
-            else if(other !is CInfo) false
+            if(other==null) false
             else if(other::class.java != this::class.java) false
-            else (other.urURL == this.urURL && other.entryName == this.entryName)
+            else sameItemAs(other)
     }
     class URLclassInfo(
         override val urURL: URL,
@@ -81,15 +80,12 @@ class JByteCodeURLINFO(public val yourURL: URL){
             classInfoAtURL = listOf()
         }
     }
-    private fun getBytesFromURL(yourURL: URL): ByteArray?{
-        val bytesOfStuff: ByteArray?
+    private fun getBytesFromURL(yourURL: URL): ByteArray? = 
         if(yourURL.protocol == "file"){
-            bytesOfStuff = File(yourURL.toURI()).inputStream().readAllBytes()
+            File(yourURL.toURI()).inputStream().readAllBytes()
         }else if(yourURL.protocol == "http" || yourURL.protocol == "https"){
-            bytesOfStuff = getBytesFromHTTP(yourURL)
-        }else bytesOfStuff = null
-        return bytesOfStuff
-    }
+            getBytesFromHTTP(yourURL)
+        }else null
     //add other protocols here if desired
     private fun getBytesFromHTTP(yourURL: URL): ByteArray? = try {
         val urlBytes: ByteArray?
