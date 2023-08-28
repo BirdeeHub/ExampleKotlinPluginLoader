@@ -61,7 +61,9 @@ class DangerZone(pluginLocation: URI) {
         //TODO scan the resource
         return rescInfo
     }
-
+    //pass plugin info to loader after updating isBlocked appropriately
+    fun passToPluginManager(plugURL: URL, cINFO: List<JByteCodeURLINFO.URLclassInfo>) = 
+        PluginManager.updateCacheForURL(plugURL, cINFO)
     //Usage: run on each supplied URL before passing to loader. 
     //Do checks, pass updated URLclassInfos with blocking info to PluginManager, 
     //so it knows which have been blocked and also does not need to search for names again
