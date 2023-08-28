@@ -149,7 +149,7 @@ class JByteCodeURLINFO(public val yourURL: URL){
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
 //-------------DANGER ZONE-------------DANGER ZONE--------------DANGER ZONE--------------DANGER ZONE--------DANGER ZONE--------DANGER ZONE--------DANGER ZONE----
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
-//DO DANGERCHECKING HERE
+//DANGER ZONE HELPER FUNCTIONS
 
     class ClassDangerCheckInfo(
         override val urURL: URL,
