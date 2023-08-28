@@ -19,9 +19,14 @@ class JByteCodeURLINFO(public val yourURL: URL){
     private val urlBytes: ByteArray?
     private val classBytes: Map<String,ByteArray>
     private val urlDangerInfos = mutableListOf<CInfo>()
-    private interface CInfo {
-        val urURL: URL
-        val entryName: String
+    abstract class CInfo {
+        abstract val urURL: URL
+        abstract val entryName: String
+        override fun equals(other: Any?): Boolean =
+            if(this == other) true
+            else if(other !is CInfo) false
+            else if(other::class.java != this::class.java) false
+            else (other.urURL == this.urURL && other.entryName == this.entryName)
     }
     class URLclassInfo(
         override val urURL: URL,
@@ -33,16 +38,15 @@ class JByteCodeURLINFO(public val yourURL: URL){
         val xtnds: String?,
         val imps: List<String>?,
         var optUUID: UUID?
-    ): CInfo{
-        fun isImpOf(internalName: String): Boolean = imps?.contains(internalName) ?: false
+    ): CInfo() { 
+        fun isImpOf(obj: Class<*>): Boolean = imps?.contains(Type.getInternalName(obj)) ?: false 
     }
     companion object {
-        fun getExtClassName(internalName: String): String = 
+        fun getExternalName(internalName: String): String = 
             Type.getObjectType(internalName).getClassName()
-        fun getInternalCName(obj: Class<*>): String = 
-            Type.getInternalName(obj)
+        fun getExternalName(obj: Class<*>): String = 
+            Type.getType(obj).getClassName()
     }
-
     init{ 
         urlBytes = getBytesFromURL(yourURL)
         if(urlBytes!=null){
@@ -54,13 +58,11 @@ class JByteCodeURLINFO(public val yourURL: URL){
                 val urlCInfos = mutableListOf<URLclassInfo>()
                 classBytes.forEach{urlCInfos.addAll(getCINFO(yourURL, it.key, it.value))}
                 classInfoAtURL = urlCInfos
-
             }else if(yourURL.toString().endsWith(".class")){
                 protocolSupported = true
                 classBytes = mapOf(Pair(yourURL.file, urlBytes))
                 rescInJar = mapOf()
                 classInfoAtURL = getCINFO(yourURL, yourURL.file, urlBytes)
-                
             } else {
                 protocolSupported = false
                 classBytes = mapOf()
@@ -126,7 +128,19 @@ class JByteCodeURLINFO(public val yourURL: URL){
         val classReader = ClassReader(classBytes)
         classReader.accept(object : ClassVisitor(Opcodes.ASM9) {
             override fun visit(version: Int, access: Int, name: String?, signature: String?, superName: String?, interfaces: Array<String>?) {
-                classInfo.add(URLclassInfo(yourURL, entryName, version, access, name, signature, superName, interfaces?.toList(), null))
+                classInfo.add(
+                    URLclassInfo(
+                        yourURL, 
+                        entryName, 
+                        version, 
+                        access, 
+                        name, 
+                        signature, 
+                        superName, 
+                        interfaces?.toList(), 
+                        null
+                    )
+                )
             }
         }, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
         return classInfo
@@ -137,23 +151,19 @@ class JByteCodeURLINFO(public val yourURL: URL){
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
 //DO DANGERCHECKING HERE
 
-    private class ClassDangerCheckInfo(
+    class ClassDangerCheckInfo(
         override val urURL: URL,
         override val entryName: String,
+        val classBytes: ByteArray,
         //TODO: Add all of the fields from ClassVisitors useful for finding danger
-    ): CInfo {}
-    private class RescDangerCheckInfo(
+    ): CInfo() {}
+    class RescDangerCheckInfo(
         override val urURL: URL,
         override val entryName: String,
-    ): CInfo {}
-    fun dangerCheck(): String{
-        val reconData = dangerScan()
-        //TODO, check the class and danger infos for danger
-        //TODO, process the results of that check, and scan info from getRescDangerInfo
-            //and turn them into nice report
-        return "dangerCheck() not yet implemented"
-    }
-    private fun dangerScan(): List<CInfo>{
+        val rescBytes: ByteArray,
+        //TODO: add output of Resource Scan
+    ): CInfo() {}
+    fun dangerScan(): List<CInfo>{
         classBytes.forEach { (k,v) -> urlDangerInfos.addAll(getClassDangerInfo(yourURL, k, v)) }
         rescInJar.forEach { (k,v) -> urlDangerInfos.addAll(getRescDangerInfo(yourURL, k, v)) }
         val totalCInfos = mutableListOf<CInfo>()

@@ -16,8 +16,8 @@ fun main(args: Array<String>) {
     val programLocation = File(File(
         FindLocationOfTheThing::class.java.protectionDomain.codeSource.location.toURI())
         .getParent()).toPath().resolve("MyProgram").resolve("examplepluginloader.jar").toUri().toURL()
-    val sysloader = URLClassLoader(arrayOf(apiPath), ClassLoader.getSystemClassLoader())
-    val programloader = URLClassLoader(arrayOf(programLocation), sysloader)
+    val sysloader = URLClassLoader("MySysLoader", arrayOf(apiPath), ClassLoader.getSystemClassLoader())
+    val programloader = URLClassLoader("MyProgramLoader", arrayOf(programLocation), sysloader)
     programloader.loadClass("examplepluginloader.program.MyProgram").getConstructor(List::class.java, Int::class.java).newInstance(mutArgs.toList(), mode)
 }
 private class FindLocationOfTheThing() {}

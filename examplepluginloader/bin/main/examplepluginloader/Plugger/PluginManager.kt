@@ -39,13 +39,13 @@ object PluginManager {
     fun getPluginAPIobj(plugID: UUID): MyAPI? = pluginAPIobjs[plugID]
     fun getPluginCNamesAtURL(plugURL: URL): List<String>? =
         classInfoByURLs[plugURL]?.filter { it.optUUID!=null }
-            ?.mapNotNull { it.name }?.map { JByteCodeURLINFO.getExtClassName(it) }
+            ?.mapNotNull { it.name }?.map { JByteCodeURLINFO.getExternalName(it) }
     fun getPluginClassName(plugID: UUID): String? { 
         val name = mutableListOf<String>()
         classInfoByURLs.forEach {
             name.addAll(it.value.filter { it.optUUID == plugID }.mapNotNull {it.name})
         }
-        return if(name.size != 1) null else JByteCodeURLINFO.getExtClassName(name.get(0))
+        return if(name.size != 1) null else JByteCodeURLINFO.getExternalName(name.get(0))
     }
     fun getPluginLocation(plugID: UUID): URL? = try{ 
         //only ever 1 url per uuid. 2 uuids for 1 url is possible but not relevant here, 
@@ -59,13 +59,11 @@ object PluginManager {
     private val lock = Any() // Shared lock object
 
     //If you wish to dangerCheck URL, get JByteCodeURLINFO and run the danger check
-    //then put class info into here so you dont have to download it again
+    //then put class info into here so you dont have to download it again. 
+    //Synchronized so you cant overwrite the info cache while load is running
     @Synchronized
-    fun addInfoCacheForURL(pluginClassInfo: List<JByteCodeURLINFO.URLclassInfo>){
-        val info = pluginClassInfo.filter{ 
-            it.isImpOf(JByteCodeURLINFO.getInternalCName(MyPlugin::class.java)) 
-        }
-        if(!info.isEmpty()) classInfoByURLs[info.get(0).urURL] = info
+    fun updateCacheForURL(plugURL: URL, pluginClassInfo: List<JByteCodeURLINFO.URLclassInfo>){
+        classInfoByURLs[plugURL] = pluginClassInfo.filter{ it.isImpOf(MyPlugin::class.java) }
     }
     @Synchronized
     fun clearInfoCacheForURL(pluginURL: URL) = classInfoByURLs.remove(pluginURL)
@@ -240,13 +238,11 @@ object PluginManager {
         val plugIDs = mutableListOf<UUID>()
         try{ // Step 1: getJarURLs(pluginPath: URI): List<URL>
             getJarURLs(pluginURI).forEach { plugURL ->
-                try{ // Step 2: get Plugin info at each url with JByteCodeURLINFO
-                    //eventually, we can optionally pre-populate JByteCodeURLINFO.classInfoAtURL 
-                    //with a separate function so we can optionally virus scan before we load
-                    if(classInfoByURLs[plugURL] == null){
-                        classInfoByURLs[plugURL]=JByteCodeURLINFO(plugURL).classInfoAtURL.filter{ 
-                            it.isImpOf(JByteCodeURLINFO.getInternalCName(MyPlugin::class.java)) 
-                        }
+                try{ // Step 2: get Plugin info at each url with JByteCodeURLINFO without resetting cache.
+                    //We can optionally pre-populate JByteCodeURLINFO.classInfoAtURL 
+                    //with a separate function so we can virus scan before we load
+                    if(classInfoByURLs[plugURL]==null){
+                        updateCacheForURL(plugURL, JByteCodeURLINFO(plugURL).classInfoAtURL)
                     }
                     //Step 3: map to name and add to the list to pass to loadPluginClasses
                     val pluginNames = classInfoByURLs[plugURL]?.mapNotNull {it.name}
@@ -259,7 +255,7 @@ object PluginManager {
     }
 
     //gets URLS of bytecode files in directories, or URI as URL
-    private fun getJarURLs(pluginPathURI: URI): List<URL> {
+    fun getJarURLs(pluginPathURI: URI): List<URL> {
         try{
             val pluginPath: URL
             pluginPath = pluginPathURI.toURL()
@@ -296,13 +292,13 @@ object PluginManager {
     }
     private fun loadPluginClass(plugURL: URL, pluginName: String, targetCNames: List<String> = listOf()): UUID? {
         //first, check our targets list
-        if(targetCNames.isEmpty()||(targetCNames.any { target -> (JByteCodeURLINFO.getExtClassName(pluginName) == target) })){
+        if(targetCNames.isEmpty()||(targetCNames.any { JByteCodeURLINFO.getExternalName(pluginName) == it })){
             //then get instance, UUID, then update global list/maps. Return new UUID so user knows which were 
             var loader: PluginLoader? = null
             try{
                 val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
                 loader = PluginLoader(plugURL, pluginUUID, PluginManager::class.java.classLoader.parent) //PluginManager is running under MyProgramLoader. Get parent, which is MySystemLoader
-                val pluginInstance = loader.loadClass(JByteCodeURLINFO.getExtClassName(pluginName)).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in jar
+                val pluginInstance = loader.loadClass(JByteCodeURLINFO.getExternalName(pluginName)).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in jar
                 classInfoByURLs[plugURL]?.find { it.name==pluginName }?.optUUID = pluginUUID
                 pluginAPIobjs[pluginUUID] = MyAPIobj(pluginUUID) //<-- create a new api obj for each one so that we can manage them individually
                 pluginObjectMap[pluginUUID] = pluginInstance
