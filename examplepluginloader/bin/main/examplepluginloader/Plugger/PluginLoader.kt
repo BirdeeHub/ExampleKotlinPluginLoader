@@ -5,6 +5,9 @@ import java.net.URL
 import java.io.InputStream
 import java.util.UUID
 import java.util.Enumeration
+//import java.awt.Toolkit
+//import java.awt.EventQueue
+//import java.awt.event.InvocationEvent
 class PluginLoader(val plugURL: URL, val plugID: UUID, val parentCL: ClassLoader): URLClassLoader(arrayOf(plugURL), parentCL){
     init{this.setDefaultAssertionStatus(false)}
     //this loader actually loads the stuff for the plugin, and can cut it off.
@@ -12,6 +15,9 @@ class PluginLoader(val plugURL: URL, val plugID: UUID, val parentCL: ClassLoader
     fun getUUID()=plugID
     fun addPluginURLs(pluginURLs: List<URL>) = pluginURLs.forEach { plugURL -> this.addURL(plugURL) }
     override fun close(){
+        //I was trying to get the event queue and remove all events launched by classes loaded by this classloader on close?
+        //but I do not know how to do that
+        //val eventQueue = Toolkit.getDefaultToolkit().getSystemEventQueue()
         this.clearAssertionStatus()
         super.close()
         pluginIsLoaded=false

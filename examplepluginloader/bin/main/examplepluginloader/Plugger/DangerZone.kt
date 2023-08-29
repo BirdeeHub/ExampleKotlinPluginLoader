@@ -42,14 +42,28 @@ class DangerZone(pluginLocation: URI) {
         bcINFO.classBytes.forEach { (k,v) -> totalCInfos.addAll(getClassDangerInfo(bcINFO.yourURL, k, v)) }
         return totalCInfos
     }
-    private fun getClassDangerInfo(yourURL: URL, entryName: String, classBytes: ByteArray): List<ClassDangerCheckInfo> {
-        val classInfo = mutableListOf<ClassDangerCheckInfo>()
-        val classReader = ClassReader(classBytes)
-        classReader.accept(object : ClassVisitor(Opcodes.ASM9) {
-            //TODO: visit all the other things and add the object(s) to the list so we can dangerCheck() later!
-            //Add them all to 1 object for ease of use later
-        }, ClassReader.EXPAND_FRAMES)
-        return classInfo
+    companion object{
+        fun getClassDangerInfo(yourURL: URL, entryName: String, classBytes: ByteArray): List<ClassDangerCheckInfo> {
+            val classInfo = mutableListOf<ClassDangerCheckInfo>()
+            /*val classReader = ClassReader(classBytes)
+            classReader.accept(object : ClassVisitor(Opcodes.ASM9) {
+                override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<String>?): MethodVisitor? {
+                    print("${access}, ${name}, ${descriptor}, ${signature}" )
+                    exceptions?.forEach { print(it) }
+                    println()
+                    return null
+                }
+                override fun visitSource(source: String?, debug: String?){
+                    println("$source :: $debug")
+                }
+                override fun visitPermittedSubclass(permittedSubclass: String?){
+                    println("PSubC: $permittedSubclass")
+                }
+                //TODO: visit all the other things and add the object(s) to the list so we can dangerCheck() later!
+                //Add them all to 1 object for ease of use later
+            }, ClassReader.EXPAND_FRAMES)*/
+            return classInfo
+        }
     }
     fun rescDangerScan(bcINFO: JByteCodeURLINFO): List<CInfo> {
         val totalCInfos = mutableListOf<CInfo>()
