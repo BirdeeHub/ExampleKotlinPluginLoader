@@ -12,7 +12,7 @@ class MyPluginImplementation2 : MyPlugin{
         //normally you call your plugin's opening class from here and pass it the api instance.
         //but this is a test so we just show that making calls to api works.
         println(api.plugin().pluginLocation().toString())
-        PluginFrame().setVisible(true)
+        EventQueue.invokeLater { PluginFrame().setVisible(true) }
         var looptest: Boolean = true
         val thread = Thread {
             try {

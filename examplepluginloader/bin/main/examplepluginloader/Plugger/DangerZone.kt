@@ -1,5 +1,6 @@
 package examplepluginloader.Plugger
 
+import examplepluginloader.Plugger.JByteCodeURLINFO.URLclassInfo
 import java.net.URI
 import java.net.URL
 import org.objectweb.asm.ClassReader
@@ -62,7 +63,7 @@ class DangerZone(pluginLocation: URI) {
         return rescInfo
     }
     //pass plugin info to loader after updating isBlocked appropriately
-    fun passToPluginManager(plugURL: URL, cINFO: List<JByteCodeURLINFO.URLclassInfo>) = 
+    fun passToPluginManager(plugURL: URL, cINFO: List<URLclassInfo>) = 
         PluginManager.updateCacheForURL(plugURL, cINFO)
     //Usage: run on each supplied URL before passing to loader. 
     //Do checks, pass updated URLclassInfos with blocking info to PluginManager, 

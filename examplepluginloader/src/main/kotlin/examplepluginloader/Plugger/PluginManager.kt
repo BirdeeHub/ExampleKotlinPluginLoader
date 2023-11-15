@@ -4,6 +4,7 @@ import examplepluginloader.api.MyPlugin //<-- this is MyPlugin interface. To mak
 import examplepluginloader.api.MyAPI //<-- this gets passed to the plugin via the myPluginInstance.launchPlugin(api: MyAPI) function that you must implement
 import examplepluginloader.api.plugin.PluginUnloadHandler
 import examplepluginloader.Plugger.JByteCodeURLINFO
+import examplepluginloader.Plugger.JByteCodeURLINFO.URLclassInfo
 import examplepluginloader.apimps.UnloadPlugistration
 import examplepluginloader.apimps.MyAPIobj
 import java.io.InputStream
@@ -20,7 +21,7 @@ object PluginManager {
     private val plugIDList = mutableListOf<UUID>() //<-- initialize our lists of stuff for loading and closing
     private val pluginObjectMap = mutableMapOf<UUID,MyPlugin>() //<-- this one has the loaded instances
     private val pluginCLMap: WeakHashMap<UUID,PluginLoader> = WeakHashMap<UUID,PluginLoader>() //<-- we will close these to unload plugins
-    private val classInfoByURLs = mutableMapOf<URL,List<JByteCodeURLINFO.URLclassInfo>>() //<-- I made a reflections with ASM that works over web, which shouldnt hold any references
+    private val classInfoByURLs = mutableMapOf<URL,List<URLclassInfo>>() //<-- I made a reflections with ASM that works over web, which shouldnt hold any references
     private val pluginAPIobjs = mutableMapOf<UUID,MyAPI>() //<-- these have the references of each api object i pass to a plugin
     private val shutdownRegistrations = mutableListOf<UnloadPlugistration>() //<-- These have a reference to a plugin defined shutdown handler
 
@@ -62,7 +63,7 @@ object PluginManager {
     //then put class info into here so you dont have to download it again. 
     //Synchronized so you cant overwrite the info cache while load is running
     @Synchronized
-    fun updateCacheForURL(plugURL: URL, pluginClassInfo: List<JByteCodeURLINFO.URLclassInfo>){
+    fun updateCacheForURL(plugURL: URL, pluginClassInfo: List<URLclassInfo>){
         classInfoByURLs[plugURL] = pluginClassInfo.filter{ it.isImpOf(MyPlugin::class.java) }
     }
     @Synchronized
@@ -296,9 +297,11 @@ object PluginManager {
             //then get instance, UUID, then update global list/maps. Return new UUID so user knows which were 
             var loader: PluginLoader? = null
             try{
-                val pluginUUID = UUID.randomUUID() //<-- Use a UUID to keep track of them.
-                loader = PluginLoader(plugURL, pluginUUID, PluginManager::class.java.classLoader.parent) //PluginManager is running under MyProgramLoader. Get parent, which is MySystemLoader
-                val pluginInstance = loader.loadClass(JByteCodeURLINFO.getExternalName(pluginName)).getConstructor().newInstance() as MyPlugin //<-- this will throw if theres a name collision in jar
+                val pluginUUID = UUID.randomUUID() //Use a UUID to keep track of them.
+                //PluginManager is running under MyProgramLoader. Get parent, which is MySystemLoader
+                loader = PluginLoader(plugURL, pluginUUID, PluginManager::class.java.classLoader.parent)
+                 //this will throw if theres a name collision in jar
+                val pluginInstance = loader.loadClass(JByteCodeURLINFO.getExternalName(pluginName)).getConstructor().newInstance() as MyPlugin
                 classInfoByURLs[plugURL]?.find { it.name==pluginName }?.optUUID = pluginUUID
                 pluginAPIobjs[pluginUUID] = MyAPIobj(pluginUUID) //<-- create a new api obj for each one so that we can manage them individually
                 pluginObjectMap[pluginUUID] = pluginInstance
