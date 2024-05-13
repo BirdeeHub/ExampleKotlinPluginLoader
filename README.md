@@ -43,16 +43,6 @@ But I thought I figured out everything that wasn't swing twice, and I still impr
 
 So I either need confirmation that the only remaining issue with unload is swing/EDT, or a suggestion as to how to remove this stupid assertion lock that I did not ask for.
 
--------------------------------------------------------------------------------------
-
-There are only 2 files over about 60 lines. And for one of those, you shouldnt need to look at more than the top 45 lines
-
-Most of them are closer to 10 lines
-
-(other than the java minesweeper game in example plugins, which isnt relevant. The bug happens with or without it.) 
-
-Outline is as follows:
-
 ------
 
 Main is in entryPoint:
@@ -100,19 +90,3 @@ But I want a working base....
 And scrapping it all and using OSGi (which I just heard of) sounds so... 
 
 I really really wanted to learn how to do this....
-
---------------------------------------------------------------------------------------------------
-
-**For Java Coders**
-
-The return types are after the function, the ? mean "can be null", 
-
-vals cant be reassigned, vars can, class ClassName(): URLClassLoader() {} means ClassName extends URLClassLoader
-
-and PluginManager.kt is a static class (marked with object keyword at start)
-
-Other than that, it is all java, and java classes and JVM
-
-There is 3 usages of .filter {} and .map {} that might be a bit confusing but those work fine.
-
-it can also load from local or over the internet. so thats kinda cool.
