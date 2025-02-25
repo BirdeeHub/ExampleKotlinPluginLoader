@@ -35,9 +35,11 @@ The only api functions of note are a shutdown hook, and the interface to impleme
 The hook from the user is passed to PluginManager in a "plugistration" implementation
 
 ```java
+// registering a plugin
+package examplepluginloader.api.plugin;
 public class PluginLoading implements MyPlugin {
     public void launchPlugin(MyAPI api){
-        // do plugin stuff
+        // do plugin stuff with the api
         api.plugin().registerShutdownSequence(new PluginUnloadHandler(){
             public void pluginUnloaded(){
                 // cleanup code if needed
@@ -47,7 +49,29 @@ public class PluginLoading implements MyPlugin {
 }
 ```
 
+- most of the api used above
+
 ```kotlin
+package examplepluginloader.api
+import examplepluginloader.api.plugin.ManagePlugins
+public interface MyAPI {
+    //this would normally have a lot more things in it.
+    // the api you want to expose to plugins will go here
+    // but right now it only has plugin lifecycle stuff
+    fun plugin(): ManagePlugins
+}
+```
+
+```kotlin
+package examplepluginloader.api
+import examplepluginloader.api.MyAPI
+public interface MyPlugin {
+    fun launchPlugin(api: MyAPI)
+}
+```
+
+```kotlin
+package examplepluginloader.api.plugin;
 public interface ManagePlugins{
     fun pluginLocation(): URL?
     fun unloadPlugin()
